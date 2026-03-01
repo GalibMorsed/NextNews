@@ -69,7 +69,7 @@ export default function AddNoteButton({
     if (!publishedAt) return "Date Not Available";
     const parsed = new Date(publishedAt);
     if (Number.isNaN(parsed.getTime())) return "Date Not Available";
-    return parsed.toLocaleString();
+    return parsed.toLocaleString("en-US");
   }, [publishedAt]);
 
   const handleSave = async () => {
@@ -203,7 +203,9 @@ export default function AddNoteButton({
                         </span>
                       </p>
                       <p>
-                        <span className="font-medium text-slate-500 dark:text-slate-400">Date:</span>
+                        <span className="font-medium text-slate-500 dark:text-slate-400">
+                          Date:
+                        </span>
                         <span className="mt-1 block text-slate-900 dark:text-slate-100">
                           {formattedDate}
                         </span>
@@ -217,7 +219,9 @@ export default function AddNoteButton({
                         </span>
                       </p>
                       <p className="sm:col-span-2">
-                        <span className="font-medium text-slate-500 dark:text-slate-400">Link:</span>
+                        <span className="font-medium text-slate-500 dark:text-slate-400">
+                          Link:
+                        </span>
                         <span className="block mt-1">
                           <a
                             href={link}
@@ -284,7 +288,10 @@ export default function AddNoteButton({
               ) : (
                 <div className="flex flex-col items-center justify-center py-6 text-center">
                   <div className="mb-4 rounded-full bg-blue-50 p-4 dark:bg-blue-950/40">
-                    <Notebook size={32} className="text-blue-600 dark:text-blue-300" />
+                    <Notebook
+                      size={32}
+                      className="text-blue-600 dark:text-blue-300"
+                    />
                   </div>
                   <p className="mb-6 max-w-xs text-sm text-slate-600 dark:text-slate-300">
                     This functionality is only for registered members. Please

@@ -6,6 +6,13 @@ export async function GET(req: Request) {
   const date = searchParams.get("date");
   const category = searchParams.get("category");
   const country = searchParams.get("country") || "us";
+  const rawPage = Number(searchParams.get("page") || "1");
+  const rawPageSize = Number(searchParams.get("pageSize") || "20");
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+  const pageSize =
+    Number.isFinite(rawPageSize) && rawPageSize > 0
+      ? Math.min(rawPageSize, 100)
+      : 20;
 
   const baseUrl = process.env.NEWS_API_BASE_URL || "https://newsapi.org/v2";
   const apiKey = process.env.NEWS_API_KEY2 || process.env.NEWS_API_KEY;
@@ -17,14 +24,14 @@ export async function GET(req: Request) {
     );
   }
 
-  let url = `${baseUrl}/top-headlines?country=${encodeURIComponent(country)}&apiKey=${apiKey}`;
+  let url = `${baseUrl}/top-headlines?country=${encodeURIComponent(country)}&page=${page}&pageSize=${pageSize}&apiKey=${apiKey}`;
 
   if (category) {
     url += `&category=${encodeURIComponent(category)}`;
   }
 
   if (query) {
-    url = `${baseUrl}/everything?q=${encodeURIComponent(query)}&apiKey=${apiKey}`;
+    url = `${baseUrl}/everything?q=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}&apiKey=${apiKey}`;
     if (date) {
       url += `&from=${encodeURIComponent(date)}&sortBy=publishedAt`;
     }

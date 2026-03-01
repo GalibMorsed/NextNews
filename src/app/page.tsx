@@ -1,5 +1,5 @@
-import ArticleCard from "./components/artticalCart";
 import RegisterReminder from "./components/registerReminder";
+import NewsFeedWithLoadMore from "./components/newsFeedWithLoadMore";
 
 // 1. Define types matching your API response
 interface Article {
@@ -31,7 +31,7 @@ async function getNews(): Promise<Article[]> {
 
   try {
     const res = await fetch(
-      `https://newsapi.org/v2/top-headlines?country=us&pageSize=100&apiKey=${apiKey}`,
+      `https://newsapi.org/v2/top-headlines?country=us&page=1&pageSize=20&apiKey=${apiKey}`,
       {
         // Revalidate every hour (3600 seconds)
         next: { revalidate: 3600 },
@@ -82,25 +82,12 @@ export default async function Home() {
           </p>
         </header>
 
-        <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
-          {articles.map((article, index) => {
-            const formattedDate = article.publishedAt
-              ? new Date(article.publishedAt).toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })
-              : "Date Not Available";
-
-            return (
-              <ArticleCard
-                key={article.url + index}
-                article={article}
-                formattedDate={formattedDate}
-              />
-            );
-          })}
-        </div>
+        <NewsFeedWithLoadMore
+          initialArticles={articles}
+          country="us"
+          pageSize={20}
+          emptyMessage="No news available at the moment. Please check back later."
+        />
       </div>
     </main>
   );
