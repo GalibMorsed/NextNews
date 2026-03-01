@@ -1,4 +1,4 @@
-import ArticleCard from "../components/artticalCart";
+import NewsFeedWithLoadMore from "../components/newsFeedWithLoadMore";
 
 interface Article {
   source: { id: string | null; name: string };
@@ -28,7 +28,7 @@ async function getSearchNews(query: string): Promise<Article[]> {
 
   try {
     const res = await fetch(
-      `${baseUrl}/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&pageSize=50&apiKey=${apiKey}`,
+      `${baseUrl}/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&page=1&pageSize=20&apiKey=${apiKey}`,
       { next: { revalidate: 300 } },
     );
 
@@ -76,33 +76,22 @@ export default async function SearchPage({
             Search Results
           </h1>
           <p className="text-lg text-gray-600">
-            Showing results for <span className="font-semibold text-gray-800">"{query}"</span>
+            Showing results for{" "}
+            <span className="font-semibold text-gray-800">&quot;{query}&quot;</span>
           </p>
         </header>
 
         {articles.length > 0 ? (
-          <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
-            {articles.map((article, index) => {
-              const formattedDate = article.publishedAt
-                ? new Date(article.publishedAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })
-                : "Date Not Available";
-
-              return (
-                <ArticleCard
-                  key={article.url + index}
-                  article={article}
-                  formattedDate={formattedDate}
-                />
-              );
-            })}
-          </div>
+          <NewsFeedWithLoadMore
+            key={query}
+            initialArticles={articles}
+            query={query}
+            pageSize={20}
+            emptyMessage={`No articles found for "${query}".`}
+          />
         ) : (
           <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-gray-600">
-            No articles found for "{query}".
+            No articles found for &quot;{query}&quot;.
           </div>
         )}
       </div>

@@ -37,23 +37,23 @@ const FONT_FAMILY_OPTIONS = [
 ];
 
 export default function AppearancePage() {
-  const [initialSettings] = useState(() => readAppearanceSettings());
-  const [theme, setTheme] = useState(() => initialSettings.theme);
+  const [theme, setTheme] = useState(DEFAULT_APPEARANCE_SETTINGS.theme);
   const [primaryColor, setPrimaryColor] = useState(
-    () => initialSettings.primaryColor,
+    DEFAULT_APPEARANCE_SETTINGS.primaryColor,
   );
-  const [fontSize, setFontSize] = useState(() => initialSettings.fontSize);
+  const [fontSize, setFontSize] = useState(DEFAULT_APPEARANCE_SETTINGS.fontSize);
   const [fontFamily, setFontFamily] = useState(
-    () => initialSettings.fontFamily,
+    DEFAULT_APPEARANCE_SETTINGS.fontFamily,
   );
   const [reducedMotion, setReducedMotion] = useState(
-    () => initialSettings.reducedMotion,
+    DEFAULT_APPEARANCE_SETTINGS.reducedMotion,
   );
   const [highContrast, setHighContrast] = useState(
-    () => initialSettings.highContrast,
+    DEFAULT_APPEARANCE_SETTINGS.highContrast,
   );
   const [popupMessage, setPopupMessage] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [hasLoadedStoredSettings, setHasLoadedStoredSettings] = useState(false);
 
   const currentSettings = useMemo<AppearanceSettings>(
     () => ({
@@ -69,9 +69,26 @@ export default function AppearancePage() {
 
   // Apply changes live
   useEffect(() => {
+    if (!hasLoadedStoredSettings) return;
     applyAppearanceSettings(currentSettings);
     broadcastAppearanceSettings(currentSettings);
-  }, [currentSettings]);
+  }, [currentSettings, hasLoadedStoredSettings]);
+
+  // Load saved settings after mount to avoid hydration mismatch.
+  useEffect(() => {
+    const stored = readAppearanceSettings();
+    const frame = window.requestAnimationFrame(() => {
+      setTheme(stored.theme);
+      setPrimaryColor(stored.primaryColor);
+      setFontSize(stored.fontSize);
+      setFontFamily(stored.fontFamily);
+      setReducedMotion(stored.reducedMotion);
+      setHighContrast(stored.highContrast);
+      setHasLoadedStoredSettings(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   // Check for mobile view
   useEffect(() => {
@@ -92,18 +109,25 @@ export default function AppearancePage() {
   }, [popupMessage]);
 
   const saveSettings = () => {
+    if (!hasLoadedStoredSettings) return;
     saveAppearanceSettings(currentSettings);
     broadcastAppearanceSettings(currentSettings);
     setPopupMessage("Appearance saved successfully!");
   };
 
   const resetDefaults = () => {
-    setTheme(DEFAULT_APPEARANCE_SETTINGS.theme);
-    setPrimaryColor(DEFAULT_APPEARANCE_SETTINGS.primaryColor);
-    setFontSize(DEFAULT_APPEARANCE_SETTINGS.fontSize);
-    setFontFamily(DEFAULT_APPEARANCE_SETTINGS.fontFamily);
-    setReducedMotion(DEFAULT_APPEARANCE_SETTINGS.reducedMotion);
-    setHighContrast(DEFAULT_APPEARANCE_SETTINGS.highContrast);
+    const defaults = DEFAULT_APPEARANCE_SETTINGS;
+    setTheme(defaults.theme);
+    setPrimaryColor(defaults.primaryColor);
+    setFontSize(defaults.fontSize);
+    setFontFamily(defaults.fontFamily);
+    setReducedMotion(defaults.reducedMotion);
+    setHighContrast(defaults.highContrast);
+    if (hasLoadedStoredSettings) {
+      saveAppearanceSettings(defaults);
+      applyAppearanceSettings(defaults);
+      broadcastAppearanceSettings(defaults);
+    }
     setPopupMessage("Settings have been reset to defaults.");
   };
 

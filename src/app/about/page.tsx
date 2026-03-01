@@ -298,7 +298,7 @@ export default function AboutPage() {
             variants={itemVariant}
             className="text-lg leading-relaxed text-slate-300 mb-6 max-w-3xl mx-auto"
           >
-            I’m Galib Morsed, a passionate full-stack developer focused on
+            I’m Galib Morsed, a passionate Software developer focused on
             building modern, scalable, and user-centric web applications.
             NextNews reflects my approach to clean architecture and thoughtful
             UI design.

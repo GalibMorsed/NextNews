@@ -2,6 +2,7 @@
 
 import { ArrowUpRight } from "lucide-react";
 import AddNoteButton from "./addNoteButton";
+import AISummaryButton from "./aiSummaryButton";
 import { getNewsImageSrc } from "@/lib/newsImage";
 
 interface Article {
@@ -55,12 +56,12 @@ export default function ArticleCard({
           {article.description || "Click to read the full story."}
         </p>
         <div className="mt-auto pt-4 border-t border-gray-50">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <a
               href={article.url || "#"}
               target={article.url ? "_blank" : "_self"}
               rel={article.url ? "noopener noreferrer" : ""}
-              className={`inline-flex items-center text-sm font-semibold transition-colors ${
+              className={`inline-flex items-center text-sm font-semibold transition-colors sm:flex-shrink-0 ${
                 article.url
                   ? "text-blue-600 hover:text-blue-700 cursor-pointer"
                   : "text-gray-400 cursor-not-allowed"
@@ -70,12 +71,20 @@ export default function ArticleCard({
               <ArrowUpRight className="w-4 h-4 ml-1" />
             </a>
 
-            <AddNoteButton
-              title={article.title}
-              link={article.url}
-              publishedAt={article.publishedAt}
-              sourceName={article.source?.name}
-            />
+            <div className="flex flex-nowrap items-center gap-2 sm:ml-auto">
+              <AISummaryButton
+                title={article.title}
+                description={article.description}
+                content={article.content}
+                sourceName={article.source?.name}
+              />
+              <AddNoteButton
+                title={article.title}
+                link={article.url}
+                publishedAt={article.publishedAt}
+                sourceName={article.source?.name}
+              />
+            </div>
           </div>
         </div>
       </div>

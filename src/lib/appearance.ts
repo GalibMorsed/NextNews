@@ -21,15 +21,25 @@ export const DEFAULT_APPEARANCE_SETTINGS: AppearanceSettings = {
 export const APPEARANCE_EVENT = "appearance-settings-changed";
 
 export function getAppearanceStorageKey(): string {
-  const userId =
-    typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-  return userId ? `appearanceSettings_${userId}` : "appearanceSettings_guest";
+  if (typeof window === "undefined") return "appearanceSettings_guest";
+
+  try {
+    const userId = localStorage.getItem("auth_token");
+    return userId ? `appearanceSettings_${userId}` : "appearanceSettings_guest";
+  } catch {
+    return "appearanceSettings_guest";
+  }
 }
 
 export function readAppearanceSettings(): AppearanceSettings {
   if (typeof window === "undefined") return DEFAULT_APPEARANCE_SETTINGS;
 
-  const raw = localStorage.getItem(getAppearanceStorageKey());
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(getAppearanceStorageKey());
+  } catch {
+    return DEFAULT_APPEARANCE_SETTINGS;
+  }
   if (!raw) return DEFAULT_APPEARANCE_SETTINGS;
 
   try {
@@ -61,7 +71,12 @@ export function applyAppearanceSettings(settings: AppearanceSettings): void {
 
 export function saveAppearanceSettings(settings: AppearanceSettings): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(getAppearanceStorageKey(), JSON.stringify(settings));
+
+  try {
+    localStorage.setItem(getAppearanceStorageKey(), JSON.stringify(settings));
+  } catch {
+    // Ignore localStorage write errors (e.g., private mode or storage limits).
+  }
 }
 
 export function broadcastAppearanceSettings(settings: AppearanceSettings): void {
