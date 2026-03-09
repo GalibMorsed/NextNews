@@ -1,4 +1,4 @@
-import NewsFeedWithLoadMore from "@/app/components/newsFeedWithLoadMore";
+import CategoryContent from "./CategoryContent";
 
 interface Article {
   source?: { id?: string | null; name?: string };
@@ -42,14 +42,7 @@ export default async function CategoryPage({
 
   return (
     <main className="p-6">
-      <h1 className="mb-6 text-4xl font-bold capitalize">{category}</h1>
-      <NewsFeedWithLoadMore
-        initialArticles={articles}
-        category={category}
-        country="us"
-        pageSize={20}
-        emptyMessage="No articles found for this category."
-      />
+      <CategoryContent category={category} initialArticles={articles} pageSize={20} />
     </main>
   );
 }
