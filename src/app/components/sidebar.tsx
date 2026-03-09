@@ -12,10 +12,13 @@ import {
   Heart,
   Home,
   Laptop,
+  Landmark,
   LogOut,
+  Plane,
   Radio,
   Search,
   Settings,
+  ShieldAlert,
   Trophy,
   StickyNote,
   X,
@@ -222,7 +225,7 @@ function SidebarContent({
             placeholder="Search news..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-          className="w-full pl-10 pr-10 py-2 rounded-xl bg-gray-100 focus:ring-2 focus:ring-[var(--primary)] focus:outline-none text-sm transition-all"
+            className="w-full pl-10 pr-10 py-2 rounded-xl bg-gray-100 focus:ring-2 focus:ring-[var(--primary)] focus:outline-none text-sm transition-all"
           />
           {query && (
             <button
@@ -297,6 +300,17 @@ function SidebarContent({
             />
             Entertainment
           </Link>
+          <Link
+            href="/categories/sports"
+            className={navItemClass(pathname.startsWith("/categories/sports"))}
+            onClick={closeAndNavigate}
+          >
+            <Trophy
+              size={18}
+              className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
+            />
+            Sports
+          </Link>
           {isAuthenticated && (
             <Link
               href="/categories/health"
@@ -329,17 +343,45 @@ function SidebarContent({
           )}
           {isAuthenticated && (
             <Link
-              href="/categories/sports"
+              href="/categories/politics"
               className={navItemClass(
-                pathname.startsWith("/categories/sports"),
+                pathname.startsWith("/categories/politics"),
               )}
               onClick={closeAndNavigate}
             >
-              <Trophy
+              <Landmark
                 size={18}
                 className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
               />
-              Sports
+              Politics
+            </Link>
+          )}
+          {isAuthenticated && (
+            <Link
+              href="/categories/tourism"
+              className={navItemClass(
+                pathname.startsWith("/categories/tourism"),
+              )}
+              onClick={closeAndNavigate}
+            >
+              <Plane
+                size={18}
+                className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
+              />
+              Tourism
+            </Link>
+          )}
+          {isAuthenticated && (
+            <Link
+              href="/categories/crime"
+              className={navItemClass(pathname.startsWith("/categories/crime"))}
+              onClick={closeAndNavigate}
+            >
+              <ShieldAlert
+                size={18}
+                className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
+              />
+              Crime
             </Link>
           )}
           {isAuthenticated && (

@@ -1,4 +1,5 @@
-import NewsFeedWithLoadMore from "@/app/components/newsFeedWithLoadMore";
+import CategoryContent from "./CategoryContent";
+import { getCategorySearchConfig } from "@/lib/newsCategories";
 
 interface Article {
   source?: { id?: string | null; name?: string };
@@ -19,10 +20,12 @@ async function getCategoryNews(category: string, country = "us") {
     return { articles: [] };
   }
 
-  const res = await fetch(
-    `${baseUrl}/top-headlines?country=${encodeURIComponent(country)}&category=${encodeURIComponent(category)}&page=1&pageSize=20&apiKey=${apiKey}`,
-    { next: { revalidate: 300 } },
-  );
+  const customCategory = getCategorySearchConfig(category);
+  const endpoint = customCategory
+    ? `${baseUrl}/everything?q=${encodeURIComponent(customCategory.query)}&page=1&pageSize=20&sortBy=publishedAt&apiKey=${apiKey}${customCategory.searchIn ? `&searchIn=${encodeURIComponent(customCategory.searchIn)}` : ""}`
+    : `${baseUrl}/top-headlines?country=${encodeURIComponent(country)}&category=${encodeURIComponent(category)}&page=1&pageSize=20&apiKey=${apiKey}`;
+
+  const res = await fetch(endpoint, { next: { revalidate: 300 } });
 
   if (!res.ok) {
     throw new Error(`Failed to fetch news for category: ${category}`);
@@ -42,14 +45,7 @@ export default async function CategoryPage({
 
   return (
     <main className="p-6">
-      <h1 className="mb-6 text-4xl font-bold capitalize">{category}</h1>
-      <NewsFeedWithLoadMore
-        initialArticles={articles}
-        category={category}
-        country="us"
-        pageSize={20}
-        emptyMessage="No articles found for this category."
-      />
+      <CategoryContent category={category} initialArticles={articles} pageSize={20} />
     </main>
   );
 }

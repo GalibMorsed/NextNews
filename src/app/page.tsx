@@ -1,5 +1,5 @@
 import RegisterReminder from "./components/registerReminder";
-import NewsFeedWithLoadMore from "./components/newsFeedWithLoadMore";
+import TopHeadlinesContent from "./components/topHeadlinesContent";
 
 // 1. Define types matching your API response
 interface Article {
@@ -82,12 +82,7 @@ export default async function Home() {
           </p>
         </header>
 
-        <NewsFeedWithLoadMore
-          initialArticles={articles}
-          country="us"
-          pageSize={20}
-          emptyMessage="No news available at the moment. Please check back later."
-        />
+        <TopHeadlinesContent initialArticles={articles} pageSize={20} />
       </div>
     </main>
   );

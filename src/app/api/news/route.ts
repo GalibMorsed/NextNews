@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getCategorySearchConfig } from "@/lib/newsCategories";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -27,7 +28,15 @@ export async function GET(req: Request) {
   let url = `${baseUrl}/top-headlines?country=${encodeURIComponent(country)}&page=${page}&pageSize=${pageSize}&apiKey=${apiKey}`;
 
   if (category) {
-    url += `&category=${encodeURIComponent(category)}`;
+    const customCategory = getCategorySearchConfig(category);
+    if (customCategory) {
+      url = `${baseUrl}/everything?q=${encodeURIComponent(customCategory.query)}&page=${page}&pageSize=${pageSize}&apiKey=${apiKey}&sortBy=publishedAt`;
+      if (customCategory.searchIn) {
+        url += `&searchIn=${encodeURIComponent(customCategory.searchIn)}`;
+      }
+    } else {
+      url += `&category=${encodeURIComponent(category)}`;
+    }
   }
 
   if (query) {
