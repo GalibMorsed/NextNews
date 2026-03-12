@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Menu, Newspaper, X, StickyNote } from "lucide-react";
+import { Menu, X, StickyNote } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { supabase } from "../../../lib/superbaseClient";
 
@@ -41,7 +42,16 @@ export default function Navbar({ onMenuToggle, isMobileOpen }: NavbarProps) {
         href="/"
         className="flex items-center gap-2 transition-opacity hover:opacity-80"
       >
-        <Newspaper className="h-8 w-6 text-[var(--primary)]" strokeWidth={1.5} />
+        <span className="inline-flex rounded-xl bg-white/90 p-1.5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-800/80 dark:ring-slate-700">
+          <Image
+            src="/nav-logo.jpg"
+            alt="NextNews logo"
+            width={40}
+            height={40}
+            className="h-8 w-8 rounded-md object-cover dark:brightness-110 dark:contrast-110"
+            priority
+          />
+        </span>
         <span className="text-2xl font-light italic tracking-wide text-[var(--foreground)]">
           NextNews
         </span>

@@ -30,10 +30,13 @@ function formatPublishedDate(date?: string) {
   if (!date) return "Date Not Available";
   const parsed = new Date(date);
   if (Number.isNaN(parsed.getTime())) return "Date Not Available";
-  return parsed.toLocaleDateString("en-US", {
+  return parsed.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
   });
 }
 

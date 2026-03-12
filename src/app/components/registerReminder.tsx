@@ -117,10 +117,10 @@ export default function RegisterReminder() {
                 Register Now
               </Link>
               {/* Subtext */}
-              <p className="mt-2 text-center text-xs text-slate-400">
-                Takes less than a minute · No spam · Always free
-              </p>
             </motion.div>
+            <p className="mt-2 text-center text-xs text-slate-400">
+              Takes less than a minute · No spam · Always free
+            </p>
           </div>
         </motion.div>
       )}

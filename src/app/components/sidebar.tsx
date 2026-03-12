@@ -1,14 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Briefcase,
   ChevronDown,
+  Clapperboard,
+  Palette,
+  BookOpen,
+  Car,
+  Sprout,
+  Shield,
+  Gamepad2,
+  Gem,
+  GraduationCap,
+  Info,
+  Leaf,
+  LifeBuoy,
+  Map,
+  Music2,
   Film,
   FlaskConical,
+  Shirt,
   Heart,
   Home,
   Laptop,
@@ -19,11 +34,19 @@ import {
   Search,
   Settings,
   ShieldAlert,
+  SlidersHorizontal,
   Trophy,
+  UtensilsCrossed,
+  Wallet,
   StickyNote,
+  UserPlus,
   X,
 } from "lucide-react";
 import { supabase } from "../../../lib/superbaseClient";
+import {
+  PERSONALIZATION_UPDATED_EVENT,
+  getUserPersonalization,
+} from "../services/personalizationService";
 import {
   DEFAULT_APPEARANCE_SETTINGS,
   applyAppearanceSettings,
@@ -35,10 +58,76 @@ interface SidebarProps {
   onCloseMobile: () => void;
 }
 
+type CategoryNavItem = {
+  topic: string;
+  href: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+};
+
+const CATEGORY_NAV_ITEMS: CategoryNavItem[] = [
+  { topic: "Top Headlines", href: "/", icon: Home },
+  { topic: "Technology", href: "/categories/technology", icon: Laptop },
+  { topic: "Business", href: "/categories/business", icon: Briefcase },
+  { topic: "Entertainment", href: "/categories/entertainment", icon: Film },
+  { topic: "Sports", href: "/categories/sports", icon: Trophy },
+  { topic: "Health", href: "/categories/health", icon: Heart },
+  { topic: "Science", href: "/categories/science", icon: FlaskConical },
+  { topic: "Politics", href: "/categories/politics", icon: Landmark },
+  { topic: "Tourism", href: "/categories/tourism", icon: Plane },
+  { topic: "Crime", href: "/categories/crime", icon: ShieldAlert },
+  { topic: "Environment", href: "/categories/environment", icon: Leaf },
+  { topic: "Education", href: "/categories/education", icon: GraduationCap },
+  { topic: "Travel", href: "/categories/travel", icon: Map },
+  { topic: "Food", href: "/categories/food", icon: UtensilsCrossed },
+  { topic: "Fashion", href: "/categories/fashion", icon: Shirt },
+  { topic: "Finance", href: "/categories/finance", icon: Wallet },
+  { topic: "Automotive", href: "/categories/automotive", icon: Car },
+  { topic: "Music", href: "/categories/music", icon: Music2 },
+  { topic: "Movies", href: "/categories/movies", icon: Clapperboard },
+  { topic: "Books", href: "/categories/books", icon: BookOpen },
+  { topic: "Art", href: "/categories/art", icon: Palette },
+  { topic: "Culture", href: "/categories/culture", icon: Palette },
+  { topic: "Gaming", href: "/categories/gaming", icon: Gamepad2 },
+  {
+    topic: "Spirituality & Religion",
+    href: "/categories/spirituality-religion",
+    icon: Gem,
+  },
+  { topic: "Mental Health", href: "/categories/mental-health", icon: Heart },
+  {
+    topic: "Artificial Intelligence",
+    href: "/categories/artificial-intelligence",
+    icon: Laptop,
+  },
+  { topic: "Cybersecurity", href: "/categories/cybersecurity", icon: ShieldAlert },
+  { topic: "Space & Astronomy", href: "/categories/space-astronomy", icon: Info },
+  { topic: "Stock Market", href: "/categories/stock-market", icon: Wallet },
+  { topic: "Trade & Economy", href: "/categories/trade-economy", icon: Landmark },
+  { topic: "Real Estate", href: "/categories/real-estate", icon: Home },
+  { topic: "Defense & Military", href: "/categories/defense-military", icon: Shield },
+  {
+    topic: "Agriculture & Farming",
+    href: "/categories/agriculture-farming",
+    icon: Sprout,
+  },
+];
+
+const DEFAULT_TOPIC_SELECTION = [
+  "top headlines",
+  "technology",
+  "business",
+  "entertainment",
+  "sports",
+  "health",
+  "science",
+];
+
 export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   const [query, setQuery] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [isPersonalizationLoaded, setIsPersonalizationLoaded] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -55,6 +144,20 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   };
 
   useEffect(() => {
+    const loadPersonalization = async () => {
+      setIsPersonalizationLoaded(false);
+      try {
+        const { data } = await getUserPersonalization();
+        setSelectedTopics(
+          Array.isArray(data?.favorite_topics) ? data.favorite_topics : [],
+        );
+      } catch {
+        setSelectedTopics([]);
+      } finally {
+        setIsPersonalizationLoaded(true);
+      }
+    };
+
     const storedToken = localStorage.getItem("auth_token");
     if (storedToken) {
       setIsAuthenticated(true);
@@ -72,6 +175,10 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
           sessionUser.email ?? "",
           data.session?.access_token ?? "",
         );
+        void loadPersonalization();
+      } else {
+        setSelectedTopics([]);
+        setIsPersonalizationLoaded(true);
       }
     });
 
@@ -84,15 +191,30 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
         setIsAuthenticated(true);
         setUserEmail(nextUser.email ?? "");
         persistSession(nextUser.email ?? "", session?.access_token ?? "");
+        void loadPersonalization();
       } else {
         setIsAuthenticated(false);
         setUserEmail("");
+        setSelectedTopics([]);
+        setIsPersonalizationLoaded(true);
         clearSession();
       }
     });
 
+    const handlePersonalizationUpdated = () => {
+      void loadPersonalization();
+    };
+    window.addEventListener(
+      PERSONALIZATION_UPDATED_EVENT,
+      handlePersonalizationUpdated,
+    );
+
     return () => {
       subscription.unsubscribe();
+      window.removeEventListener(
+        PERSONALIZATION_UPDATED_EVENT,
+        handlePersonalizationUpdated,
+      );
     };
   }, []);
 
@@ -125,6 +247,8 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       onCloseMobile={onCloseMobile}
       isAuthenticated={isAuthenticated}
       userEmail={userEmail}
+      selectedTopics={selectedTopics}
+      isPersonalizationLoaded={isPersonalizationLoaded}
       router={router}
     />
   );
@@ -166,6 +290,150 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   );
 }
 
+// ─── Snake Register Button ────────────────────────────────────────────────────
+
+function SnakeRegisterButton({ onClick }: { onClick: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animRef = useRef<number>(0);
+  const hoverRef = useRef(false);
+  const tRef = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const W = canvas.width;
+    const H = canvas.height;
+    const SEGMENTS = 28;
+    const RADIUS = 4;
+
+    // Perimeter path: top → right → bottom → left (clockwise)
+    const perimeter = 2 * (W + H);
+
+    function perimeterToXY(d: number): [number, number] {
+      const p = ((d % perimeter) + perimeter) % perimeter;
+      if (p < W) return [p, 0];
+      if (p < W + H) return [W, p - W];
+      if (p < 2 * W + H) return [W - (p - W - H), H];
+      return [0, H - (p - 2 * W - H)];
+    }
+
+    function draw(timestamp: number) {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, W, H);
+
+      const speed = hoverRef.current ? 3.5 : 1.2;
+      tRef.current += speed;
+      const t = tRef.current;
+
+      const SEG_GAP = 9;
+
+      // Draw each segment from tail to head
+      for (let i = SEGMENTS - 1; i >= 0; i--) {
+        const dist = t - i * SEG_GAP;
+        const [x, y] = perimeterToXY(dist);
+
+        const progress = i / (SEGMENTS - 1); // 0=head, 1=tail
+        const isHead = i === 0;
+
+        // Color: vivid green gradient head→tail
+        const green = Math.round(180 + (1 - progress) * 55);
+        const alpha = hoverRef.current ? 1 : 0.85;
+
+        if (isHead) {
+          // HEAD — draw a slightly bigger circle + eyes + tongue on hover
+          const [nx, ny] = perimeterToXY(dist + 1);
+          const angle = Math.atan2(ny - y, nx - x);
+
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(angle);
+
+          // Head body
+          ctx.beginPath();
+          ctx.arc(0, 0, RADIUS + 2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(34,${green},34,${alpha})`;
+          ctx.fill();
+
+          // Eyes
+          ctx.beginPath();
+          ctx.arc(3, -2.5, 1.2, 0, Math.PI * 2);
+          ctx.arc(3, 2.5, 1.2, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(0,0,0,0.9)";
+          ctx.fill();
+
+          // Tongue on hover
+          if (hoverRef.current) {
+            const flick = Math.sin(timestamp / 80) > 0;
+            ctx.strokeStyle = "#e53e3e";
+            ctx.lineWidth = 1;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(RADIUS + 2, 0);
+            ctx.lineTo(RADIUS + 7, 0);
+            if (flick) {
+              ctx.moveTo(RADIUS + 7, 0);
+              ctx.lineTo(RADIUS + 10, -2.5);
+              ctx.moveTo(RADIUS + 7, 0);
+              ctx.lineTo(RADIUS + 10, 2.5);
+            }
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        } else {
+          // BODY segment
+          const r = RADIUS * (1 - progress * 0.45);
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(34,${green},34,${alpha})`;
+          ctx.fill();
+
+          // Scale pattern on body
+          if (i % 3 === 0) {
+            ctx.beginPath();
+            ctx.arc(x, y, r * 0.55, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(20,${Math.round(green * 0.75)},20,${alpha * 0.5})`;
+            ctx.fill();
+          }
+        }
+      }
+
+      animRef.current = requestAnimationFrame(draw);
+    }
+
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, []);
+
+  return (
+    <div className="relative w-full">
+      {/* Snake canvas — sits on top of the button, pointer-events off so clicks pass through */}
+      <canvas
+        ref={canvasRef}
+        width={224}
+        height={40}
+        className="absolute inset-0 w-full h-full pointer-events-none z-10"
+        style={{ borderRadius: "0.75rem" }}
+      />
+      <Link
+        href="/auth/register"
+        className="flex w-full items-center justify-center gap-2 py-2 rounded-xl border border-[var(--primary)] bg-transparent text-[var(--primary)] text-sm font-medium transition-all duration-300 hover:bg-transparent hover:text-[var(--primary)] hover:border-emerald-500/80 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.35),0_8px_20px_-12px_rgba(16,185,129,0.45)] hover:scale-105 active:scale-95"
+        onClick={onClick}
+        onMouseEnter={() => (hoverRef.current = true)}
+        onMouseLeave={() => (hoverRef.current = false)}
+      >
+        <UserPlus size={16} />
+        <span>Create Account</span>
+      </Link>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function SidebarContent({
   query,
   setQuery,
@@ -175,6 +443,8 @@ function SidebarContent({
   onCloseMobile,
   isAuthenticated,
   userEmail,
+  selectedTopics,
+  isPersonalizationLoaded,
   router,
 }: {
   query: string;
@@ -185,10 +455,31 @@ function SidebarContent({
   onCloseMobile: () => void;
   isAuthenticated: boolean;
   userEmail: string;
+  selectedTopics: string[];
+  isPersonalizationLoaded: boolean;
   router: ReturnType<typeof useRouter>;
 }) {
   const closeAndNavigate = () => onCloseMobile();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const selectedTopicSet = new Set(
+    selectedTopics.map((topic) => topic.trim().toLowerCase()),
+  );
+  const effectiveTopicSet = new Set<string>();
+  effectiveTopicSet.add("top headlines");
+
+  if (isAuthenticated) {
+    if (selectedTopicSet.size > 0) {
+      for (const topic of selectedTopicSet) effectiveTopicSet.add(topic);
+    } else {
+      for (const topic of DEFAULT_TOPIC_SELECTION) effectiveTopicSet.add(topic);
+    }
+  } else {
+    for (const topic of DEFAULT_TOPIC_SELECTION) effectiveTopicSet.add(topic);
+  }
+
+  const visibleCategoryItems = CATEGORY_NAV_ITEMS.filter((item) =>
+    effectiveTopicSet.has(item.topic.toLowerCase()),
+  );
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -217,7 +508,7 @@ function SidebarContent({
 
         <form onSubmit={handleSearch} className="mb-6 relative">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-300"
             size={18}
           />
           <input
@@ -225,13 +516,13 @@ function SidebarContent({
             placeholder="Search news..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 rounded-xl bg-gray-100 focus:ring-2 focus:ring-[var(--primary)] focus:outline-none text-sm transition-all"
+            className="w-full rounded-xl border border-gray-200 bg-gray-100 py-2 pl-10 pr-10 text-sm text-gray-800 placeholder:text-gray-500 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)] dark:border-slate-500 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-300 dark:focus:border-[var(--primary)] dark:focus:bg-slate-700"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
             >
               <X size={14} />
             </button>
@@ -239,17 +530,6 @@ function SidebarContent({
         </form>
 
         <nav className="space-y-2">
-          <Link
-            href="/"
-            className={navItemClass(pathname === "/")}
-            onClick={closeAndNavigate}
-          >
-            <Home
-              size={18}
-              className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-            />
-            Top Headlines
-          </Link>
           <Link
             href="/live-news"
             className={navItemClass(pathname.startsWith("/live-news"))}
@@ -261,129 +541,35 @@ function SidebarContent({
             />
             Live News Streaming
           </Link>
-          <Link
-            href="/categories/technology"
-            className={navItemClass(
-              pathname.startsWith("/categories/technology"),
+          {visibleCategoryItems.map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href);
+
+            return (
+              <Link
+                key={item.topic}
+                href={item.href}
+                className={navItemClass(isActive)}
+                onClick={closeAndNavigate}
+              >
+                <Icon
+                  size={18}
+                  className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
+                />
+                {item.topic}
+              </Link>
+            );
+          })}
+          {isAuthenticated &&
+            isPersonalizationLoaded &&
+            visibleCategoryItems.length === 0 && (
+              <p className="px-4 py-2 text-xs text-gray-500">
+                No topics selected. Add topics in Personalization.
+              </p>
             )}
-            onClick={closeAndNavigate}
-          >
-            <Laptop
-              size={18}
-              className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-            />
-            Technology
-          </Link>
-          <Link
-            href="/categories/business"
-            className={navItemClass(
-              pathname.startsWith("/categories/business"),
-            )}
-            onClick={closeAndNavigate}
-          >
-            <Briefcase
-              size={18}
-              className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-            />
-            Business
-          </Link>
-          <Link
-            href="/categories/entertainment"
-            className={navItemClass(
-              pathname.startsWith("/categories/entertainment"),
-            )}
-            onClick={closeAndNavigate}
-          >
-            <Film
-              size={18}
-              className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-            />
-            Entertainment
-          </Link>
-          <Link
-            href="/categories/sports"
-            className={navItemClass(pathname.startsWith("/categories/sports"))}
-            onClick={closeAndNavigate}
-          >
-            <Trophy
-              size={18}
-              className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-            />
-            Sports
-          </Link>
-          {isAuthenticated && (
-            <Link
-              href="/categories/health"
-              className={navItemClass(
-                pathname.startsWith("/categories/health"),
-              )}
-              onClick={closeAndNavigate}
-            >
-              <Heart
-                size={18}
-                className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-              />
-              Health
-            </Link>
-          )}
-          {isAuthenticated && (
-            <Link
-              href="/categories/science"
-              className={navItemClass(
-                pathname.startsWith("/categories/science"),
-              )}
-              onClick={closeAndNavigate}
-            >
-              <FlaskConical
-                size={18}
-                className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-              />
-              Science
-            </Link>
-          )}
-          {isAuthenticated && (
-            <Link
-              href="/categories/politics"
-              className={navItemClass(
-                pathname.startsWith("/categories/politics"),
-              )}
-              onClick={closeAndNavigate}
-            >
-              <Landmark
-                size={18}
-                className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-              />
-              Politics
-            </Link>
-          )}
-          {isAuthenticated && (
-            <Link
-              href="/categories/tourism"
-              className={navItemClass(
-                pathname.startsWith("/categories/tourism"),
-              )}
-              onClick={closeAndNavigate}
-            >
-              <Plane
-                size={18}
-                className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-              />
-              Tourism
-            </Link>
-          )}
-          {isAuthenticated && (
-            <Link
-              href="/categories/crime"
-              className={navItemClass(pathname.startsWith("/categories/crime"))}
-              onClick={closeAndNavigate}
-            >
-              <ShieldAlert
-                size={18}
-                className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-              />
-              Crime
-            </Link>
-          )}
           {isAuthenticated && (
             <div className="relative md:hidden my-2">
               {/* Animated border */}
@@ -422,18 +608,28 @@ function SidebarContent({
         {isAuthenticated && (
           <CollapsibleSection title="Extra Options">
             <Link
-              href="/plans"
-              className="block px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
+              href="/personalization"
+              className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
               onClick={closeAndNavigate}
             >
-              Subscriptions
+              <SlidersHorizontal size={14} />
+              Personalization
             </Link>
             <Link
               href="/appearance"
-              className="block px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
               onClick={closeAndNavigate}
             >
+              <Palette size={14} />
               Appearance
+            </Link>
+            <Link
+              href="/plans"
+              className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
+              onClick={closeAndNavigate}
+            >
+              <Gem size={14} />
+              Subscriptions
             </Link>
           </CollapsibleSection>
         )}
@@ -441,16 +637,18 @@ function SidebarContent({
         <CollapsibleSection title="More Info">
           <Link
             href="/about"
-            className="block px-4 py-1 text-sm text-gray-600 transition-colors hover:text-[var(--primary)]"
+            className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 transition-colors hover:text-[var(--primary)]"
             onClick={closeAndNavigate}
           >
+            <Info size={14} />
             About NextNews
           </Link>
           <Link
             href="/support"
-            className="block px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
             onClick={closeAndNavigate}
           >
+            <LifeBuoy size={14} />
             Contact Support
           </Link>
         </CollapsibleSection>
@@ -512,13 +710,7 @@ function SidebarContent({
             )}
           </div>
         ) : (
-          <Link
-            href="/auth/register"
-            className="block w-full text-center py-2 rounded-xl border border-[var(--primary)] bg-transparent text-[var(--primary)] text-sm font-medium transition-all duration-300 hover:bg-[var(--primary)] hover:text-white hover:shadow-lg hover:scale-105 active:scale-95"
-            onClick={closeAndNavigate}
-          >
-            Register
-          </Link>
+          <SnakeRegisterButton onClick={closeAndNavigate} />
         )}
       </div>
     </>

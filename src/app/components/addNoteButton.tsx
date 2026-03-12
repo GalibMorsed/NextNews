@@ -295,7 +295,7 @@ export default function AddNoteButton({
                   </div>
                   <p className="mb-6 max-w-xs text-sm text-slate-600 dark:text-slate-300">
                     This functionality is only for registered members. Please
-                    log in or register to save notes.
+                    log in or register to save notes.🤭
                   </p>
                   <div className="flex w-full gap-3">
                     <button

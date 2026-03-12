@@ -81,13 +81,16 @@ export default function AboutPage() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Image
-              src="/logo1.png"
-              alt="NextNews Logo"
-              width={64}
-              height={64}
-              className="mx-auto mb-6 h-29 w-auto"
-            />
+            <div className="mx-auto mb-6 inline-flex rounded-2xl bg-white/90 p-3 shadow-md ring-1 ring-slate-200 dark:bg-slate-800/80 dark:ring-slate-700">
+              <Image
+                src="/logo3.jpg"
+                alt="NextNews Logo"
+                width={180}
+                height={180}
+                className="h-26 w-auto rounded-lg object-contain dark:brightness-110 dark:contrast-110"
+                priority
+              />
+            </div>
             <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl md:text-6xl">
               About NextNews
             </h1>
