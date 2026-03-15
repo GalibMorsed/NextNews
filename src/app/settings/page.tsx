@@ -24,6 +24,7 @@ import {
   persistDarkModeSetting,
   readDarkModeSetting,
 } from "@/lib/accountSettings";
+import { clearClientSession, getVerifiedAuthUser } from "@/lib/clientAuth";
 
 type NotificationSettings = {
   accountActivity: boolean;
@@ -173,8 +174,7 @@ export default function AccountSettingsPage() {
         }));
       }
 
-      const { data } = await supabase.auth.getSession();
-      const user = data.session?.user ?? null;
+      const { user } = await getVerifiedAuthUser();
       if (mounted && user) {
         setSettings((prev) => ({
           ...prev,
@@ -205,7 +205,7 @@ export default function AccountSettingsPage() {
         ...prev,
         profile: {
           ...prev.profile,
-          email: email || prev.profile.email,
+          email,
         },
       }));
     });
@@ -377,21 +377,7 @@ export default function AccountSettingsPage() {
         return;
       }
 
-      const keysToRemove = ["auth_email", "auth_token", "userEmail"];
-      for (const key of keysToRemove) localStorage.removeItem(key);
-
-      for (let i = localStorage.length - 1; i >= 0; i -= 1) {
-        const key = localStorage.key(i);
-        if (!key) continue;
-        if (
-          key.startsWith("accountSettings_") ||
-          key.startsWith("appearanceSettings_")
-        ) {
-          localStorage.removeItem(key);
-        }
-      }
-      localStorage.removeItem("app_dark_mode");
-
+      clearClientSession(session.user.email);
       broadcastAccountSettings({ darkMode: false });
       await supabase.auth.signOut();
 

@@ -1,4 +1,5 @@
 import { supabase } from "../../../lib/superbaseClient";
+import { getVerifiedAuthUser } from "@/lib/clientAuth";
 
 export const PERSONALIZATION_UPDATED_EVENT = "personalization-updated";
 
@@ -48,10 +49,10 @@ function resolveUserEmail(userEmail: string | null | undefined) {
 }
 
 async function getAuthenticatedUser() {
-  const { data, error } = await supabase.auth.getUser();
+  const { user, error } = await getVerifiedAuthUser();
   if (error) throw error;
-  if (!data.user) throw new Error("Not logged in");
-  return data.user;
+  if (!user) throw new Error("Not logged in");
+  return user;
 }
 
 export function broadcastPersonalizationUpdated() {

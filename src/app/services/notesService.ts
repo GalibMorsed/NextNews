@@ -1,4 +1,5 @@
 import { supabase } from "../../../lib/superbaseClient";
+import { generateClientUuid, getVerifiedAuthUser } from "@/lib/clientAuth";
 
 export interface NoteInput {
   article_title: string;
@@ -39,15 +40,15 @@ function resolveUserEmail(userEmail: string | null | undefined) {
 }
 
 async function getAuthenticatedUser() {
-  const { data, error } = await supabase.auth.getUser();
+  const { user, error } = await getVerifiedAuthUser();
   if (error) throw error;
-  if (!data.user) throw new Error("Not logged in");
-  return data.user;
+  if (!user) throw new Error("Not logged in");
+  return user;
 }
 
 function createNoteEntry(note: NoteInput): UserNote {
   return {
-    id: crypto.randomUUID(),
+    id: generateClientUuid(),
     article_title: note.article_title,
     article_slug: note.article_slug,
     article_url: note.article_url ?? "",
