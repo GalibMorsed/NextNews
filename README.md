@@ -23,4 +23,4 @@ Through this project, I gained strong experience with Next.js routing, API integ
 
 ## Marketing Poster
 
-![image alt](NextNews-Poster.png)
+![image alt](https://github.com/GalibMorsed/NextNews/blob/d4729ba5fd4eb45ba185b3f44175f9bdd1223fb3/public/NextNews-Poster.png)
