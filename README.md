@@ -1,5 +1,3 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
 ## Getting Started
 
 First, run the development server:
@@ -14,23 +12,15 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+NextNews is a modern news web application built using Next.js and React that allows users to explore the latest news articles in a fast and responsive interface. The application fetches real-time news data from external APIs and displays them using dynamic routing and server-side rendering to improve performance and SEO.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The project focuses on clean component architecture, reusable UI components, and efficient data fetching. Users can browse news by category, open full articles, and navigate between pages smoothly without reloads. The application is designed with responsive layout techniques to ensure proper usability across desktop and mobile devices.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Through this project, I gained strong experience with Next.js routing, API integration, SSR/CSR concepts, and frontend optimization, along with improving my ability to structure scalable React applications.
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Marketing Poster
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+![image alt](https://github.com/GalibMorsed/NextNews/blob/d4729ba5fd4eb45ba185b3f44175f9bdd1223fb3/public/NextNews-Poster.png)

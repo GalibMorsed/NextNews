@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Menu, X, StickyNote } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { supabase } from "../../../lib/superbaseClient";
+import { getVerifiedAuthUser } from "@/lib/clientAuth";
 
 interface NavbarProps {
   onMenuToggle: () => void;
@@ -17,8 +18,8 @@ export default function Navbar({ onMenuToggle, isMobileOpen }: NavbarProps) {
   const pathname = usePathname();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setIsAuthenticated(Boolean(data.session?.user));
+    getVerifiedAuthUser().then(({ user }) => {
+      setIsAuthenticated(Boolean(user));
     });
 
     const {

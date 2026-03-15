@@ -6,6 +6,7 @@ import { saveNote } from "../services/notesService";
 import { AnimatePresence, motion } from "framer-motion";
 import { Notebook, X } from "lucide-react";
 import { supabase } from "../../../lib/superbaseClient";
+import { getVerifiedAuthUser } from "@/lib/clientAuth";
 
 interface AddNoteButtonProps {
   title: string;
@@ -38,10 +39,8 @@ export default function AddNoteButton({
 
   useEffect(() => {
     const checkAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
+      const { user } = await getVerifiedAuthUser();
+      setIsAuthenticated(Boolean(user));
     };
     checkAuth();
 

@@ -47,15 +47,7 @@ import {
   PERSONALIZATION_UPDATED_EVENT,
   getUserPersonalization,
 } from "../services/personalizationService";
-import {
-  DEFAULT_APPEARANCE_SETTINGS,
-  applyAppearanceSettings,
-  removeAppearanceSettings,
-} from "@/lib/appearance";
-import {
-  applyDarkMode,
-  removeStoredAccountSettings,
-} from "@/lib/accountSettings";
+import { clearClientSession, getVerifiedAuthUser, persistClientSession } from "@/lib/clientAuth";
 
 interface SidebarProps {
   isMobileOpen: boolean;
@@ -135,20 +127,6 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const persistSession = (emailValue: string, tokenValue: string) => {
-    localStorage.setItem("auth_email", emailValue);
-    localStorage.setItem("auth_token", tokenValue);
-    document.cookie = `auth_token=${encodeURIComponent(tokenValue)}; path=/; max-age=604800; samesite=lax`;
-  };
-
-  const clearSession = () => {
-    const currentUserEmail = localStorage.getItem("auth_email");
-    removeStoredAccountSettings(currentUserEmail);
-    localStorage.removeItem("auth_email");
-    localStorage.removeItem("auth_token");
-    document.cookie = "auth_token=; path=/; max-age=0; samesite=lax";
-  };
-
   useEffect(() => {
     const loadPersonalization = async () => {
       setIsPersonalizationLoaded(false);
@@ -164,20 +142,18 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       }
     };
 
-    const storedEmail = localStorage.getItem("auth_email");
-    if (storedEmail) setUserEmail(storedEmail);
-
-    supabase.auth.getSession().then(({ data }) => {
-      const sessionUser = data.session?.user ?? null;
-      if (sessionUser) {
+    getVerifiedAuthUser().then(async ({ user }) => {
+      if (user) {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         setIsAuthenticated(true);
-        setUserEmail(sessionUser.email ?? "");
-        persistSession(
-          sessionUser.email ?? "",
-          data.session?.access_token ?? "",
-        );
+        setUserEmail(user.email ?? "");
+        persistClientSession(user.email ?? "", session?.access_token ?? "");
         void loadPersonalization();
       } else {
+        setIsAuthenticated(false);
+        setUserEmail("");
         setSelectedTopics([]);
         setIsPersonalizationLoaded(true);
       }
@@ -191,14 +167,14 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       if (nextUser) {
         setIsAuthenticated(true);
         setUserEmail(nextUser.email ?? "");
-        persistSession(nextUser.email ?? "", session?.access_token ?? "");
+        persistClientSession(nextUser.email ?? "", session?.access_token ?? "");
         void loadPersonalization();
       } else {
         setIsAuthenticated(false);
         setUserEmail("");
         setSelectedTopics([]);
         setIsPersonalizationLoaded(true);
-        clearSession();
+        clearClientSession();
       }
     });
 
@@ -483,19 +459,10 @@ function SidebarContent({
     effectiveTopicSet.has(item.topic.toLowerCase()),
   );
   const handleSignOut = async () => {
-    const currentUserEmail = userEmail || localStorage.getItem("auth_email") || "";
-
     try {
       await supabase.auth.signOut();
     } finally {
-      document.cookie = "auth_token=; path=/; max-age=0; samesite=lax";
-      removeAppearanceSettings(currentUserEmail);
-      removeStoredAccountSettings(currentUserEmail);
-      localStorage.removeItem("auth_email");
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("app_dark_mode");
-      applyDarkMode(false);
-      applyAppearanceSettings(DEFAULT_APPEARANCE_SETTINGS);
+      clearClientSession(userEmail);
       onCloseMobile();
       router.replace("/");
     }
