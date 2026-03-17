@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   app:
     build:
@@ -8,22 +6,30 @@ services:
       args:
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-        NEWS_API_KEY: ${NEWS_API_KEY1}
     image: nextnews-app:latest
+    restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
       - .env
     environment:
       NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-      NEWS_API_KEY: ${NEWS_API_KEY1}  # Using NEWS_API_KEY1 as the primary
-      # Add other env vars as needed
-    # Uncomment the following to run in development mode (hot reload)
-    # command: ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]
-    # volumes:
-    #   - .:/app
-    #   - /app/node_modules
-    # ports:
-    #   - "3000:3000"
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      NEWS_API_KEY: ${NEWS_API_KEY1}
+      NEWS_API_KEY2: ${NEWS_API_KEY2:-${NEWS_API_KEY1}}
+      NEWS_API_KEY3: ${NEWS_API_KEY3}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL}
+      OPENROUTER_SITE_URL: ${OPENROUTER_SITE_URL:-http://localhost:3000}
+      OPENROUTER_APP_NAME: ${OPENROUTER_APP_NAME:-NextNews}
+      NEXT_PUBLIC_YOUTUBE_API_KEY: ${NEXT_PUBLIC_YOUTUBE_API_KEY}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s

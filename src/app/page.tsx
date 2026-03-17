@@ -22,7 +22,7 @@ interface NewsResponse {
 // 2. Create a data fetching function
 async function getNews(): Promise<Article[]> {
   // Ensure you have this in your .env.local file
-  const apiKey = process.env.NEWS_API_KEY2;
+  const apiKey = process.env.NEWS_API_KEY2 || process.env.NEWS_API_KEY3;
 
   if (!apiKey) {
     console.error("NEWS_API_KEY is missing");

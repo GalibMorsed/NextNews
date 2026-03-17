@@ -1,5 +1,5 @@
 export async function getNews(query?: string) {
-    const apiKey = process.env.NEWS_API_KEY2;
+    const apiKey = process.env.NEWS_API_KEY2 || process.env.NEWS_API_KEY3;
 
     // If a query exists, search 'everything', otherwise get 'top-headlines'
     const endpoint = query

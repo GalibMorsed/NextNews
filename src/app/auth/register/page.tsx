@@ -196,7 +196,7 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/register`,
+        redirectTo: `${window.location.origin}/`,
       },
     });
 
