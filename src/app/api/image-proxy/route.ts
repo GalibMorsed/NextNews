@@ -22,8 +22,11 @@ export async function GET(req: Request) {
   }
 
   try {
+    // Remote news images can be very large; avoid buffering and avoid Next's fetch
+    // data cache (which refuses items >2MB and can trigger errors).
     const upstream = await fetch(parsed.toString(), {
-      next: { revalidate: 1800 },
+      cache: "no-store",
+      redirect: "follow",
       headers: {
         Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
       },
@@ -38,7 +41,10 @@ export async function GET(req: Request) {
       upstream.headers.get("cache-control") ||
       "public, max-age=3600, stale-while-revalidate=86400";
 
-    const body = await upstream.arrayBuffer();
+    const body = upstream.body;
+    if (!body) {
+      return NextResponse.redirect(new URL(FALLBACK_IMAGE_PATH, req.url));
+    }
 
     return new NextResponse(body, {
       status: 200,

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
@@ -12,9 +13,12 @@ import {
   Moon,
   Save,
   Shield,
+  ShieldCheck,
+  Sparkles,
   Trash2,
   UserRound,
   X,
+  Zap,
 } from "lucide-react";
 import { supabase } from "../../../lib/superbaseClient";
 import {
@@ -413,6 +417,8 @@ export default function AccountSettingsPage() {
           </p>
         </motion.section>
 
+        <PlanSettingsCard />
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <SettingsCard
             icon={<Moon className="h-5 w-5 text-[var(--primary)]" />}
@@ -775,6 +781,64 @@ export default function AccountSettingsPage() {
         )}
       </AnimatePresence>
     </main>
+  );
+}
+
+function PlanSettingsCard() {
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
+
+  useEffect(() => {
+    const savedPlan = localStorage.getItem("nextnews-plan");
+    if (savedPlan) setCurrentPlan(savedPlan);
+  }, []);
+
+  if (!currentPlan) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={clsx(
+        "flex items-center justify-between gap-4 rounded-2xl border p-4 shadow-sm transition-all sm:p-5",
+        currentPlan === "Pro+"
+          ? "border-orange-200 bg-orange-50 dark:border-orange-700/50 dark:bg-orange-950/20"
+          : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800",
+      )}
+    >
+      <div className="flex items-center gap-3.5">
+        <div
+          className={clsx(
+            "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
+            currentPlan === "Pro+"
+              ? "bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400"
+              : "bg-teal-50 text-teal-600 dark:bg-teal-900/20 dark:text-teal-400",
+          )}
+        >
+          {currentPlan === "Pro+" ? (
+            <Zap className="h-6 w-6" />
+          ) : currentPlan === "Pro" ? (
+            <ShieldCheck className="h-6 w-6" />
+          ) : (
+            <Sparkles className="h-6 w-6" />
+          )}
+        </div>
+        <div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+            Current Plan
+          </h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Your selected subscription is <span className="font-medium">{currentPlan} Plan</span>{" "}
+            currently active on this account.
+          </p>
+        </div>
+      </div>
+      <Link
+        href="/plans"
+        className="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+      >
+        Manage
+      </Link>
+    </motion.div>
   );
 }
 

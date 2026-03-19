@@ -1,0 +1,46 @@
+4. New features / components that fit your app well
+   Here are additions that align with what you already built and give a big perceived upgrade, without changing your architecture:
+
+\\** HIGHEST PRIORITY FEATUR NOW
+**Onboarding**
+
+After first signup:
+Guide user through 3‑step onboarding:
+Choose topics (Personalization).
+Try saving a note from an article.
+Try AI summary on one article.
+Option: small checklist card on home “Getting started” until they complete these steps.
+make it a professional popup each for every feature explain properly for process.
+\\**
+
+1) “For You” unified personalized feed****
+
+New page: For You tab that:
+Uses saved topics + sources from personalization.
+Calls your /api/news endpoint with those preferences.
+Shows a mix of:
+Top headlines in chosen topics.
+A small “Recommended for you” section (maybe call OpenRouter to re‑rank).
+Components to add:
+ForYouFeed component that accepts favoriteTopics and composes the feed.
+“Fine‑tune” button linking back to Personalization. 
+
+2) “My Activity” / history****
+
+New tab under settings or notes:
+Shows recent articles you opened (persist minimal metadata to Supabase, or local storage).
+Shows your recent AI summaries or “Most summarized topics”.
+Value: makes the app feel like your personal news workspace, not just a feed. 
+
+3) Saved searches / alerts (simple version)**
+
+On search page:
+“Save this search” button → store query + filters to Supabase.
+Section listing “Saved searches” with quick chips/tags to rerun.
+(Optional later) Email or in-app “badge” when there are new articles matching a saved search. 
+
+4) Better note integration in article cards****
+
+On each article card, show:
+A badge/indicator if you already have a note on that article.
+“Quick note” popover to create/edit a note without leaving the feed. 
