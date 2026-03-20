@@ -4,7 +4,7 @@ import path from "node:path";
 const nextConfig: NextConfig = {
   /* config options here */
   devIndicators: false,
-  output: process.env.DOCKER_BUILD ? "standalone" : undefined,
+  output: "standalone",
   reactCompiler: true,
   turbopack: {
     root: path.resolve(__dirname),
