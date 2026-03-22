@@ -18,7 +18,6 @@ interface Article {
 
 interface CategoryContentProps {
   category: string;
-  initialArticles: Article[];
   pageSize?: number;
 }
 
@@ -58,11 +57,11 @@ function RefreshSkeleton() {
 
 export default function CategoryContent({
   category,
-  initialArticles,
   pageSize = 20,
 }: CategoryContentProps) {
   const categoryDisplayName = getCategoryDisplayName(category);
-  const [articles, setArticles] = useState<Article[]>(initialArticles ?? []);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
@@ -89,6 +88,28 @@ export default function CategoryContent({
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const params = new URLSearchParams({
+          country: "us",
+          category,
+          page: "1",
+          pageSize: String(pageSize),
+        });
+        const res = await fetch(`/api/news?${params.toString()}`);
+        const data = await res.json();
+        setArticles(data.articles ?? []);
+      } catch {
+        setArticles([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, [category, pageSize]);
 
   const handleRefresh = async () => {
     if (isRefreshing) return;
@@ -213,7 +234,7 @@ export default function CategoryContent({
       )}
 
       {/* Main Content */}
-      {isRefreshing ? (
+      {isRefreshing || loading ? (
         <RefreshSkeleton />
       ) : (
         <NewsFeedWithLoadMore
