@@ -1,4 +1,5 @@
 import CategoryContent from "./CategoryContent";
+import { getCategorySearchConfig } from "@/lib/newsCategories";
 
 interface Article {
   source?: { id?: string | null; name?: string };
@@ -12,25 +13,25 @@ interface Article {
 }
 
 async function getCategoryNews(category: string, country = "us") {
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://next-news-six-rouge.vercel.app";
+  const baseUrl = process.env.NEWS_API_BASE_URL || "https://newsapi.org/v2";
+  const apiKey = process.env.NEWS_API_KEY2 || process.env.NEWS_API_KEY;
 
-  try {
-    const res = await fetch(
-      `${siteUrl}/api/news?category=${encodeURIComponent(category)}&country=${encodeURIComponent(country)}&page=1&pageSize=20`,
-      { next: { revalidate: 300 } },
-    );
-
-    if (!res.ok) {
-      console.error(`Failed to fetch news for category: ${category} — status ${res.status}`);
-      return { articles: [] };
-    }
-
-    return res.json();
-  } catch (err) {
-    console.error(`Error fetching news for category: ${category}`, err);
+  if (!apiKey) {
     return { articles: [] };
   }
+
+  const customCategory = getCategorySearchConfig(category);
+  const endpoint = customCategory
+    ? `${baseUrl}/everything?q=${encodeURIComponent(customCategory.query)}&page=1&pageSize=20&sortBy=publishedAt&apiKey=${apiKey}${customCategory.searchIn ? `&searchIn=${encodeURIComponent(customCategory.searchIn)}` : ""}`
+    : `${baseUrl}/top-headlines?country=${encodeURIComponent(country)}&category=${encodeURIComponent(category)}&page=1&pageSize=20&apiKey=${apiKey}`;
+
+  const res = await fetch(endpoint, { next: { revalidate: 300 } });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch news for category: ${category}`);
+  }
+
+  return res.json();
 }
 
 export default async function CategoryPage({
