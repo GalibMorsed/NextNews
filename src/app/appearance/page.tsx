@@ -41,7 +41,9 @@ export default function AppearancePage() {
   const [primaryColor, setPrimaryColor] = useState(
     DEFAULT_APPEARANCE_SETTINGS.primaryColor,
   );
-  const [fontSize, setFontSize] = useState(DEFAULT_APPEARANCE_SETTINGS.fontSize);
+  const [fontSize, setFontSize] = useState(
+    DEFAULT_APPEARANCE_SETTINGS.fontSize,
+  );
   const [fontFamily, setFontFamily] = useState(
     DEFAULT_APPEARANCE_SETTINGS.fontFamily,
   );
@@ -160,13 +162,15 @@ export default function AppearancePage() {
         className="w-full mx-auto bg-white dark:bg-slate-900 lg:rounded-none shadow-xl lg:shadow-none p-4 sm:p-6 md:p-8 lg:p-10 lg:min-h-[calc(100vh-65px)]"
       >
         <section className="mb-6 md:mb-8 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 p-4 sm:p-6">
-          <span className="mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Personalization
-          </span>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-slate-100 text-center md:text-left">
+          <div className="flex justify-start mb-3">
+            <span className="inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+              Theme & Style
+            </span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
             Appearance Settings
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-gray-600 dark:text-slate-300 text-center md:text-left">
+          <p className="mt-2 text-xs sm:text-sm text-gray-600 dark:text-slate-300 text-left">
             Customize theme color, typography, and accessibility preferences to
             make the app look and feel the way you prefer. 😉
           </p>

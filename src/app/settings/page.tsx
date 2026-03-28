@@ -407,10 +407,10 @@ export default function AccountSettingsPage() {
           className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm sm:p-6"
         >
           <span className="mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Account
+            User Profile
           </span>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
-            Settings
+            Account Settings
           </h1>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 sm:text-base">
             Manage profile, security, preferences, and communication settings.🧠
@@ -422,7 +422,7 @@ export default function AccountSettingsPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <SettingsCard
             icon={<Moon className="h-5 w-5 text-[var(--primary)]" />}
-            title="Appearance"
+            title="App Theme"
             description="Theme preference for the full application."
           >
             <ToggleRow
@@ -891,8 +891,9 @@ function PlanSettingsCard() {
             Current Plan
           </h3>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Your selected subscription is <span className="font-medium">{currentPlan} Plan</span>{" "}
-            currently active on this account.
+            Your selected subscription is{" "}
+            <span className="font-medium">{currentPlan} Plan</span> currently
+            active on this account.
           </p>
         </div>
       </div>
