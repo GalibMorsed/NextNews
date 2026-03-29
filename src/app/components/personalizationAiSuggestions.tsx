@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import { Loader2, Sparkles } from "lucide-react";
 import { supabase } from "../../../lib/superbaseClient";
+import { incrementPersonalizationSuggestionUsage } from "@/lib/activityAnalytics";
 
 type TopicSuggestion = {
   topic: string;
@@ -104,6 +105,7 @@ export default function PersonalizationAiSuggestions({
       setSuggestions(
         Array.isArray(payload.suggestions) ? payload.suggestions : [],
       );
+      incrementPersonalizationSuggestionUsage();
     } catch {
       onErrorMessage(
         "We couldn't get AI suggestions right now. Please try again shortly.",

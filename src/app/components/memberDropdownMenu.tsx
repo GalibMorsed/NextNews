@@ -9,6 +9,7 @@ import {
   useCallback,
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   Activity,
   ArrowRight,
@@ -53,7 +54,8 @@ const memberLinks: MemberLink[] = [
     label: "My Activity",
     description: "Your history and engagements",
     icon: Activity,
-    isComingSoon: true,
+    href: "/my-activity",
+    isComingSoon: false,
   },
   {
     id: "explore",
@@ -96,6 +98,7 @@ interface MemberDropdownMenuProps {
 export default function MemberDropdownMenu({
   className = "",
 }: MemberDropdownMenuProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [showNotice, setShowNotice] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -245,6 +248,22 @@ export default function MemberDropdownMenu({
       setShowNotice(false);
     }, 4000);
   }, []);
+
+  const handleMemberClick = useCallback(
+    (item: (typeof memberLinks)[number]) => {
+      if (item.isComingSoon) {
+        handleComingSoonClick();
+        return;
+      }
+
+      if (item.href) {
+        setIsOpen(false);
+        setShowNotice(false);
+        router.push(item.href);
+      }
+    },
+    [handleComingSoonClick, router],
+  );
 
   const dismissNotice = useCallback(() => {
     setShowNotice(false);
@@ -434,6 +453,7 @@ export default function MemberDropdownMenu({
                             aria-label={item.label}
                             onClick={() => {
                               if (inactive) handleComingSoonClick();
+                              else handleMemberClick(item);
                             }}
                             whileHover={
                               reduceMotion

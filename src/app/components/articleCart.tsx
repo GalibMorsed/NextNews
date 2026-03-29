@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import AddNoteButton from "./addNoteButton";
 import AISummaryButton from "./aiSummaryButton";
 import { getNewsImageSrc } from "@/lib/newsImage";
+import { trackActivityEvent } from "@/lib/activityAnalytics";
 
 interface Article {
   source: { id: string | null; name: string };
@@ -19,11 +20,13 @@ interface Article {
 interface ArticleCardProps {
   article: Article;
   formattedDate: string;
+  category?: string;
 }
 
 export default function ArticleCard({
   article,
   formattedDate,
+  category,
 }: ArticleCardProps) {
   return (
     <article className="flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100">
@@ -61,6 +64,13 @@ export default function ArticleCard({
               href={article.url || "#"}
               target={article.url ? "_blank" : "_self"}
               rel={article.url ? "noopener noreferrer" : ""}
+              onClick={() => {
+                if (!article.url) return;
+                trackActivityEvent("article_open", {
+                  source: article.source?.name ?? "",
+                  category: category ?? "",
+                });
+              }}
               className={`inline-flex items-center text-sm font-semibold transition-colors sm:flex-shrink-0 ${
                 article.url
                   ? "text-blue-600 hover:text-blue-700 cursor-pointer"
@@ -77,6 +87,7 @@ export default function ArticleCard({
                 description={article.description}
                 content={article.content}
                 sourceName={article.source?.name}
+                category={category}
               />
               <AddNoteButton
                 title={article.title}
