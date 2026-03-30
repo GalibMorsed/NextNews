@@ -9,6 +9,7 @@ import {
   useCallback,
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   Activity,
   ArrowRight,
@@ -23,6 +24,7 @@ import {
 interface MemberLink {
   id: string;
   label: string;
+  accessLabel: string;
   description?: string;
   icon: React.ComponentType<{
     size?: number;
@@ -37,6 +39,7 @@ const memberLinks: MemberLink[] = [
   {
     id: "community",
     label: "Community",
+    accessLabel: "Pro+",
     description: "Connect with other members",
     icon: Users,
     isComingSoon: true,
@@ -44,6 +47,7 @@ const memberLinks: MemberLink[] = [
   {
     id: "for-you",
     label: "For You",
+    accessLabel: "Pro",
     description: "Personalized tailored to you",
     icon: UserRound,
     isComingSoon: true,
@@ -51,13 +55,16 @@ const memberLinks: MemberLink[] = [
   {
     id: "my-activity",
     label: "My Activity",
+    accessLabel: "Free",
     description: "Your history and engagements",
     icon: Activity,
-    isComingSoon: true,
+    href: "/my-activity",
+    isComingSoon: false,
   },
   {
     id: "explore",
     label: "Explore",
+    accessLabel: "Free",
     description: "Discover topics and new perspectives",
     icon: Compass,
     isComingSoon: true,
@@ -96,6 +103,7 @@ interface MemberDropdownMenuProps {
 export default function MemberDropdownMenu({
   className = "",
 }: MemberDropdownMenuProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [showNotice, setShowNotice] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -245,6 +253,22 @@ export default function MemberDropdownMenu({
       setShowNotice(false);
     }, 4000);
   }, []);
+
+  const handleMemberClick = useCallback(
+    (item: (typeof memberLinks)[number]) => {
+      if (item.isComingSoon) {
+        handleComingSoonClick();
+        return;
+      }
+
+      if (item.href) {
+        setIsOpen(false);
+        setShowNotice(false);
+        router.push(item.href);
+      }
+    },
+    [handleComingSoonClick, router],
+  );
 
   const dismissNotice = useCallback(() => {
     setShowNotice(false);
@@ -434,6 +458,7 @@ export default function MemberDropdownMenu({
                             aria-label={item.label}
                             onClick={() => {
                               if (inactive) handleComingSoonClick();
+                              else handleMemberClick(item);
                             }}
                             whileHover={
                               reduceMotion
@@ -485,8 +510,13 @@ export default function MemberDropdownMenu({
                               <Icon size={18} strokeWidth={1.6} />
                             </motion.span>
                             <span className="min-w-0 flex-1">
-                              <span className="text-sm font-semibold text-[var(--foreground)] transition-colors duration-200 group-hover:text-[color:color-mix(in_srgb,var(--foreground)_90%,var(--primary)_10%)]">
-                                {item.label}
+                              <span className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-[var(--foreground)] transition-colors duration-200 group-hover:text-[color:color-mix(in_srgb,var(--foreground)_90%,var(--primary)_10%)]">
+                                  {item.label}
+                                </span>
+                                <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
+                                  {item.accessLabel}
+                                </span>
                               </span>
                               {item.description ? (
                                 <span className="mt-0.5 block text-[11px] leading-snug text-[var(--muted)]">

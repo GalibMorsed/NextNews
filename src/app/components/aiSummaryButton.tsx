@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bot, Loader2, Sparkles, X } from "lucide-react";
 import { supabase } from "../../../lib/superbaseClient";
+import { incrementAiSummaryUsage } from "@/lib/activityAnalytics";
 
 interface AISummaryButtonProps {
   title: string;
   description: string | null;
   content: string | null;
   sourceName?: string;
+  category?: string;
 }
 
 function toBulletPoints(rawSummary: string) {
@@ -40,6 +42,7 @@ export default function AISummaryButton({
   description,
   content,
   sourceName,
+  category,
 }: AISummaryButtonProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -136,6 +139,10 @@ export default function AISummaryButton({
       }
 
       setSummary(typeof data?.summary === "string" ? data.summary : "");
+      incrementAiSummaryUsage({
+        source: sourceName,
+        category,
+      });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Unable to create summary.";

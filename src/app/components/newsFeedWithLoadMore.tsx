@@ -226,6 +226,7 @@ export default function NewsFeedWithLoadMore({
               content: article.content ?? null,
             }}
             formattedDate={formatPublishedDate(article.publishedAt)}
+            category={category}
           />
         ))}
       </div>
