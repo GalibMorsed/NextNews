@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import {
   Bot,
   BrainCircuit,
@@ -26,6 +27,24 @@ const RANGE_OPTIONS = [
   { label: "3 months", days: 90 },
   { label: "All time", days: null },
 ] as const;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.06, delayChildren: 0.04 },
+  },
+};
+
+const softSpring = {
+  type: "spring" as const,
+  stiffness: 280,
+  damping: 24,
+};
 
 type RangeLabel = (typeof RANGE_OPTIONS)[number]["label"];
 const timeOf = (note: UserNote) =>
@@ -55,6 +74,13 @@ const heatColor = (count: number) =>
       : count >= 1
         ? "bg-emerald-200 dark:bg-emerald-800/70"
         : "bg-slate-100 dark:bg-slate-800";
+
+const HEAT_LEGEND = [
+  { label: "None", color: "bg-stone-100 dark:bg-slate-200" },
+  { label: "1-2 articles", color: "bg-emerald-200 dark:bg-emerald-300" },
+  { label: "3-5 articles", color: "bg-emerald-500 dark:bg-emerald-400" },
+  { label: "6+ articles", color: "bg-emerald-700 dark:bg-emerald-500" },
+] as const;
 
 export default function MyActivityPage() {
   const [selectedRange, setSelectedRange] = useState<RangeLabel>("7 days");
@@ -301,9 +327,18 @@ export default function MyActivityPage() {
   ] as const;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_28%),linear-gradient(to_bottom,_#fafaf9,_#ffffff_28%)] px-4 py-6 sm:px-6 lg:px-8 dark:bg-slate-950">
-      <div className="mx-auto flex max-w-7xl flex-col gap-5">
-        <section className="rounded-[32px] border border-stone-200/80 bg-white/90 p-5 shadow-sm backdrop-blur sm:p-7 dark:border-slate-700 dark:bg-slate-900/90">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_28%),linear-gradient(to_bottom,_#fafaf9,_#ffffff_28%)] px-4 py-6 sm:px-6 lg:px-8 dark:bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.12),_transparent_24%),linear-gradient(to_bottom,_#020617,_#0f172a_38%,_#020617)]">
+      <motion.div
+        className="mx-auto flex max-w-7xl flex-col gap-5"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.section
+          variants={fadeUp}
+          transition={softSpring}
+          className="rounded-[32px] border border-stone-200/80 bg-white/90 p-5 shadow-sm backdrop-blur sm:p-7 dark:border-slate-700/80 dark:bg-slate-900/88 dark:shadow-[0_18px_60px_-28px_rgba(16,185,129,0.28)]"
+        >
           <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
             <div className="max-w-2xl">
               <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl dark:text-slate-50">My Activity</h1>
@@ -315,15 +350,23 @@ export default function MyActivityPage() {
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {RANGE_OPTIONS.map(({ label }) => (
-                <button key={label} type="button" onClick={() => setSelectedRange(label)} className={`rounded-2xl border px-5 py-3 text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 ${selectedRange === label ? "border-[var(--primary)] bg-stone-100 text-[var(--primary)]" : "border-stone-200 bg-stone-50 text-slate-700 hover:border-[var(--primary)] hover:text-[var(--primary)]"}`}>
+                <motion.button
+                  key={label}
+                  type="button"
+                  whileHover={{ y: -2, scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={softSpring}
+                  onClick={() => setSelectedRange(label)}
+                  className={`rounded-2xl border px-5 py-3 text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-emerald-500/50 dark:hover:text-emerald-300 ${selectedRange === label ? "border-[var(--primary)] bg-stone-100 text-[var(--primary)] dark:border-emerald-500/60 dark:bg-emerald-950/30 dark:text-emerald-300" : "border-stone-200 bg-stone-50 text-slate-700 hover:border-[var(--primary)] hover:text-[var(--primary)]"}`}
+                >
                   {label}
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <section className="grid grid-cols-2 gap-4 xl:grid-cols-4">
           <MetricCard title="Articles read" value={articleCount} delta={articleDelta} subtitle="Counted from how many times you opened articles with Read more in this range." icon={<FileText className="h-5 w-5" />} />
           <MetricCard title="Notes added" value={noteCount} delta={noteDelta} subtitle="Saved notes and highlights from your account." icon={<FileText className="h-5 w-5" />} />
           <MetricCard title="Reading streak" value={streak.current} suffix={streak.current === 1 ? "day" : "days"} subtitle={`Personal best: ${streak.best} day${streak.best === 1 ? "" : "s"}`} icon={<Flame className="h-5 w-5" />} />
@@ -340,7 +383,60 @@ export default function MyActivityPage() {
                   <div key={item.label} className="flex flex-1 flex-col items-center gap-3">
                     <div className="text-xs font-medium text-slate-500 dark:text-slate-400">{item.count}</div>
                     <div className="flex h-[180px] w-full items-end">
-                      <div className="w-full rounded-t-2xl bg-[linear-gradient(180deg,_rgba(16,185,129,0.9),_rgba(20,184,166,0.72))]" style={{ height: `${height}px` }} title={`${item.label}: ${item.count}`} />
+                      <motion.div
+                        initial={{ height: 0, opacity: 0.7 }}
+                        animate={{ height: `${height}px`, opacity: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 180,
+                          damping: 20,
+                          delay: 0.12 + chartBuckets.indexOf(item) * 0.08,
+                        }}
+                        className="relative w-full overflow-hidden rounded-t-2xl bg-[linear-gradient(180deg,_rgba(16,185,129,0.95),_rgba(20,184,166,0.78)_58%,_rgba(59,130,246,0.72))]"
+                        title={`${item.label}: ${item.count}`}
+                      >
+                        <motion.span
+                          aria-hidden
+                          className="absolute inset-x-[12%] top-2 h-5 rounded-full bg-white/20 blur-sm"
+                          animate={{
+                            x: ["-6%", "7%", "-4%"],
+                            y: [0, 3, 0],
+                            scaleX: [1, 1.12, 0.96],
+                          }}
+                          transition={{
+                            duration: 3.6,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: chartBuckets.indexOf(item) * 0.15,
+                          }}
+                        />
+                        <motion.span
+                          aria-hidden
+                          className="absolute -bottom-2 left-[18%] h-10 w-[68%] rounded-full bg-emerald-300/30 blur-md dark:bg-emerald-200/20"
+                          animate={{
+                            x: ["-10%", "8%", "-6%"],
+                            scaleX: [0.94, 1.06, 0.98],
+                            scaleY: [1, 0.92, 1],
+                          }}
+                          transition={{
+                            duration: 4.4,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: 0.2 + chartBuckets.indexOf(item) * 0.12,
+                          }}
+                        />
+                        <motion.span
+                          aria-hidden
+                          className="absolute inset-x-0 top-0 h-[1px] bg-white/50"
+                          animate={{ opacity: [0.35, 0.7, 0.35] }}
+                          transition={{
+                            duration: 2.6,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: chartBuckets.indexOf(item) * 0.1,
+                          }}
+                        />
+                      </motion.div>
                     </div>
                     <div className="text-xs font-medium text-slate-500 dark:text-slate-400">{item.label}</div>
                   </div>
@@ -372,10 +468,15 @@ export default function MyActivityPage() {
 
         <section className="grid gap-4 xl:grid-cols-2">
           <Panel title="Reading streak" description="A heatmap-style streak grid for recent reading, note-taking, and AI activity days.">
-            <div className="grid grid-cols-6 gap-3 sm:grid-cols-8 lg:grid-cols-10">
-              {heatmap.map((day) => (
-                <div
+            <div className="space-y-4">
+              <div className="grid grid-cols-6 gap-3 sm:grid-cols-8 lg:grid-cols-10">
+                {heatmap.map((day, index) => (
+                  <motion.div
                   key={day.key}
+                  initial={{ opacity: 0, scale: 0.92 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ ...softSpring, delay: index * 0.01 }}
+                  whileHover={{ scale: 1.08, y: -1 }}
                   className={`flex aspect-square items-center justify-center rounded-xl text-[11px] font-medium ${heatColor(day.count)} ${
                     day.count > 0
                       ? "text-emerald-950 dark:text-emerald-50"
@@ -384,8 +485,18 @@ export default function MyActivityPage() {
                   title={`${day.key}: ${day.count}`}
                 >
                   {day.key.slice(-2)}
-                </div>
-              ))}
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-x-7 gap-y-2 rounded-2xl border border-stone-200/80 bg-stone-50/90 px-4 py-3 dark:border-slate-700/70 dark:bg-slate-950/60">
+                {HEAT_LEGEND.map((item) => (
+                  <div key={item.label} className="flex items-center gap-2.5 text-sm font-medium text-stone-600 dark:text-slate-200">
+                    <span className={`h-4 w-4 rounded-[4px] ring-1 ring-black/5 dark:ring-white/10 ${item.color}`} aria-hidden />
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </Panel>
 
@@ -415,12 +526,15 @@ export default function MyActivityPage() {
           <Panel title="AI analysts" description="Your AI usage activity across article summaries and personalization suggestions." icon={<Bot className="h-5 w-5" />}>
             <div className="grid gap-4 lg:grid-cols-3">
               {analystCards.map(({ title, description, icon: Icon }) => (
-                <article key={title} className="rounded-[24px] border border-slate-200/80 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(240,253,250,0.85))] p-5 dark:border-slate-700 dark:bg-slate-950/40">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300">
+                <article
+                  key={title}
+                  className="rounded-[24px] border border-slate-200/80 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(240,253,250,0.85))] p-5 dark:border-slate-700/80 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,0.96),_rgba(10,18,34,0.92))] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+                >
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 dark:ring-1 dark:ring-emerald-700/30">
                     <Icon className="h-5 w-5" />
                   </span>
                   <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{description}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300/90">{description}</p>
                 </article>
               ))}
             </div>
@@ -435,7 +549,7 @@ export default function MyActivityPage() {
             </div>
           </Panel>
         </section>
-      </div>
+      </motion.div>
     </main>
   );
 }
@@ -457,25 +571,42 @@ function MetricCard({
 }) {
   const positive = (delta ?? 0) >= 0;
   return (
-    <article className="rounded-[28px] border border-stone-200/70 bg-stone-50/90 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <motion.article
+      variants={fadeUp}
+      transition={softSpring}
+      whileHover={{ y: -4, transition: softSpring }}
+      className="rounded-[26px] border border-stone-200/70 bg-stone-50/90 p-4 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/88 dark:shadow-[0_18px_44px_-30px_rgba(16,185,129,0.2)] sm:rounded-[28px] sm:p-5"
+    >
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">{title}</p>
-          <div className="mt-4 text-5xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 sm:text-xs sm:tracking-[0.22em]">
+            {title}
+          </p>
+          <div className="mt-3 text-4xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:mt-4 sm:text-5xl">
             {value}
-            {suffix ? <span className="ml-2 text-2xl font-medium text-slate-600 dark:text-slate-300">{suffix}</span> : null}
+            {suffix ? (
+              <span className="ml-1.5 text-xl font-medium text-slate-600 dark:text-slate-300 sm:ml-2 sm:text-2xl">
+                {suffix}
+              </span>
+            ) : null}
           </div>
         </div>
-        <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-[var(--primary)] ring-1 ring-stone-200 dark:bg-slate-800 dark:ring-slate-700">{icon}</span>
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-[var(--primary)] ring-1 ring-stone-200 dark:bg-slate-800 dark:ring-slate-700 sm:h-11 sm:w-11">
+          {icon}
+        </span>
       </div>
       {typeof delta === "number" ? (
-        <div className={`mt-4 inline-flex items-center gap-2 text-sm ${positive ? "text-emerald-700 dark:text-emerald-300" : "text-rose-700 dark:text-rose-300"}`}>
+        <div
+          className={`mt-3 inline-flex items-start gap-1.5 text-xs leading-5 sm:mt-4 sm:items-center sm:gap-2 sm:text-sm ${positive ? "text-emerald-700 dark:text-emerald-300" : "text-rose-700 dark:text-rose-300"}`}
+        >
           {positive ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
           {Math.abs(delta)}% vs last period
         </div>
       ) : null}
-      <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">{subtitle}</p>
-    </article>
+      <p className="mt-3 text-xs leading-6 text-slate-500 dark:text-slate-400 sm:text-sm">
+        {subtitle}
+      </p>
+    </motion.article>
   );
 }
 
@@ -491,7 +622,12 @@ function Panel({
   icon?: React.ReactNode;
 }) {
   return (
-    <section className="rounded-[30px] border border-slate-200/80 bg-white/90 p-5 shadow-sm sm:p-6 dark:border-slate-700 dark:bg-slate-900/90">
+    <motion.section
+      variants={fadeUp}
+      transition={softSpring}
+      whileHover={{ y: -2, transition: softSpring }}
+      className="rounded-[30px] border border-slate-200/80 bg-white/90 p-5 shadow-sm sm:p-6 dark:border-slate-700/80 dark:bg-slate-900/88 dark:shadow-[0_18px_52px_-34px_rgba(16,185,129,0.18)]"
+    >
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{title}</h2>
@@ -500,7 +636,7 @@ function Panel({
         {icon ? <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">{icon}</span> : null}
       </div>
       {children}
-    </section>
+    </motion.section>
   );
 }
 
@@ -514,20 +650,31 @@ function SummaryRow({
   detail: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-4 dark:border-slate-700 dark:bg-slate-950/40">
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={softSpring}
+      whileHover={{ x: 3, transition: softSpring }}
+      className="flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-4 dark:border-slate-700/80 dark:bg-slate-950/40"
+    >
       <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-[var(--primary)] shadow-sm dark:bg-slate-800">{icon}</span>
       <div className="min-w-0">
         <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{title}</p>
         <p className="text-sm text-slate-600 dark:text-slate-300">{detail}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function EmptyStateText({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-[24px] border border-slate-200/80 bg-white px-4 py-5 text-sm leading-6 text-slate-500 dark:border-slate-700 dark:bg-slate-950/40 dark:text-slate-400">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35 }}
+      className="rounded-[24px] border border-slate-200/80 bg-white px-4 py-5 text-sm leading-6 text-slate-500 dark:border-slate-700/80 dark:bg-slate-950/40 dark:text-slate-400"
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
