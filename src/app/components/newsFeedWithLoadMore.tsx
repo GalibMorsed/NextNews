@@ -345,7 +345,7 @@ export default function NewsFeedWithLoadMore({
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.96 }}
-            className="fixed bottom-5 right-3 z-40 inline-flex h-12 w-12 items-center justify-center overflow-visible rounded-full border border-white/50 bg-transparent text-slate-950 shadow-[0_12px_26px_-20px_rgba(15,23,42,0.18)] backdrop-blur-[22px] transition-colors hover:border-white/70 dark:border-white/30 dark:bg-transparent dark:text-white dark:shadow-[0_14px_30px_-22px_rgba(0,0,0,0.35)] dark:hover:border-white/42 sm:bottom-6 sm:right-5"
+            className="fixed bottom-5 right-3 z-30 inline-flex h-12 w-12 items-center justify-center overflow-visible rounded-full border border-white/50 bg-transparent text-slate-950 shadow-[0_12px_26px_-20px_rgba(15,23,42,0.18)] backdrop-blur-[22px] transition-colors hover:border-white/70 dark:border-white/30 dark:bg-transparent dark:text-white dark:shadow-[0_14px_30px_-22px_rgba(0,0,0,0.35)] dark:hover:border-white/42 sm:bottom-6 sm:right-5"
             aria-label="Back to top"
           >
             <span className="absolute inset-0 rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.025)_38%,rgba(255,255,255,0.005)_100%)] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.018)_38%,rgba(255,255,255,0.004)_100%)]" />
