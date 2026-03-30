@@ -187,13 +187,20 @@ export default function MyActivityPage() {
       if (
         event.type !== "article_open" &&
         event.type !== "ai_summary" &&
-        event.type !== "personalization_suggestion"
+        event.type !== "personalization_suggestion" &&
+        event.type !== "category_visit"
       ) {
         return;
       }
       const key = dayKey(event.timestamp);
       if (!key) return;
-      counts.set(key, (counts.get(key) ?? 0) + 1);
+
+      const score =
+        event.type === "category_visit"
+          ? Math.max(1, Math.round((event.durationMs ?? 0) / 60000))
+          : 1;
+
+      counts.set(key, (counts.get(key) ?? 0) + score);
     });
 
     return counts;
@@ -255,10 +262,19 @@ export default function MyActivityPage() {
 
   const categoryBreakdown = useMemo(() => {
     const counts = new Map<string, number>();
+
     filteredEvents.forEach((event) => {
       const category = event.category?.trim();
-      if (category) counts.set(category, (counts.get(category) ?? 0) + 1);
+      if (!category) return;
+
+      const score =
+        event.type === "category_visit"
+          ? Math.max(1, Math.round((event.durationMs ?? 0) / 60000))
+          : 1;
+
+      counts.set(category, (counts.get(category) ?? 0) + score);
     });
+
     const total = Array.from(counts.values()).reduce((sum, value) => sum + value, 0);
     return Array.from(counts.entries())
       .sort((a, b) => b[1] - a[1])
