@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown, CreditCard, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -71,6 +71,13 @@ export default function NewsFeedWithLoadMore({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showPlansPopup, setShowPlansPopup] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [isBackToTopHovered, setIsBackToTopHovered] = useState(false);
+  const [isBackToTopFocused, setIsBackToTopFocused] = useState(false);
+  const [showBackToTopHint, setShowBackToTopHint] = useState(false);
+  const backToTopHintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -106,6 +113,25 @@ export default function NewsFeedWithLoadMore({
     return () => {
       window.removeEventListener("storage", syncAuthState);
       window.removeEventListener("focus", syncAuthState);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 900);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (backToTopHintTimeoutRef.current) {
+        clearTimeout(backToTopHintTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -189,6 +215,23 @@ export default function NewsFeedWithLoadMore({
 
     setShowPlansPopup(true);
   };
+
+  const handleBackToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setShowBackToTopHint(true);
+
+    if (backToTopHintTimeoutRef.current) {
+      clearTimeout(backToTopHintTimeoutRef.current);
+    }
+
+    backToTopHintTimeoutRef.current = setTimeout(() => {
+      setShowBackToTopHint(false);
+      backToTopHintTimeoutRef.current = null;
+    }, 1400);
+  };
+
+  const showBackToTopText =
+    isBackToTopHovered || isBackToTopFocused || showBackToTopHint;
 
   const popupVariants = isMobile
     ? {
@@ -286,6 +329,48 @@ export default function NewsFeedWithLoadMore({
 
         {loadError && <p className="text-sm text-red-600">{loadError}</p>}
       </div>
+
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            type="button"
+            onClick={handleBackToTop}
+            onMouseEnter={() => setIsBackToTopHovered(true)}
+            onMouseLeave={() => setIsBackToTopHovered(false)}
+            onFocus={() => setIsBackToTopFocused(true)}
+            onBlur={() => setIsBackToTopFocused(false)}
+            initial={{ opacity: 0, y: 18, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 14, scale: 0.96 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            className="fixed bottom-5 right-3 z-40 inline-flex h-12 w-12 items-center justify-center overflow-visible rounded-full border border-white/50 bg-transparent text-slate-950 shadow-[0_12px_26px_-20px_rgba(15,23,42,0.18)] backdrop-blur-[22px] transition-colors hover:border-white/70 dark:border-white/30 dark:bg-transparent dark:text-white dark:shadow-[0_14px_30px_-22px_rgba(0,0,0,0.35)] dark:hover:border-white/42 sm:bottom-6 sm:right-5"
+            aria-label="Back to top"
+          >
+            <span className="absolute inset-0 rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.025)_38%,rgba(255,255,255,0.005)_100%)] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.018)_38%,rgba(255,255,255,0.004)_100%)]" />
+            <span className="absolute inset-[2px] rounded-full border border-white/22 bg-white/[0.025] shadow-[inset_0_1px_0_rgba(255,255,255,0.26)] dark:border-white/12 dark:bg-white/[0.015] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]" />
+            <span className="absolute left-1/2 top-[6px] h-4 w-[50%] -translate-x-1/2 rounded-full bg-white/20 blur-[6px] dark:bg-white/10" />
+            <span className="absolute bottom-[7px] left-1/2 h-5 w-[42%] -translate-x-1/2 rounded-full bg-black/[0.045] blur-[8px] dark:bg-black/[0.18]" />
+            <span className="relative flex items-center justify-center">
+              <ArrowDown className="h-4 w-4 rotate-180 text-black/85 drop-shadow-[0_1px_1px_rgba(255,255,255,0.45)] sm:h-5 sm:w-5 dark:text-white" />
+              <AnimatePresence initial={false}>
+                {showBackToTopText && (
+                  <motion.span
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="absolute bottom-full mb-2 whitespace-nowrap rounded-full border border-white/45 bg-white/85 px-2.5 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-black/85 shadow-sm backdrop-blur-md dark:border-white/20 dark:bg-slate-900/80 dark:text-white"
+                  >
+                    To Top
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </span>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {showPlansPopup && (

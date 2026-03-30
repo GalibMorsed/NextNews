@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import NewsFeedWithLoadMore from "@/app/components/newsFeedWithLoadMore";
 import { getCategoryDisplayName } from "@/lib/newsCategories";
+import { trackCategoryVisit } from "@/lib/activityAnalytics";
 import { supabase } from "../../../../lib/superbaseClient";
 
 interface Article {
@@ -67,6 +68,7 @@ export default function CategoryContent({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const activeStartRef = useRef<number | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -101,6 +103,45 @@ export default function CategoryContent({
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const flushActiveTime = () => {
+      if (activeStartRef.current === null) return;
+      const durationMs = Date.now() - activeStartRef.current;
+      activeStartRef.current = null;
+      trackCategoryVisit(category, durationMs);
+    };
+
+    const resumeActiveTime = () => {
+      if (document.visibilityState !== "visible") return;
+      if (activeStartRef.current !== null) return;
+      activeStartRef.current = Date.now();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        flushActiveTime();
+      } else {
+        resumeActiveTime();
+      }
+    };
+
+    const handlePageHide = () => {
+      flushActiveTime();
+    };
+
+    resumeActiveTime();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pagehide", handlePageHide);
+
+    return () => {
+      flushActiveTime();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pagehide", handlePageHide);
+    };
+  }, [category]);
 
   const handleRefresh = async () => {
     if (isRefreshing) return;

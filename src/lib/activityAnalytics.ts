@@ -3,13 +3,15 @@ const ACTIVITY_ANALYTICS_PREFIX = "activityAnalytics_";
 export type ActivityEventType =
   | "article_open"
   | "ai_summary"
-  | "personalization_suggestion";
+  | "personalization_suggestion"
+  | "category_visit";
 
 export type ActivityEvent = {
   type: ActivityEventType;
   timestamp: string;
   source?: string;
   category?: string;
+  durationMs?: number;
 };
 
 export type ActivityAnalytics = {
@@ -58,7 +60,7 @@ function writeActivityAnalytics(next: ActivityAnalytics) {
 
 export function trackActivityEvent(
   type: ActivityEventType,
-  details?: { source?: string; category?: string },
+  details?: { source?: string; category?: string; durationMs?: number },
 ) {
   const current = readActivityAnalytics();
   const nextEvent: ActivityEvent = {
@@ -66,6 +68,10 @@ export function trackActivityEvent(
     timestamp: new Date().toISOString(),
     source: details?.source?.trim() || undefined,
     category: details?.category?.trim() || undefined,
+    durationMs:
+      typeof details?.durationMs === "number" && Number.isFinite(details.durationMs)
+        ? Math.max(0, Math.round(details.durationMs))
+        : undefined,
   };
 
   writeActivityAnalytics({
@@ -91,4 +97,10 @@ export function incrementAiSummaryUsage(details?: {
 
 export function incrementPersonalizationSuggestionUsage() {
   trackActivityEvent("personalization_suggestion");
+}
+
+export function trackCategoryVisit(category: string, durationMs: number) {
+  if (!category.trim()) return;
+  if (!Number.isFinite(durationMs) || durationMs < 1000) return;
+  trackActivityEvent("category_visit", { category, durationMs });
 }
