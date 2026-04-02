@@ -431,7 +431,7 @@ export async function GET(request: Request) {
       : [];
 
     const heroArticle = articles[0] ?? null;
-    const sideArticles = articles.slice(1, 3);
+    const sideArticles = articles.slice(1, 4);
     const fallback = fallbackInsights(region.label, query, articles);
     const aiInsights = await fetchAiInsights(region.label, query, articles);
 

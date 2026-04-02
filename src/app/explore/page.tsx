@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -24,6 +24,7 @@ import {
   getUserPersonalization,
   saveUserPersonalization,
 } from "../services/personalizationService";
+import RegionSelector from "../components/RegionSelector";
 
 type ExploreState = {
   data: ExploreResponse | null;
@@ -91,23 +92,34 @@ function SectionHeading({
   title,
   description,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   description: string;
 }) {
   return (
-    <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">
-          {eyebrow}
-        </p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--foreground)]">
+    <div className="flex flex-col gap-6 w-full">
+      <div className="flex flex-col">
+        {eyebrow && (
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.25em] text-[var(--primary)] pulse-soft mb-2">
+            {eyebrow}
+          </p>
+        )}
+        <h2 className="text-4xl font-extrabold tracking-tight text-[var(--foreground)] sm:text-5xl lg:text-6xl">
           {title}
         </h2>
+        <div className="mt-5 h-1.5 w-20 rounded-full bg-[var(--primary)] shadow-sm" />
       </div>
-      <p className="max-w-2xl text-sm leading-6 text-[var(--muted)]">
-        {description}
-      </p>
+
+      <div className="max-w-4xl rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-800/60 ring-1 ring-slate-100 dark:ring-slate-700/50">
+        <div className="flex items-start gap-4">
+          <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color:color-mix(in_srgb,var(--primary)_10%,white)] text-[var(--primary)] dark:bg-[color:color-mix(in_srgb,var(--primary)_20%,transparent)]">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <p className="text-base font-medium leading-relaxed text-[var(--muted)] sm:text-lg lg:text-xl">
+            {description}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -122,6 +134,7 @@ export default function ExplorePage() {
   const [followedSources, setFollowedSources] = useState<string[]>([]);
   const [favoriteTopics, setFavoriteTopics] = useState<string[]>([]);
   const [isSavingSources, setIsSavingSources] = useState<string | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const syncAuthState = () => {
@@ -266,6 +279,17 @@ export default function ExplorePage() {
     }
   };
 
+  const handleTopicClick = (tag: string) => {
+    setSearchInput(tag);
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+      searchInputRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[var(--background)] px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -291,8 +315,8 @@ export default function ExplorePage() {
                 Explore opens after sign in
               </h1>
               <p className="mt-3 text-base leading-7 text-[var(--muted)]">
-                This area uses saved session data and personalization, so we only
-                show it for logged-in users.
+                This area uses saved session data and personalization, so we
+                only show it for logged-in users.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -312,80 +336,60 @@ export default function ExplorePage() {
           </PageSurface>
         ) : (
           <>
-            <PageSurface className="overflow-hidden">
-              <div className="border-b border-slate-200/80 bg-slate-50/80 px-6 py-6 dark:border-slate-700/80 dark:bg-slate-800/60 sm:px-8">
-                <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+            <div className="space-y-6">
+              <PageSurface className="overflow-hidden">
+                <div className="px-6 py-8 sm:px-8">
                   <div className="max-w-3xl">
                     <div className="inline-flex items-center gap-2 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_10%,white)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)] dark:bg-[color:color-mix(in_srgb,var(--primary)_16%,transparent)]">
                       <Sparkles className="h-3.5 w-3.5" />
                       Live Explore
                     </div>
-                    <h1 className="mt-4 text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-[2.8rem]">
+                    <h1 className="mt-4 text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-[3.2rem]">
                       Explore
                     </h1>
-                    <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--muted)]">
-                      Switch regions or search a live topic. Stories, category
-                      paths, trends, and suggested sources all update around what
-                      is happening now.
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleSearchSubmit} className="w-full max-w-xl">
-                    <div className="relative rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
-                      <Search
-                        className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted)]"
-                        aria-hidden
-                      />
-                      <input
-                        type="text"
-                        value={searchInput}
-                        onChange={(event) => setSearchInput(event.target.value)}
-                        placeholder="Search regions, topics..."
-                        className="w-full bg-transparent py-4 pl-12 pr-28 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] sm:text-base"
-                      />
-                      <button
-                        type="submit"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
-                      >
-                        Search
-                      </button>
+                    <div className="mt-4 flex flex-col gap-1">
+                      <div className="h-0.5 w-12 rounded-full bg-[var(--primary)]/30" />
+                      <p className="max-w-2xl text-base leading-7 text-[var(--muted)]">
+                        Switch regions or search a live topic. Stories, category
+                        paths, trends, and suggested sources all update around
+                        what is happening now.
+                      </p>
                     </div>
-                  </form>
+                  </div>
                 </div>
-              </div>
+              </PageSurface>
 
-              <div className="px-6 py-4 sm:px-8">
-                <div className="flex gap-3 overflow-x-auto pb-1">
-                  {EXPLORE_REGIONS.map((region) => (
-                    <button
-                      key={region.id}
-                      type="button"
-                      onClick={() => setSelectedRegion(region.id)}
-                      className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition ${
-                        selectedRegion === region.id
-                          ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
-                          : "border-slate-200 bg-white text-[var(--foreground)] hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
-                      }`}
-                    >
-                      <span
-                        className={
-                          selectedRegion === region.id
-                            ? "text-[var(--background)]"
-                            : "text-[var(--primary)]"
-                        }
-                      >
-                        {region.id === "world" ? (
-                          <Globe2 className="h-4 w-4" />
-                        ) : (
-                          <Compass className="h-4 w-4" />
-                        )}
-                      </span>
-                      {region.label}
-                    </button>
-                  ))}
+              <RegionSelector
+                selectedRegion={selectedRegion}
+                onRegionSelect={setSelectedRegion}
+              />
+
+              <form
+                onSubmit={handleSearchSubmit}
+                className="mx-auto w-full max-w-4xl px-2"
+              >
+                <div className="group relative rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 focus-within:border-[var(--primary)] focus-within:ring-4 focus-within:ring-[var(--primary)]/10 dark:border-slate-700 dark:bg-slate-900">
+                  <Search
+                    className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted)] transition-colors group-focus-within:text-[var(--primary)]"
+                    aria-hidden
+                  />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
+                    placeholder={`Search any topic in ${data?.regionLabel}...`}
+                    className="w-full bg-transparent py-5 pl-14 pr-32 text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-xl bg-[var(--primary)] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:brightness-110 active:scale-95"
+                  >
+                    Search
+                  </button>
                 </div>
-              </div>
-            </PageSurface>
+              </form>
+            </div>
 
             {exploreState.loading ? (
               <div className="grid gap-4 lg:grid-cols-[1.55fr_1fr]">
@@ -406,110 +410,143 @@ export default function ExplorePage() {
               <>
                 <section className="space-y-4">
                   <SectionHeading
-                    eyebrow="Editorial Hero Grid"
-                    title={`${data?.regionLabel} now`}
+                    title={`${data?.regionLabel} Now`}
                     description={
                       data?.regionBrief ||
-                      "The strongest story sits on the left, with two supporting developments stacked on the right."
+                      "Explore the latest developments and breaking stories from this region, curated by our AI based on your preferences."
                     }
                   />
 
-                  <div className="grid gap-4 lg:grid-cols-[1.55fr_1fr]">
+                  <div className="flex flex-col gap-6">
                     {heroArticle ? (
-                      <PageSurface className="overflow-hidden">
-                        <div className="relative h-72 sm:h-80">
+                      <PageSurface className="overflow-hidden shadow-md">
+                        <div className="relative h-[24rem] sm:h-[28rem] lg:h-[32rem]">
                           <StoryImage
                             article={heroArticle}
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/20 to-transparent" />
-                          <div className="absolute left-5 right-5 top-5 flex items-center justify-between gap-3">
-                            <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-700 dark:bg-slate-900/90 dark:text-slate-200">
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                          <div className="absolute left-6 right-6 top-6 flex items-center justify-between gap-4">
+                            <span className="backdrop-blur-md rounded-full bg-white/20 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-white ring-1 ring-white/30">
                               {data?.regionLabel}
                             </span>
-                            <span className="rounded-full bg-black/40 px-3 py-1 text-xs font-medium text-white">
+                            <span className="backdrop-blur-md rounded-full bg-black/40 px-4 py-1.5 text-xs font-bold text-white ring-1 ring-white/10">
                               {formatRelativeTime(heroArticle.publishedAt)}
                             </span>
                           </div>
-                          <div className="absolute bottom-0 left-0 right-0 p-6">
-                            <p className="text-sm font-medium text-white/80">
+                          <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-10">
+                            <div className="flex items-center gap-2 text-sm font-bold text-[var(--primary)] uppercase tracking-wider">
+                              <div className="h-1.5 w-1.5 rounded-full bg-[var(--primary)] animate-pulse" />
                               {heroArticle.source.name}
-                            </p>
-                            <h3 className="mt-2 text-2xl font-semibold leading-tight text-white sm:text-[2rem]">
+                            </div>
+                            <h3 className="mt-3 text-3xl font-bold leading-[1.1] text-white sm:text-4xl lg:text-5xl">
                               {heroArticle.title}
                             </h3>
                           </div>
                         </div>
 
-                        <div className="space-y-5 p-6 sm:p-7">
-                          <p className="text-base leading-7 text-[var(--muted)]">
-                            {heroArticle.description ||
-                              "Open the lead story first, then use the guided direction below to search a related angle inside this region."}
-                          </p>
+                        <div className="grid gap-8 p-8 sm:p-10 xl:grid-cols-[1fr_0.8fr]">
+                          <div className="space-y-6">
+                            <p className="text-lg leading-relaxed text-[var(--muted)] sm:text-xl">
+                              {heroArticle.description ||
+                                "A significant regional development requiring your attention. Read the full analysis or explore deeper search angles below."}
+                            </p>
 
-                          <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/70">
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">
-                              Suggested Search Direction
-                            </p>
-                            <p className="mt-2 text-sm leading-6 text-[var(--foreground)]">
-                              {data?.heroSearchPrompt}
-                            </p>
+                            <div className="flex flex-wrap gap-4">
+                              <a
+                                href={heroArticle.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-8 text-base font-bold text-[var(--foreground)] transition-all hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5 active:translate-y-0 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
+                              >
+                                Open full story
+                                <ArrowUpRight className="h-5 w-5" />
+                              </a>
+                              <a
+                                href="#explore-categories"
+                                className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl bg-[var(--primary)]/[0.08] px-8 text-base font-bold text-[var(--primary)] transition-all hover:bg-[var(--primary)]/[0.14] hover:-translate-y-0.5 active:translate-y-0 dark:bg-[var(--primary)]/[0.14] dark:hover:bg-[var(--primary)]/[0.2]"
+                              >
+                                Browse topics
+                                <ArrowRight className="h-5 w-5" />
+                              </a>
+                            </div>
                           </div>
 
-                          <div className="flex flex-wrap gap-3">
-                            <button
-                              type="button"
-                              onClick={handleHeroPromptSearch}
-                              className="inline-flex items-center gap-2 rounded-2xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-110"
-                            >
-                              Search this angle
-                              <Search className="h-4 w-4" />
-                            </button>
-                            <a
-                              href={heroArticle.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground)] transition hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
-                            >
-                              Open full story
-                              <ArrowUpRight className="h-4 w-4" />
-                            </a>
+                          <div className="flex flex-col rounded-3xl border border-[var(--primary)]/20 bg-[var(--primary)]/[0.03] p-6 dark:bg-[var(--primary)]/[0.05]">
+                            <div className="flex items-center gap-2">
+                              <Sparkles className="h-4 w-4 text-[var(--primary)]" />
+                              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--primary)]">
+                                AI Suggested Search Direction
+                              </p>
+                            </div>
+                            <p className="mt-4 text-base font-medium leading-relaxed text-[var(--foreground)]">
+                              {data?.heroSearchPrompt ||
+                                "How is this event affecting regional stability and what are the long-term economic implications?"}
+                            </p>
+                            <div className="mt-auto flex flex-col gap-6 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                              <div className="flex -space-x-2">
+                                {[1, 2, 3].map((i) => (
+                                  <div
+                                    key={i}
+                                    className="h-8 w-8 rounded-full border-2 border-white bg-slate-200 dark:border-slate-900"
+                                  />
+                                ))}
+                                <div className="flex h-8 items-center pl-4 text-xs font-bold text-[var(--muted)]">
+                                  +12 related perspectives
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={handleHeroPromptSearch}
+                                className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[var(--primary)] px-5 text-sm font-bold text-white shadow-md shadow-[var(--primary)]/20 transition-all hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0"
+                              >
+                                Search this angle
+                                <Search className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </PageSurface>
                     ) : null}
 
-                    <div className="grid gap-4">
+                    <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
                       {sideArticles.map((article) => (
-                        <PageSurface key={article.url} className="overflow-hidden">
-                          <div className="grid sm:grid-cols-[11rem_1fr] lg:grid-cols-1">
-                            <div className="relative h-44 sm:h-full lg:h-40">
+                        <PageSurface
+                          key={article.url}
+                          className="group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                        >
+                          <div className="flex flex-col h-full bg-[var(--card)]">
+                            <div className="relative h-52 w-full overflow-hidden">
                               <StoryImage
                                 article={article}
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 to-transparent" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
+                              <div className="absolute bottom-3 left-4">
+                                <span className="rounded-lg bg-[var(--primary)]/90 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                                  {article.source.name}
+                                </span>
+                              </div>
                             </div>
-                            <div className="p-5">
-                              <span className="inline-flex rounded-full bg-[color:color-mix(in_srgb,var(--primary)_12%,white)] px-3 py-1 text-xs font-medium text-[var(--primary)] dark:bg-[color:color-mix(in_srgb,var(--primary)_20%,transparent)]">
-                                {article.source.name}
-                              </span>
-                              <h3 className="mt-4 text-xl font-semibold leading-snug text-[var(--foreground)]">
+                            <div className="flex flex-col flex-1 p-5">
+                              <h3 className="text-lg font-bold leading-tight text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
                                 {article.title}
                               </h3>
-                              <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+                              <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-[var(--muted)]">
                                 {article.description ||
-                                  "A secondary development that adds more context to the main regional picture."}
+                                  "Stay updated with this developing story providing more context to the current global landscape."}
                               </p>
-                              <a
-                                href={article.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary)]"
-                              >
-                                Read story
-                                <ArrowRight className="h-4 w-4" />
-                              </a>
+                              <div className="mt-auto pt-5">
+                                <a
+                                  href={article.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 text-sm font-bold text-[var(--primary)] hover:gap-3 transition-all"
+                                >
+                                  Read story
+                                  <ArrowRight className="h-4 w-4" />
+                                </a>
+                              </div>
                             </div>
                           </div>
                         </PageSurface>
@@ -518,16 +555,18 @@ export default function ExplorePage() {
                   </div>
                 </section>
 
-                <section className="space-y-4">
+                <section id="explore-categories" className="space-y-4">
                   <SectionHeading
-                    eyebrow="More Stories"
-                    title="Category paths shaped by the region"
-                    description="These category cards stay simple and editorial, giving users a cleaner way to jump into the most relevant topic streams."
+                    title={`More stories from ${data?.regionLabel}`}
+                    description="Explore more stories organized into categories, curated by our AI to help you dive deeper into the topics that matter most in this region right now."
                   />
 
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {visibleCategories.map((category) => (
-                      <Link key={category.slug} href={`/categories/${category.slug}`}>
+                      <Link
+                        key={category.slug}
+                        href={`/categories/${category.slug}`}
+                      >
                         <PageSurface className="h-full p-6 transition hover:border-slate-300 hover:shadow-md dark:hover:border-slate-600">
                           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[color:color-mix(in_srgb,var(--primary)_12%,white)] text-[var(--primary)] dark:bg-[color:color-mix(in_srgb,var(--primary)_20%,transparent)]">
                             <Compass className="h-5 w-5" />
@@ -550,65 +589,65 @@ export default function ExplorePage() {
 
                 <section className="grid gap-4 xl:grid-cols-[0.9fr_1.4fr]">
                   <PageSurface className="p-6 sm:p-7">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 dark:bg-rose-950/50 dark:text-rose-200">
-                        <TrendingUp className="h-5 w-5" />
+                    <div className="flex flex-col gap-5">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 shadow-sm shadow-rose-100/50 dark:bg-rose-950/50 dark:text-rose-200">
+                          <TrendingUp className="h-6 w-6" />
+                        </div>
+                        <div>
+                          <h2 className="mt-1 text-3xl font-extrabold text-[var(--foreground)] sm:text-4xl">
+                            Live Stories
+                          </h2>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">
-                          Trending In Region
-                        </p>
-                        <h2 className="mt-1 text-2xl font-semibold text-[var(--foreground)]">
-                          Live pulse
-                        </h2>
-                      </div>
-                    </div>
 
-                    <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-rose-700 dark:bg-rose-950/40 dark:text-rose-200">
-                      <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-rose-500" />
-                      AI + News API signal mix
+                      <div className="flex items-center gap-3">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-rose-100 bg-rose-50 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-rose-700 dark:border-rose-950/40 dark:bg-rose-950/40 dark:text-rose-200">
+                          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-rose-500 shadow-sm shadow-rose-500/50" />
+                          Trending in {data?.regionLabel}
+                        </div>
+                      </div>
                     </div>
 
                     <div className="mt-6 space-y-3">
                       {visibleTrendingTopics.map((topic, index) => (
-                        <div
+                        <button
                           key={`${topic.tag}-${index}`}
-                          className="rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-4 dark:border-slate-700 dark:bg-slate-800/70"
+                          onClick={() => handleTopicClick(topic.tag)}
+                          className="w-full text-left rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-4 transition-all hover:bg-white hover:shadow-md hover:border-[var(--primary)]/30 dark:border-slate-700 dark:bg-slate-800/70 dark:hover:bg-slate-800"
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div>
-                              <p className="text-lg font-semibold text-[var(--foreground)]">
+                              <p className="text-lg font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
                                 {topic.tag}
                               </p>
                               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
                                 {topic.reason}
                               </p>
                             </div>
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-200">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-200 group-hover:scale-110 transition-transform">
                               <ArrowUpRight className="h-4 w-4" />
                             </div>
                           </div>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </PageSurface>
 
                   <PageSurface className="p-6 sm:p-7">
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="flex flex-col gap-4">
                       <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">
-                          Sources To Follow
-                        </p>
-                        <h2 className="mt-1 text-2xl font-semibold text-[var(--foreground)]">
-                          Suggested voices for this region
+                        <h2 className="mt-2 text-3xl font-extrabold text-[var(--foreground)] sm:text-4xl">
+                          Suggested Voices
                         </h2>
+                        <div className="mt-4 h-1.5 w-16 rounded-full bg-[var(--primary)]" />
                       </div>
-                      <div className="rounded-full border border-slate-200 bg-slate-50/80 px-3 py-1 text-xs font-medium text-[var(--muted)] dark:border-slate-700 dark:bg-slate-800/70">
-                        Saved to personalization
+                      <div className="inline-flex max-w-fit rounded-full border border-slate-200/60 bg-slate-50/80 px-4 py-1.5 text-xs font-bold text-[var(--muted)] shadow-sm dark:border-slate-700/60 dark:bg-slate-800/70">
+                        Follow Best sources form {data?.regionLabel}.
                       </div>
                     </div>
 
-                    <div className="mt-6 grid gap-4 md:grid-cols-2">
+                    <div className="mt-6 flex flex-col gap-3">
                       {visibleSources.map((source, index) => {
                         const isFollowing = followSet.has(source.name);
                         const isSaving = isSavingSources === source.name;
@@ -616,43 +655,52 @@ export default function ExplorePage() {
                         return (
                           <div
                             key={`${source.name}-${source.regionHint}-${index}`}
-                            className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/70"
+                            className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/50 dark:hover:border-slate-600"
                           >
-                            <div className="flex min-w-0 items-center gap-3">
-                              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[color:color-mix(in_srgb,var(--primary)_12%,white)] text-sm font-semibold text-[var(--primary)] dark:bg-[color:color-mix(in_srgb,var(--primary)_20%,transparent)]">
+                            <div className="flex flex-1 items-center gap-4 min-w-0">
+                              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[color:color-mix(in_srgb,var(--primary)_10%,white)] text-sm font-bold text-[var(--primary)] shadow-inner dark:bg-[color:color-mix(in_srgb,var(--primary)_20%,transparent)]">
                                 {source.name.slice(0, 2).toUpperCase()}
                               </div>
-                              <div className="min-w-0">
-                                <p className="truncate text-base font-semibold text-[var(--foreground)]">
-                                  {source.name}
-                                </p>
-                                <p className="text-sm text-[var(--muted)]">
-                                  {source.regionHint}
-                                </p>
-                                <p className="mt-1 line-clamp-2 text-xs leading-5 text-[var(--muted)]">
+
+                              <div className="flex flex-1 flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 min-w-0">
+                                <div className="min-w-[140px]">
+                                  <p className="truncate text-base font-bold text-[var(--foreground)]">
+                                    {source.name}
+                                  </p>
+                                  <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">
+                                    {source.regionHint}
+                                  </p>
+                                </div>
+
+                                <div className="hidden md:block h-8 w-px bg-slate-200 dark:bg-slate-800" />
+
+                                <p className="flex-1 text-sm leading-relaxed text-[var(--muted)] line-clamp-1">
                                   {source.reason}
                                 </p>
                               </div>
                             </div>
 
-                            <button
-                              type="button"
-                              onClick={() => void handleToggleSource(source.name)}
-                              disabled={isSaving}
-                              className={`inline-flex min-w-[110px] shrink-0 items-center justify-center rounded-2xl border px-4 py-2.5 text-sm font-semibold transition ${
-                                isFollowing
-                                  ? "border-[color:color-mix(in_srgb,var(--primary)_28%,var(--border))] bg-[color:color-mix(in_srgb,var(--primary)_12%,white)] text-[var(--primary)] dark:bg-[color:color-mix(in_srgb,var(--primary)_20%,transparent)]"
-                                  : "border-slate-200 bg-white text-[var(--foreground)] hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
-                              }`}
-                            >
-                              {isSaving ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : isFollowing ? (
-                                "Following"
-                              ) : (
-                                "Follow"
-                              )}
-                            </button>
+                            <div className="flex sm:block justify-end pt-2 sm:pt-0">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  void handleToggleSource(source.name)
+                                }
+                                disabled={isSaving}
+                                className={`inline-flex min-w-[120px] shrink-0 items-center justify-center rounded-xl border px-5 py-2.5 text-sm font-bold transition-all active:scale-95 ${isFollowing
+                                  ? "border-[var(--primary)]/30 bg-[var(--primary)]/5 text-[var(--primary)] hover:bg-[var(--primary)]/10"
+                                  : "border-slate-200 bg-slate-50 text-[var(--foreground)] hover:border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
+                                  }`}
+                              >
+                                {isSaving ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : isFollowing ? (
+                                  "Following"
+                                ) : (
+                                  "Follow"
+                                )}
+                              </button>
+                            </div>
                           </div>
                         );
                       })}

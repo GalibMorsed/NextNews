@@ -2,6 +2,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  scroll-behavior: smooth;
   /* Light mode defaults */
   --background: #f8fafc;       /* slate-50 */
   --foreground: #0f172a;       /* slate-900 */
