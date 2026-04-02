@@ -119,12 +119,11 @@ export const EXPLORE_REGIONS: ExploreRegionConfig[] = [
   },
   {
     id: "india",
-    label: "India",
-    chipLabel: "India",
-    country: "in",
+    label: "South Asia",
+    chipLabel: "South Asia",
     topicQuery:
-      "(India OR New Delhi OR Mumbai OR Bengaluru OR Indian economy OR Indian politics)",
-    searchContext: "India news",
+      "(South Asia OR India OR Pakistan OR Bangladesh OR Sri Lanka OR Nepal OR New Delhi)",
+    searchContext: "South Asia news",
   },
 ] as const;
 

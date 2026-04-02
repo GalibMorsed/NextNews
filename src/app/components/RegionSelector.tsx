@@ -208,7 +208,7 @@ export default function RegionSelector({
                 ) : (
                   <Sparkles className="h-5 w-5 animate-pulse" />
                 )}
-                <span className="tracking-tight">AI Suggest Destinations</span>
+                <span className="tracking-tight">AI Suggest Region</span>
                 {/* Visual glow */}
                 <div className="absolute -inset-1 rounded-[2.2rem] bg-[var(--primary)]/20 opacity-0 blur-xl transition-opacity group-hover:opacity-100" />
               </button>

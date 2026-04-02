@@ -97,28 +97,19 @@ function SectionHeading({
   description: string;
 }) {
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <div className="flex flex-col">
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm sm:p-6">
+      <div>
         {eyebrow && (
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.25em] text-[var(--primary)] pulse-soft mb-2">
+          <span className="mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
             {eyebrow}
-          </p>
+          </span>
         )}
-        <h2 className="text-4xl font-extrabold tracking-tight text-[var(--foreground)] sm:text-5xl lg:text-6xl">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
           {title}
         </h2>
-        <div className="mt-5 h-1.5 w-20 rounded-full bg-[var(--primary)] shadow-sm" />
-      </div>
-
-      <div className="max-w-4xl rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-800/60 ring-1 ring-slate-100 dark:ring-slate-700/50">
-        <div className="flex items-start gap-4">
-          <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color:color-mix(in_srgb,var(--primary)_10%,white)] text-[var(--primary)] dark:bg-[color:color-mix(in_srgb,var(--primary)_20%,transparent)]">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <p className="text-base font-medium leading-relaxed text-[var(--muted)] sm:text-lg lg:text-xl">
-            {description}
-          </p>
-        </div>
+        <p className="mt-2 max-w-3xl text-sm text-slate-600 dark:text-slate-300 sm:text-base">
+          {description}
+        </p>
       </div>
     </div>
   );
@@ -339,20 +330,26 @@ export default function ExplorePage() {
             <div className="space-y-6">
               <PageSurface className="overflow-hidden">
                 <div className="px-6 py-8 sm:px-8">
-                  <div className="max-w-3xl">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-[color:color-mix(in_srgb,var(--primary)_10%,white)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)] dark:bg-[color:color-mix(in_srgb,var(--primary)_16%,transparent)]">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      Live Explore
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="max-w-3xl">
+                      <span className="mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                        Live Explore
+                      </span>
+                      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
+                        Explore
+                      </h1>
+                      <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300 sm:text-base">
+                        Switch regions or search a live topic. Stories,
+                        category paths, trends, and suggested sources all
+                        update around what is happening now.🧭🗺️
+                      </p>
                     </div>
-                    <h1 className="mt-4 text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-[3.2rem]">
-                      Explore
-                    </h1>
-                    <div className="mt-4 flex flex-col gap-1">
-                      <div className="h-0.5 w-12 rounded-full bg-[var(--primary)]/30" />
-                      <p className="max-w-2xl text-base leading-7 text-[var(--muted)]">
-                        Switch regions or search a live topic. Stories, category
-                        paths, trends, and suggested sources all update around
-                        what is happening now.
+                    <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-left sm:text-right dark:border-slate-700/80 dark:bg-slate-800/70">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Viewing
+                      </p>
+                      <p className="font-medium text-slate-700 dark:text-slate-200">
+                        {data?.regionLabel || "Live feed"}
                       </p>
                     </div>
                   </div>
@@ -410,6 +407,7 @@ export default function ExplorePage() {
               <>
                 <section className="space-y-4">
                   <SectionHeading
+                    eyebrow="Regional Brief"
                     title={`${data?.regionLabel} Now`}
                     description={
                       data?.regionBrief ||
@@ -557,6 +555,7 @@ export default function ExplorePage() {
 
                 <section id="explore-categories" className="space-y-4">
                   <SectionHeading
+                    eyebrow="Category Highlights"
                     title={`More stories from ${data?.regionLabel}`}
                     description="Explore more stories organized into categories, curated by our AI to help you dive deeper into the topics that matter most in this region right now."
                   />
@@ -595,7 +594,7 @@ export default function ExplorePage() {
                           <TrendingUp className="h-6 w-6" />
                         </div>
                         <div>
-                          <h2 className="mt-1 text-3xl font-extrabold text-[var(--foreground)] sm:text-4xl">
+                          <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
                             Live Stories
                           </h2>
                         </div>
@@ -637,7 +636,7 @@ export default function ExplorePage() {
                   <PageSurface className="p-6 sm:p-7">
                     <div className="flex flex-col gap-4">
                       <div>
-                        <h2 className="mt-2 text-3xl font-extrabold text-[var(--foreground)] sm:text-4xl">
+                        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
                           Suggested Voices
                         </h2>
                         <div className="mt-4 h-1.5 w-16 rounded-full bg-[var(--primary)]" />
