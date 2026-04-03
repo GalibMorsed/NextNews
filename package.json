@@ -33,7 +33,7 @@
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
     "nodemon": "^3.1.11",
-    "pg": "^8.18.0",
+    "pg": "^8.20.0",
     "react": "19.2.3",
     "react-country-flag": "^3.1.0",
     "react-dom": "19.2.3",
@@ -50,7 +50,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/pg": "^8.12.1",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
