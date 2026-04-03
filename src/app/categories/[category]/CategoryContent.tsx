@@ -21,6 +21,7 @@ interface CategoryContentProps {
   category: string;
   initialArticles: Article[];
   pageSize?: number;
+  regionId?: string;
 }
 
 function RefreshSkeleton() {
@@ -61,6 +62,7 @@ export default function CategoryContent({
   category,
   initialArticles,
   pageSize = 20,
+  regionId,
 }: CategoryContentProps) {
   const categoryDisplayName = getCategoryDisplayName(category);
   const [articles, setArticles] = useState<Article[]>(initialArticles ?? []);
@@ -150,11 +152,16 @@ export default function CategoryContent({
 
     try {
       const params = new URLSearchParams({
-        country: "us",
         category,
         page: "1",
         pageSize: String(pageSize),
       });
+
+      if (regionId) {
+        params.set("region", regionId);
+      } else {
+        params.set("country", "us");
+      }
 
       const response = await fetch(`/api/news?${params.toString()}`, {
         cache: "no-store",
@@ -273,6 +280,7 @@ export default function CategoryContent({
           key={refreshKey}
           initialArticles={articles}
           category={category}
+          region={regionId}
           country="us"
           pageSize={pageSize}
           emptyMessage="No articles found for this category."

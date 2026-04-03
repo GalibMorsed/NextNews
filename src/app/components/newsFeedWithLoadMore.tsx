@@ -22,6 +22,7 @@ interface NewsFeedWithLoadMoreProps {
   initialArticles: Article[];
   category?: string;
   country?: string;
+  region?: string;
   query?: string;
   date?: string;
   pageSize?: number;
@@ -56,6 +57,7 @@ export default function NewsFeedWithLoadMore({
   initialArticles,
   category,
   country = "us",
+  region,
   query,
   date,
   pageSize = 20,
@@ -86,7 +88,7 @@ export default function NewsFeedWithLoadMore({
     setHasMore((initialArticles?.length ?? 0) >= pageSize);
     setIsLoadingMore(false);
     setLoadError(null);
-  }, [initialArticles, category, country, query, date, pageSize]);
+  }, [initialArticles, category, country, region, query, date, pageSize]);
 
   useEffect(() => {
     const syncViewport = () => setIsMobile(window.innerWidth < 640);
@@ -156,10 +158,15 @@ export default function NewsFeedWithLoadMore({
 
     try {
       const params = new URLSearchParams({
-        country,
         page: String(nextPage),
         pageSize: String(pageSize),
       });
+
+      if (region) {
+        params.set("region", region);
+      } else {
+        params.set("country", country);
+      }
 
       if (category) params.set("category", category);
       if (query) params.set("q", query);

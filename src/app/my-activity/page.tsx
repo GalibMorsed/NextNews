@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -9,6 +10,8 @@ import {
   CalendarRange,
   FileText,
   Flame,
+  Loader2,
+  Lock,
   Radio,
   Sparkles,
   TrendingDown,
@@ -95,6 +98,8 @@ const HEAT_LEGEND = [
 ] as const;
 
 export default function MyActivityPage() {
+  const [isAuthResolved, setIsAuthResolved] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedRange, setSelectedRange] = useState<RangeLabel>("7 days");
   const [notes, setNotes] = useState<UserNote[]>([]);
   const [personalization, setPersonalization] =
@@ -107,6 +112,45 @@ export default function MyActivityPage() {
   });
 
   useEffect(() => {
+    let ignore = false;
+
+    const syncAuthState = async () => {
+      try {
+        const { user } = await getVerifiedAuthUser();
+        if (ignore) return;
+        setIsAuthenticated(Boolean(user));
+      } catch {
+        if (ignore) return;
+        setIsAuthenticated(false);
+      } finally {
+        if (!ignore) setIsAuthResolved(true);
+      }
+    };
+
+    void syncAuthState();
+    window.addEventListener("storage", syncAuthState);
+    window.addEventListener("focus", syncAuthState);
+
+    return () => {
+      ignore = true;
+      window.removeEventListener("storage", syncAuthState);
+      window.removeEventListener("focus", syncAuthState);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setNotes([]);
+      setPersonalization(null);
+      setPageError(null);
+      setActivityAnalytics({
+        aiSummaryCount: 0,
+        personalizationSuggestionCount: 0,
+        events: [],
+      });
+      return;
+    }
+
     let mounted = true;
     const load = async () => {
       try {
@@ -138,7 +182,7 @@ export default function MyActivityPage() {
       window.removeEventListener("focus", syncAnalytics);
       window.removeEventListener("storage", syncAnalytics);
     };
-  }, []);
+  }, [isAuthenticated]);
 
   const activeRange = RANGE_OPTIONS.find((item) => item.label === selectedRange) ?? RANGE_OPTIONS[1];
 
@@ -428,96 +472,142 @@ export default function MyActivityPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_28%),linear-gradient(to_bottom,_#fafaf9,_#ffffff_28%)] px-4 py-6 sm:px-6 lg:px-8 dark:bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.12),_transparent_24%),linear-gradient(to_bottom,_#020617,_#0f172a_38%,_#020617)]">
-      <motion.div
-        className="mx-auto flex min-w-0 max-w-7xl flex-col gap-5"
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.section
-          variants={fadeUp}
-          transition={softSpring}
-          className="rounded-[32px] border border-stone-200/80 bg-white/90 p-5 shadow-sm backdrop-blur sm:p-7 dark:border-slate-700/80 dark:bg-slate-900/88 dark:shadow-[0_18px_60px_-28px_rgba(16,185,129,0.28)]"
-        >
-          <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-            <div className="max-w-2xl">
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl dark:text-slate-50">My Activity</h1>
-              <p className="mt-2 text-base text-slate-600 dark:text-slate-300">Your reading insights, notes, history, and AI analyst activity in one place.🧐</p>
-              <div className="mt-3 inline-flex rounded-full bg-stone-100 px-3 py-1 text-sm font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                Selected filter: {selectedRange}
-              </div>
-              {pageError ? <p className="mt-3 text-sm text-rose-600 dark:text-rose-400">{pageError}</p> : null}
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {RANGE_OPTIONS.map(({ label }) => (
-                <motion.button
-                  key={label}
-                  type="button"
-                  whileHover={{ y: -2, scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={softSpring}
-                  onClick={() => setSelectedRange(label)}
-                  className={`rounded-2xl border px-5 py-3 text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-emerald-500/50 dark:hover:text-emerald-300 ${selectedRange === label ? "border-[var(--primary)] bg-stone-100 text-[var(--primary)] dark:border-emerald-500/60 dark:bg-emerald-950/30 dark:text-emerald-300" : "border-stone-200 bg-stone-50 text-slate-700 hover:border-[var(--primary)] hover:text-[var(--primary)]"}`}
-                >
-                  {label}
-                </motion.button>
-              ))}
+      {!isAuthResolved ? (
+        <div className="mx-auto w-full max-w-3xl">
+          <div className="rounded-3xl border border-slate-200/80 bg-white/92 p-8 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/88">
+            <div className="flex items-center gap-3 text-[var(--muted)]">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <p className="text-sm font-medium">Checking your session...</p>
             </div>
           </div>
-        </motion.section>
+        </div>
+      ) : !isAuthenticated ? (
+        <div className="mx-auto w-full max-w-3xl">
+          <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/92 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/88">
+            <div className="border-b border-slate-200/80 bg-slate-50/80 px-8 py-6 dark:border-slate-700/80 dark:bg-slate-800/60">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">
+                Login Required
+              </p>
+            </div>
+            <div className="mx-auto flex max-w-2xl flex-col items-center px-8 py-12 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:color-mix(in_srgb,var(--primary)_12%,white)] text-[var(--primary)] dark:bg-[color:color-mix(in_srgb,var(--primary)_20%,transparent)]">
+                <Lock className="h-6 w-6" />
+              </div>
+              <h1 className="mt-5 text-3xl font-semibold tracking-tight text-[var(--foreground)]">
+                My Activity opens after sign in
+              </h1>
+              <p className="mt-3 text-base leading-7 text-[var(--muted)]">
+                This area uses saved session data and personalized analytics, so we
+                only show it for logged-in users.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/auth/register"
+                  className="inline-flex items-center justify-center rounded-2xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110"
+                >
+                  Login / Register
+                </Link>
+                <Link
+                  href="/"
+                  className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground)] transition hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
+                >
+                  Back to Home
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <motion.div
+          className="mx-auto flex min-w-0 max-w-7xl flex-col gap-5"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.section
+            variants={fadeUp}
+            transition={softSpring}
+            className="rounded-[32px] border border-stone-200/80 bg-white/90 p-5 shadow-sm backdrop-blur sm:p-7 dark:border-slate-700/80 dark:bg-slate-900/88 dark:shadow-[0_18px_60px_-28px_rgba(16,185,129,0.28)]"
+          >
+            <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+              <div className="max-w-2xl">
+                <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl dark:text-slate-50">My Activity</h1>
+                <p className="mt-2 text-base text-slate-600 dark:text-slate-300">Your reading insights, notes, history, and AI analyst activity in one place.🧐</p>
+                <div className="mt-3 inline-flex rounded-full bg-stone-100 px-3 py-1 text-sm font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  Selected filter: {selectedRange}
+                </div>
+                {pageError ? <p className="mt-3 text-sm text-rose-600 dark:text-rose-400">{pageError}</p> : null}
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {RANGE_OPTIONS.map(({ label }) => (
+                  <motion.button
+                    key={label}
+                    type="button"
+                    whileHover={{ y: -2, scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={softSpring}
+                    onClick={() => setSelectedRange(label)}
+                    className={`rounded-2xl border px-5 py-3 text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-emerald-500/50 dark:hover:text-emerald-300 ${selectedRange === label ? "border-[var(--primary)] bg-stone-100 text-[var(--primary)] dark:border-emerald-500/60 dark:bg-emerald-950/30 dark:text-emerald-300" : "border-stone-200 bg-stone-50 text-slate-700 hover:border-[var(--primary)] hover:text-[var(--primary)]"}`}
+                  >
+                    {label}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </motion.section>
 
-        <section className="grid min-w-0 grid-cols-2 gap-4 xl:grid-cols-4">
-          <MetricCard
-            title="Articles read"
-            value={articleCount}
-            delta={articleDelta}
-            subtitle="How many opened articles with in this range."
-            icon={<FileText className="h-5 w-5" />}
-          />
-          <MetricCard
-            title="Notes added"
-            value={noteCount}
-            delta={noteDelta}
-            subtitle="Saved notes and highlights from your account."
-            icon={<FileText className="h-5 w-5" />}
-          />
-          <MetricCard
-            title="Reading streak"
-            value={streak.current}
-            suffix={streak.current === 1 ? "day" : "days"}
-            subtitle={`Personal best: ${streak.best} day${streak.best === 1 ? "" : "s"} in a row.`}
-            icon={<Flame className="h-5 w-5" />}
-          />
-          <MetricCard
-            title="Live sessions"
-            value={0}
-            subtitle="No live-session watched yet."
-            icon={<Radio className="h-5 w-5" />}
-          />
-        </section>
+          <section className="grid min-w-0 grid-cols-2 gap-4 xl:grid-cols-4">
+            <MetricCard
+              title="Articles read"
+              value={articleCount}
+              delta={articleDelta}
+              subtitle="How many opened articles with in this range."
+              icon={<FileText className="h-5 w-5" />}
+            />
+            <MetricCard
+              title="Notes added"
+              value={noteCount}
+              delta={noteDelta}
+              subtitle="Saved notes and highlights from your account."
+              icon={<FileText className="h-5 w-5" />}
+            />
+            <MetricCard
+              title="Reading streak"
+              value={streak.current}
+              suffix={streak.current === 1 ? "day" : "days"}
+              subtitle={`Personal best: ${streak.best} day${streak.best === 1 ? "" : "s"} in a row.`}
+              icon={<Flame className="h-5 w-5" />}
+            />
+            <MetricCard
+              title="Live sessions"
+              value={0}
+              subtitle="No live-session watched yet."
+              icon={<Radio className="h-5 w-5" />}
+            />
+          </section>
 
-        <section className="grid min-w-0 gap-4 xl:grid-cols-[1.6fr_1fr]">
-          <Panel title="Daily reading activity" description="A visual trend area for usage over time.">
-            <div className="flex h-[280px] items-end gap-4 rounded-[24px] border border-slate-200/80 bg-white px-4 pb-6 pt-8 dark:border-slate-700 dark:bg-slate-950/40">
-              {chartBuckets.map((item) => {
-                const max = Math.max(...chartBuckets.map((entry) => entry.count), 1);
-                const height = Math.max((item.count / max) * 180, item.count > 0 ? 24 : 8);
-                return (
-                  <div key={item.label} className="flex flex-1 flex-col items-center gap-3">
-                    <div className="text-xs font-medium text-slate-500 dark:text-slate-400">{item.count}</div>
-                    <div className="flex h-[180px] w-full items-end">
-                      <motion.div
-                        initial={{ height: 0, opacity: 0.7 }}
-                        animate={{ height: `${height}px`, opacity: 1 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 180,
-                          damping: 20,
-                          delay: 0.12 + chartBuckets.indexOf(item) * 0.08,
-                        }}
-                        className="relative w-full overflow-hidden rounded-t-2xl bg-[linear-gradient(180deg,_rgba(16,185,129,0.95),_rgba(20,184,166,0.78)_58%,_rgba(59,130,246,0.72))]"
-                        title={`${item.label}: ${item.count}`}
-                      >
+          <section className="grid min-w-0 gap-4 xl:grid-cols-[1.6fr_1fr]">
+            <Panel title="Daily reading activity" description="A visual trend area for usage over time.">
+              <div className="flex h-[280px] items-end gap-4 rounded-[24px] border border-slate-200/80 bg-white px-4 pb-6 pt-8 dark:border-slate-700 dark:bg-slate-950/40">
+                {chartBuckets.map((item) => {
+                  const max = Math.max(...chartBuckets.map((entry) => entry.count), 1);
+                  const height = Math.max((item.count / max) * 180, item.count > 0 ? 24 : 8);
+                  return (
+                    <div key={item.label} className="flex flex-1 flex-col items-center gap-3">
+                      <div className="text-xs font-medium text-slate-500 dark:text-slate-400">{item.count}</div>
+                      <div className="flex h-[180px] w-full items-end">
+                        <motion.div
+                          initial={{ height: 0, opacity: 0.7 }}
+                          animate={{ height: `${height}px`, opacity: 1 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 180,
+                            damping: 20,
+                            delay: 0.12 + chartBuckets.indexOf(item) * 0.08,
+                          }}
+                          className="relative w-full overflow-hidden rounded-t-2xl bg-[linear-gradient(180deg,_rgba(16,185,129,0.95),_rgba(20,184,166,0.78)_58%,_rgba(59,130,246,0.72))]"
+                          title={`${item.label}: ${item.count}`}
+                        >
                         <motion.span
                           aria-hidden
                           className="absolute inset-x-[12%] top-2 h-5 rounded-full bg-white/20 blur-sm"
@@ -878,7 +968,8 @@ export default function MyActivityPage() {
           </Panel>
         </section>
       </motion.div>
-    </main>
+    )}
+  </main>
   );
 }
 

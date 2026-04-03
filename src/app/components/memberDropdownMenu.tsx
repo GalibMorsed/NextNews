@@ -67,7 +67,8 @@ const memberLinks: MemberLink[] = [
     accessLabel: "Free",
     description: "Discover topics and new perspectives",
     icon: Compass,
-    isComingSoon: true,
+    href: "/explore",
+    isComingSoon: false,
   },
 ] as const;
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -118,6 +118,8 @@ const DEFAULT_TOPIC_SELECTION = [
   "science",
 ];
 
+const SIDEBAR_SEARCH_EVENT = "sidebar-search";
+
 export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   const [query, setQuery] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -212,12 +214,34 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  const runSearch = useCallback(
+    (nextQuery: string) => {
+      const trimmed = nextQuery.trim();
+      if (!trimmed) return;
+      setQuery(trimmed);
+      router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+      onCloseMobile();
+    },
+    [onCloseMobile, router],
+  );
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim()) return;
-    router.push(`/search?q=${encodeURIComponent(query)}`);
-    onCloseMobile();
+    runSearch(query);
   };
+
+  useEffect(() => {
+    const handleSidebarSearch = (event: Event) => {
+      const detail = (event as CustomEvent<{ query?: string }>).detail;
+      if (!detail?.query) return;
+      runSearch(detail.query);
+    };
+
+    window.addEventListener(SIDEBAR_SEARCH_EVENT, handleSidebarSearch);
+    return () => {
+      window.removeEventListener(SIDEBAR_SEARCH_EVENT, handleSidebarSearch);
+    };
+  }, [runSearch]);
 
   const navItemClass = (active: boolean) =>
     `group flex items-center gap-3 px-4 py-2 rounded-xl transition text-sm font-medium ${
@@ -278,151 +302,6 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
     </>
   );
 }
-
-// ─── Snake Register Button ────────────────────────────────────────────────────
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function SnakeRegisterButton({ onClick }: { onClick: () => void }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animRef = useRef<number>(0);
-  const hoverRef = useRef(false);
-  const tRef = useRef(0);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const W = canvas.width;
-    const H = canvas.height;
-    const SEGMENTS = 28;
-    const RADIUS = 4;
-
-    // Perimeter path: top → right → bottom → left (clockwise)
-    const perimeter = 2 * (W + H);
-
-    function perimeterToXY(d: number): [number, number] {
-      const p = ((d % perimeter) + perimeter) % perimeter;
-      if (p < W) return [p, 0];
-      if (p < W + H) return [W, p - W];
-      if (p < 2 * W + H) return [W - (p - W - H), H];
-      return [0, H - (p - 2 * W - H)];
-    }
-
-    function draw(timestamp: number) {
-      if (!ctx) return;
-      ctx.clearRect(0, 0, W, H);
-
-      const speed = hoverRef.current ? 3.5 : 1.2;
-      tRef.current += speed;
-      const t = tRef.current;
-
-      const SEG_GAP = 9;
-
-      // Draw each segment from tail to head
-      for (let i = SEGMENTS - 1; i >= 0; i--) {
-        const dist = t - i * SEG_GAP;
-        const [x, y] = perimeterToXY(dist);
-
-        const progress = i / (SEGMENTS - 1); // 0=head, 1=tail
-        const isHead = i === 0;
-
-        // Color: vivid green gradient head→tail
-        const green = Math.round(180 + (1 - progress) * 55);
-        const alpha = hoverRef.current ? 1 : 0.85;
-
-        if (isHead) {
-          // HEAD — draw a slightly bigger circle + eyes + tongue on hover
-          const [nx, ny] = perimeterToXY(dist + 1);
-          const angle = Math.atan2(ny - y, nx - x);
-
-          ctx.save();
-          ctx.translate(x, y);
-          ctx.rotate(angle);
-
-          // Head body
-          ctx.beginPath();
-          ctx.arc(0, 0, RADIUS + 2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(34,${green},34,${alpha})`;
-          ctx.fill();
-
-          // Eyes
-          ctx.beginPath();
-          ctx.arc(3, -2.5, 1.2, 0, Math.PI * 2);
-          ctx.arc(3, 2.5, 1.2, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(0,0,0,0.9)";
-          ctx.fill();
-
-          // Tongue on hover
-          if (hoverRef.current) {
-            const flick = Math.sin(timestamp / 80) > 0;
-            ctx.strokeStyle = "#e53e3e";
-            ctx.lineWidth = 1;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(RADIUS + 2, 0);
-            ctx.lineTo(RADIUS + 7, 0);
-            if (flick) {
-              ctx.moveTo(RADIUS + 7, 0);
-              ctx.lineTo(RADIUS + 10, -2.5);
-              ctx.moveTo(RADIUS + 7, 0);
-              ctx.lineTo(RADIUS + 10, 2.5);
-            }
-            ctx.stroke();
-          }
-
-          ctx.restore();
-        } else {
-          // BODY segment
-          const r = RADIUS * (1 - progress * 0.45);
-          ctx.beginPath();
-          ctx.arc(x, y, r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(34,${green},34,${alpha})`;
-          ctx.fill();
-
-          // Scale pattern on body
-          if (i % 3 === 0) {
-            ctx.beginPath();
-            ctx.arc(x, y, r * 0.55, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(20,${Math.round(green * 0.75)},20,${alpha * 0.5})`;
-            ctx.fill();
-          }
-        }
-      }
-
-      animRef.current = requestAnimationFrame(draw);
-    }
-
-    animRef.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(animRef.current);
-  }, []);
-
-  return (
-    <div className="relative w-full">
-      {/* Snake canvas — sits on top of the button, pointer-events off so clicks pass through */}
-      <canvas
-        ref={canvasRef}
-        width={224}
-        height={40}
-        className="absolute inset-0 w-full h-full pointer-events-none z-10"
-        style={{ borderRadius: "0.75rem" }}
-      />
-      <Link
-        href="/auth/register"
-        className="flex w-full items-center justify-center gap-2 py-2 rounded-xl border border-[var(--primary)] bg-transparent text-[var(--primary)] text-sm font-medium transition-all duration-300 hover:bg-transparent hover:text-[var(--primary)] hover:border-emerald-500/80 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.35),0_8px_20px_-12px_rgba(16,185,129,0.45)] hover:scale-105 active:scale-95"
-        onClick={onClick}
-        onMouseEnter={() => (hoverRef.current = true)}
-        onMouseLeave={() => (hoverRef.current = false)}
-      >
-        <UserPlus size={16} />
-        <span>Create Account</span>
-      </Link>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 function SidebarContent({
   query,
