@@ -39,7 +39,7 @@ function RefreshSkeleton() {
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
-            className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
+            className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-[0_4px_20px_-2px_rgba(79,70,229,0.08)] dark:border-slate-800 dark:bg-slate-900"
           >
             <div
               className="h-52 w-full animate-pulse bg-slate-200 dark:bg-slate-800"

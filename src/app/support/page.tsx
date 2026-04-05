@@ -155,11 +155,11 @@ export default function SupportPage() {
                       </span>
                     </div>
 
-                    <p className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                    <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                       NextNews is earning real love, and we are proud of it.
                     </p>
 
-                    <p className="max-w-2xl text-sm leading-relaxed text-gray-600 dark:text-slate-300">
+                    <p className="max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                       {feedbackCount.toLocaleString()} readers have already
                       rated their experience with our app and support flow.
                     </p>
@@ -191,7 +191,7 @@ export default function SupportPage() {
                     <span className="text-teal-500">help</span>, anytime.
                   </h1>
 
-                  <p className="max-w-3xl text-sm leading-relaxed text-gray-600 dark:text-slate-300 sm:text-base">
+                  <p className="max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
                     Our support team is always ready to help you troubleshoot,
                     answer questions, and guide you toward solutions.
                   </p>
@@ -220,7 +220,7 @@ export default function SupportPage() {
                   {supportOptions.map((item, index) => (
                     <motion.div
                       key={item.title}
-                      className="group flex cursor-pointer items-start gap-4 overflow-hidden rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:border-teal-100 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-teal-700"
+                      className="group flex cursor-pointer items-start gap-4 overflow-hidden rounded-xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:border-teal-100 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-teal-700"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
@@ -240,10 +240,10 @@ export default function SupportPage() {
                       </motion.div>
 
                       <div className="min-w-0 flex-1">
-                        <h3 className="truncate font-semibold text-gray-900 transition-colors duration-200 group-hover:text-teal-500 dark:text-slate-100">
+                        <h3 className="truncate font-semibold text-slate-900 transition-colors duration-200 group-hover:text-teal-500 dark:text-slate-100">
                           {item.title}
                         </h3>
-                        <p className="mt-1 text-sm text-gray-600 line-clamp-2 dark:text-slate-300">
+                        <p className="mt-1 text-sm text-slate-600 line-clamp-2 dark:text-slate-300">
                           {item.desc}
                         </p>
                       </div>
@@ -259,21 +259,21 @@ export default function SupportPage() {
                 transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
               >
                 <div className="flex w-full flex-col justify-center">
-                  <h2 className="mb-6 text-center text-xl font-semibold text-gray-900 dark:text-slate-100 sm:text-2xl lg:text-left">
+                  <h2 className="mb-6 text-center text-xl font-semibold text-slate-900 dark:text-slate-100 sm:text-2xl lg:text-left">
                     Contact Support
                   </h2>
 
                   {!submitted ? (
                     <form className="space-y-5" onSubmit={handleSubmit}>
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+                        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                           Select Issue Type
                         </label>
                         <select
                           name="issueType"
                           value={formData.issueType}
                           onChange={handleChange}
-                          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm outline-none transition-all duration-200 hover:shadow-md focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 shadow-sm outline-none transition-all duration-200 hover:shadow-md focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                           required
                         >
                           <option value="">Select issue type...</option>
@@ -290,7 +290,7 @@ export default function SupportPage() {
                       </div>
 
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+                        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                           Your Name
                         </label>
                         <input
@@ -299,13 +299,13 @@ export default function SupportPage() {
                           value={formData.name}
                           onChange={handleChange}
                           placeholder="Enter your name"
-                          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm outline-none transition-all duration-200 hover:shadow-md focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 shadow-sm outline-none transition-all duration-200 hover:shadow-md focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                           required
                         />
                       </div>
 
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+                        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                           Email Address
                         </label>
                         <input
@@ -314,13 +314,13 @@ export default function SupportPage() {
                           value={formData.email}
                           onChange={handleChange}
                           placeholder="example@example.com"
-                          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm outline-none transition-all duration-200 hover:shadow-md focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 shadow-sm outline-none transition-all duration-200 hover:shadow-md focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                           required
                         />
                       </div>
 
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+                        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                           Contact Number
                         </label>
                         <input
@@ -329,7 +329,7 @@ export default function SupportPage() {
                           value={formData.contactNumber}
                           onChange={handleChange}
                           placeholder="Enter your contact number"
-                          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm outline-none transition-all duration-200 hover:shadow-md focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 shadow-sm outline-none transition-all duration-200 hover:shadow-md focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                         />
                       </div>
 
@@ -352,7 +352,7 @@ export default function SupportPage() {
                       <h3 className="text-2xl font-semibold text-teal-600">
                         Thank You!
                       </h3>
-                      <p className="px-2 text-sm leading-relaxed text-gray-600 dark:text-slate-300 sm:text-base">
+                      <p className="px-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
                         Your support request has been submitted successfully.
                         Our team will review your inquiry and get back to you
                         within 24 hours via email or phone. If it&apos;s urgent,
@@ -363,7 +363,7 @@ export default function SupportPage() {
                         <motion.button
                           type="button"
                           onClick={() => setSubmitted(false)}
-                          className="w-full rounded-lg bg-gray-100 py-3 font-semibold text-gray-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-200 hover:shadow-md dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600"
+                          className="w-full rounded-lg bg-slate-100 py-3 font-semibold text-slate-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-200 hover:shadow-md dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600"
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
@@ -407,12 +407,12 @@ export default function SupportPage() {
             >
               <button
                 onClick={() => setActiveModal(null)}
-                className="absolute top-4 right-4 rounded-full p-1 text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-slate-700"
+                className="absolute top-4 right-4 rounded-full p-1 text-gray-400 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700"
               >
                 <FaTimes size={18} />
               </button>
 
-              <h3 className="mb-6 text-center text-xl font-bold text-gray-900 dark:text-slate-100 sm:text-2xl">
+              <h3 className="mb-6 text-center text-xl font-bold text-slate-900 dark:text-slate-100 sm:text-2xl">
                 {activeModal}
               </h3>
 
@@ -425,12 +425,12 @@ export default function SupportPage() {
                         initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 * i, duration: 0.2 }}
-                        className="border-b border-gray-100 pb-4 last:border-b-0 dark:border-slate-700"
+                        className="border-b border-slate-100 pb-4 last:border-b-0 dark:border-slate-700"
                       >
-                        <p className="mb-2 font-semibold text-gray-800 dark:text-slate-100">
+                        <p className="mb-2 font-semibold text-slate-800 dark:text-slate-100">
                           {faq.q}
                         </p>
-                        <p className="text-sm leading-relaxed text-gray-600 dark:text-slate-300">
+                        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                           {faq.a}
                         </p>
                       </motion.div>
@@ -441,9 +441,9 @@ export default function SupportPage() {
                 {activeModal === "Phone Support" && (
                   <div className="space-y-4 py-6 text-center">
                     <div className="mb-4 text-3xl">📞</div>
-                    <p className="text-lg leading-relaxed text-gray-700 dark:text-slate-200">
+                    <p className="text-lg leading-relaxed text-slate-700 dark:text-slate-200">
                       +91 8100684108 <br />
-                      <span className="text-sm text-gray-500 dark:text-slate-400">
+                      <span className="text-sm text-slate-500 dark:text-slate-400">
                         Available Mon-Fri, 10AM-6PM
                       </span>
                     </p>
@@ -461,13 +461,13 @@ export default function SupportPage() {
                 {activeModal === "Track Ticket" && (
                   <div className="space-y-4 py-6 text-center">
                     <div className="mb-4 text-3xl">🎫</div>
-                    <p className="text-base leading-relaxed text-gray-700 dark:text-slate-200">
+                    <p className="text-base leading-relaxed text-slate-700 dark:text-slate-200">
                       Enter your ticket ID on the support dashboard to track
                       updates in real time.
                     </p>
                     <motion.button
                       onClick={() => setActiveModal(null)}
-                      className="w-full rounded-lg bg-gray-100 py-2.5 font-semibold text-gray-900 transition-all duration-200 hover:bg-gray-200 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600"
+                      className="w-full rounded-lg bg-slate-100 py-2.5 font-semibold text-slate-900 transition-all duration-200 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600"
                       whileHover={{ scale: 1.02 }}
                     >
                       Go to Dashboard

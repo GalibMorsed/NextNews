@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 import {
   DEFAULT_APPEARANCE_SETTINGS,
   applyAppearanceSettings,
@@ -11,6 +11,7 @@ import {
   saveAppearanceSettings,
   type AppearanceSettings,
 } from "@/lib/appearance";
+import StatusPopup from "../components/statusPopup";
 
 const PRESET_THEMES = [
   { id: "indigo", label: "Soft Indigo", color: "#4f46e5" },
@@ -20,19 +21,25 @@ const PRESET_THEMES = [
 
 const FONT_FAMILY_OPTIONS = [
   {
-    label: "System Default (Sans Serif)",
+    label: "App Default (Jakarta Sans)",
+    value: "var(--font-jakarta), system-ui, sans-serif",
+  },
+  {
+    label: "System Native (OS Default)",
     value:
-      "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
   },
   {
     label: "italic Sans Serif",
     value: "italic system-ui, -apple-system, sans-serif",
   },
-  { label: "Roboto", value: "'Roboto', system-ui, sans-serif" },
-  { label: "Montserrat", value: "'Montserrat', sans-serif" },
   {
-    label: "Playfair Display (Serif)",
-    value: "'Playfair Display', Georgia, serif",
+    label: "Editorial Serif (Georgia)",
+    value: "Georgia, Cambria, 'Times New Roman', Times, serif",
+  },
+  {
+    label: "Classic Sans (Arial / Helvetica)",
+    value: "Arial, 'Helvetica Neue', Helvetica, sans-serif",
   },
 ];
 
@@ -54,7 +61,6 @@ export default function AppearancePage() {
     DEFAULT_APPEARANCE_SETTINGS.highContrast,
   );
   const [popupMessage, setPopupMessage] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
   const [hasLoadedStoredSettings, setHasLoadedStoredSettings] = useState(false);
 
   const currentSettings = useMemo<AppearanceSettings>(
@@ -90,14 +96,6 @@ export default function AppearancePage() {
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, []);
-
-  // Check for mobile view
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Auto-dismiss popup message
@@ -142,26 +140,14 @@ export default function AppearancePage() {
     return color;
   };
 
-  const desktopVariants = {
-    initial: { opacity: 0, y: 20, scale: 0.95 },
-    animate: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 20, scale: 0.95 },
-  };
-
-  const mobileVariants = {
-    initial: { opacity: 0, y: "100%" },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: "100%" },
-  };
-
   return (
     <>
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full mx-auto bg-white dark:bg-slate-900 lg:rounded-none shadow-xl lg:shadow-none p-4 sm:p-6 md:p-8 lg:p-10 lg:min-h-[calc(100vh-65px)]"
+        className="w-full mx-auto bg-white dark:bg-slate-900 lg:rounded-none shadow-xl lg:shadow-none p-4 sm:p-6 md:p-8 lg:p-10 lg:min-h-[calc(100vh-65px)] space-y-6 sm:space-y-8"
       >
-        <section className="mb-6 md:mb-8 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 p-4 sm:p-6">
+        <section className="mb-6 md:mb-8 rounded-2xl border border-slate-200 dark:border-slate-700 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 p-4 sm:p-6">
           <div className="flex justify-start mb-3">
             <span className="inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
               Theme & Style
@@ -170,24 +156,24 @@ export default function AppearancePage() {
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
             Appearance Settings
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-gray-600 dark:text-slate-300 text-left">
+          <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 text-left">
             Customize theme color, typography, and accessibility preferences to
             make the app look and feel the way you prefer. 😉
           </p>
         </section>
 
         {/* Interface theme */}
-        <section className="mb-8 md:mb-10">
-          <div className="mb-3 md:mb-4">
-            <h2 className="text-base sm:text-lg font-medium text-gray-900 dark:text-slate-100">
+        <section className="bg-slate-50/50 dark:bg-slate-800/10 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 sm:p-8 transition-all hover:bg-slate-50/80 dark:hover:bg-slate-800/20">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               Interface theme
             </h2>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
-              Choose the color of your application
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Choose the color scheme of your application
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {PRESET_THEMES.map((t) => {
               const isSelected = theme === t.id;
               return (
@@ -197,11 +183,11 @@ export default function AppearancePage() {
                     setTheme(t.id);
                     setPrimaryColor(t.color);
                   }}
-                  className={`group relative rounded-xl border-2 transition-all duration-200 overflow-hidden
-                  ${isSelected ? "border-[var(--primary)] shadow-md" : "border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-500"}`}
+                  className={`group relative rounded-2xl border-2 transition-all duration-300 overflow-hidden
+                  ${isSelected ? "border-[var(--primary)] bg-[var(--primary)]/5 shadow-lg translate-y-[-4px]" : "border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 bg-white/50 dark:bg-slate-800/40"}`}
                 >
-                  <div className="p-3 sm:p-4 pb-2 sm:pb-3">
-                    <div className="bg-gray-100 dark:bg-slate-700 rounded-lg overflow-hidden shadow-inner mb-2 sm:mb-3 aspect-[4/3] relative">
+                  <div className="p-4 sm:p-5">
+                    <div className="bg-slate-100 dark:bg-slate-700 rounded-xl overflow-hidden shadow-inner mb-4 aspect-[16/10] relative transition-transform group-hover:scale-[1.02] duration-300">
                       <div
                         className="absolute inset-0 opacity-10"
                         style={{ backgroundColor: t.color }}
@@ -218,14 +204,16 @@ export default function AppearancePage() {
                       />
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs sm:text-sm font-medium text-gray-800 dark:text-slate-200 group-hover:text-[var(--primary)] transition-colors">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-[var(--primary)] transition-colors">
                         {t.label}
                       </p>
-                      {isSelected && (
-                        <div className="bg-[var(--primary)] text-white rounded-full p-0.5 sm:p-0.5">
-                          <Check size={12} className="sm:w-4 sm:h-4" />
+                      {isSelected ? (
+                        <div className="bg-[var(--primary)] text-white rounded-full p-1 shadow-sm">
+                          <Check size={14} strokeWidth={3} />
                         </div>
+                      ) : (
+                        <div className="w-5 h-5 rounded-full border-2 border-slate-200 dark:border-slate-700 group-hover:border-[var(--primary)]/50 transition-colors" />
                       )}
                     </div>
                   </div>
@@ -236,31 +224,31 @@ export default function AppearancePage() {
         </section>
 
         {/* Custom color */}
-        <section className="mb-8 md:mb-10 pt-6 md:pt-8 border-t border-gray-100 dark:border-slate-700">
-          <div className="mb-3 md:mb-4">
-            <h2 className="text-base sm:text-lg font-medium text-gray-900 dark:text-slate-100">
+        <section className="bg-slate-50/50 dark:bg-slate-800/10 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 sm:p-8 transition-all hover:bg-slate-50/80 dark:hover:bg-slate-800/20">
+          <div className="mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
               Customize main color
             </h2>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
               Add your own main color
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
             <button
               onClick={() => {
                 const random = getRandomColor();
                 setTheme("custom");
                 setPrimaryColor(random);
               }}
-              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium"
+              className="px-5 py-2.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2 text-sm font-semibold shadow-sm hover:scale-[1.02] active:scale-[0.98]"
             >
               ✨ Surprise me
             </button>
 
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-3 bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-inner">
               <div
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg border border-gray-300 dark:border-slate-600 shadow-sm flex-shrink-0"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm flex-shrink-0"
                 style={{ backgroundColor: primaryColor }}
               />
               <input
@@ -270,9 +258,9 @@ export default function AppearancePage() {
                   setTheme("custom");
                   setPrimaryColor(e.target.value);
                 }}
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded cursor-pointer flex-shrink-0"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg cursor-pointer flex-shrink-0 appearance-none border-0"
               />
-              <span className="text-xs sm:text-sm font-mono text-gray-600 dark:text-slate-300 uppercase truncate">
+              <span className="text-sm font-mono text-slate-600 dark:text-slate-300 uppercase truncate pr-2">
                 {primaryColor}
               </span>
             </div>
@@ -280,51 +268,55 @@ export default function AppearancePage() {
         </section>
 
         {/* Font size */}
-        <section className="mb-10 md:mb-12 pt-6 md:pt-8 border-t border-gray-100 dark:border-slate-700">
-          <div className="mb-3 md:mb-4">
-            <h2 className="text-base sm:text-lg font-medium text-gray-900 dark:text-slate-100">
+        <section className="bg-slate-50/50 dark:bg-slate-800/10 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 sm:p-8 transition-all hover:bg-slate-50/80 dark:hover:bg-slate-800/20">
+          <div className="mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
               Font size
             </h2>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
               Personalize your application font size
             </p>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto">
-            <span className="text-sm sm:text-base font-medium text-gray-600 dark:text-slate-300">
-              Aa
-            </span>
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center gap-4 max-w-lg">
+              <span className="text-sm sm:text-base font-medium text-slate-600 dark:text-slate-400">
+                Aa
+              </span>
 
-            <input
-              type="range"
-              min={14}
-              max={20}
-              step={1}
-              value={fontSize}
-              onChange={(e) => setFontSize(Number(e.target.value))}
-              className="flex-1 h-2 sm:h-2.5 rounded-full appearance-none cursor-pointer accent-[var(--primary)] bg-gray-200"
-              style={{
-                background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((fontSize - 14) / 6) * 100}%, #e5e7eb ${((fontSize - 14) / 6) * 100}%, #e5e7eb 100%)`,
-              }}
-            />
+              <input
+                type="range"
+                min={14}
+                max={20}
+                step={1}
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                className="flex-1 h-2 sm:h-2.5 rounded-full appearance-none cursor-pointer accent-[var(--primary)] bg-slate-200 dark:bg-slate-700"
+                style={{
+                  background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((fontSize - 14) / 6) * 100}%, #e5e7eb ${((fontSize - 14) / 6) * 100}%, #e5e7eb 100%)`,
+                }}
+              />
 
-            <span className="text-lg sm:text-xl font-medium text-gray-600 dark:text-slate-300">
-              Aa
-            </span>
+              <span className="text-xl sm:text-2xl font-medium text-slate-600 dark:text-slate-400">
+                Aa
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+              <div className="bg-[var(--primary)]/10 text-[var(--primary)] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                Current: {fontSize}px
+              </div>
+            </div>
           </div>
-
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-2 sm:mt-3 text-center">
-            Current size: {fontSize}px
-          </p>
         </section>
 
-        {/* Font family - Updated styling to match page design */}
-        <section className="mb-8 md:mb-10 pt-6 md:pt-8 border-t border-gray-100 dark:border-slate-700">
-          <div className="mb-3 md:mb-4">
-            <h2 className="text-base sm:text-lg font-medium text-gray-900 dark:text-slate-100">
+        {/* Font family */}
+        <section className="bg-slate-50/50 dark:bg-slate-800/10 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 sm:p-8 transition-all hover:bg-slate-50/80 dark:hover:bg-slate-800/20">
+          <div className="mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
               Font family
             </h2>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
               Choose how text looks across the website
             </p>
           </div>
@@ -333,7 +325,7 @@ export default function AppearancePage() {
             <select
               value={fontFamily}
               onChange={(e) => setFontFamily(e.target.value)}
-              className="w-full appearance-none rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 sm:py-3 pr-10 text-sm sm:text-base text-gray-700 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent shadow-sm cursor-pointer transition-all hover:border-gray-400"
+              className="w-full appearance-none rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 pr-10 text-sm sm:text-base text-slate-700 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent shadow-sm cursor-pointer transition-all hover:border-slate-400 dark:hover:border-slate-500"
             >
               {FONT_FAMILY_OPTIONS.map((option) => (
                 <option
@@ -346,8 +338,7 @@ export default function AppearancePage() {
               ))}
             </select>
 
-            {/* Custom dropdown arrow */}
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-slate-300">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 dark:text-slate-300">
               <svg
                 className="h-5 w-5"
                 fill="none"
@@ -366,66 +357,78 @@ export default function AppearancePage() {
         </section>
 
         {/* Accessibility & Motion */}
-        <section className="mb-8 md:mb-10 pt-6 md:pt-8 border-t border-gray-100 dark:border-slate-700 space-y-5 sm:space-y-6">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex-1">
-              <p className="font-medium text-gray-900 dark:text-slate-100 text-base sm:text-lg">
-                Reduce motion
-              </p>
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
-                Minimize animations for better focus
-              </p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
-              <input
-                type="checkbox"
-                checked={reducedMotion}
-                onChange={(e) => setReducedMotion(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-9 sm:w-11 h-5 sm:h-6 bg-gray-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-[var(--primary)] after:content-[''] after:absolute after:top-[1px] sm:after:top-[2px] after:left-[1px] sm:after:left-[2px] after:bg-white after:rounded-full after:h-4 sm:after:h-5 after:w-4 sm:after:w-5 after:transition-all peer-checked:after:translate-x-4 sm:peer-checked:after:translate-x-full"></div>
-            </label>
+        <section className="bg-slate-50/50 dark:bg-slate-800/10 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 sm:p-8 transition-all hover:bg-slate-50/80 dark:hover:bg-slate-800/20">
+          <div className="mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
+              Accessibility & Motion
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Customize your browsing experience for better focus and
+              readability
+            </p>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex-1">
-              <p className="font-medium text-gray-900 dark:text-slate-100 text-base sm:text-lg">
-                High contrast mode
-              </p>
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">
-                Increase contrast for better readability
-              </p>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+              <div className="flex-1">
+                <p className="font-medium text-slate-900 dark:text-slate-100 text-sm sm:text-base">
+                  Reduce motion
+                </p>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                  Minimize animations for better focus
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                <input
+                  type="checkbox"
+                  checked={reducedMotion}
+                  onChange={(e) => setReducedMotion(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-10 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-[var(--primary)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+              </label>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
-              <input
-                type="checkbox"
-                checked={highContrast}
-                onChange={(e) => setHighContrast(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-9 sm:w-11 h-5 sm:h-6 bg-gray-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-[var(--primary)] after:content-[''] after:absolute after:top-[1px] sm:after:top-[2px] after:left-[1px] sm:after:left-[2px] after:bg-white after:rounded-full after:h-4 sm:after:h-5 after:w-4 sm:after:w-5 after:transition-all peer-checked:after:translate-x-4 sm:peer-checked:after:translate-x-full"></div>
-            </label>
+
+            <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+              <div className="flex-1">
+                <p className="font-medium text-slate-900 dark:text-slate-100 text-sm sm:text-base">
+                  High contrast mode
+                </p>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                  Increase contrast for better readability
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                <input
+                  type="checkbox"
+                  checked={highContrast}
+                  onChange={(e) => setHighContrast(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-10 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-[var(--primary)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+              </label>
+            </div>
           </div>
         </section>
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 pt-6 border-t border-gray-100 dark:border-slate-700">
-          <div className="bg-red-50 dark:bg-red-950/40 px-3 py-2 rounded-lg border border-red-100 dark:border-red-800">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 pt-6 border-t border-slate-100 dark:border-slate-700">
+          <div className="bg-red-50 dark:bg-red-950/40 px-4 py-2.5 sm:px-3 sm:py-1.5 rounded-xl sm:rounded-lg border border-red-100 dark:border-red-800">
             <button
               onClick={resetDefaults}
-              className="text-xs sm:text-sm text-red-600 dark:text-red-300 hover:text-red-700 dark:hover:text-red-200 flex items-center gap-1 transition-colors"
+              className="text-sm sm:text-xs text-red-600 dark:text-red-300 hover:text-red-700 dark:hover:text-red-200 flex items-center gap-2 transition-colors font-semibold"
             >
-              <span className="text-sm sm:text-base">↺</span> Reset to defaults
+              <span className="text-base sm:text-sm">↺</span> Reset to defaults
             </button>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-3 sm:mt-0">
-            <button className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors font-medium text-xs sm:text-sm">
+          <div className="flex flex-row gap-3 w-full sm:w-auto mt-3 sm:mt-0">
+            <button className="w-full sm:w-auto px-6 sm:px-5 py-2.5 sm:py-2 rounded-xl sm:rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-semibold text-sm">
               Cancel
             </button>
             <button
               onClick={saveSettings}
-              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg bg-[var(--primary)] text-white font-medium hover:brightness-110 transition-all shadow-sm text-xs sm:text-sm"
+              className="w-full sm:w-auto px-6 sm:px-5 py-2.5 sm:py-2 rounded-xl sm:rounded-md bg-[var(--primary)] text-white font-semibold hover:brightness-110 transition-all shadow-md text-sm hover:scale-[1.02] active:scale-[0.98]"
             >
               Save appearance
             </button>
@@ -433,62 +436,13 @@ export default function AppearancePage() {
         </div>
       </motion.div>
 
-      <AnimatePresence>
-        {popupMessage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 p-0 backdrop-blur-sm sm:items-center sm:p-6"
-            onClick={() => setPopupMessage(null)}
-          >
-            <motion.div
-              variants={isMobile ? mobileVariants : desktopVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.3 }}
-              className="relative w-full overflow-hidden rounded-t-2xl border border-emerald-200/70 bg-white/95 shadow-xl dark:border-emerald-500/20 dark:bg-slate-900/95 sm:max-w-md sm:rounded-[28px]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-emerald-400/20 via-sky-300/20 to-cyan-300/20 dark:from-emerald-400/10 dark:via-sky-400/10 dark:to-cyan-400/10" />
-              <div className="absolute -right-10 top-8 h-32 w-32 rounded-full bg-emerald-300/20 blur-3xl dark:bg-emerald-400/10" />
-              <div className="relative px-4 pb-5 pt-4 sm:p-7">
-                <div className="flex items-start justify-end">
-                  <button
-                    type="button"
-                    onClick={() => setPopupMessage(null)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/80 text-slate-400 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800/80 dark:hover:border-slate-600 dark:hover:text-slate-200"
-                    aria-label="Close message"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-
-                <div className="mt-1 flex flex-col items-center text-center sm:mt-0 sm:flex-row sm:items-center sm:gap-4 sm:text-left">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/20">
-                    <Check size={24} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-300">
-                      Appearance Updated
-                    </p>
-                    <h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      Changes saved
-                    </h3>
-                  </div>
-                </div>
-
-                <div className="mt-5 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-4 text-center dark:border-emerald-500/10 dark:from-emerald-500/10 dark:via-slate-900 dark:to-sky-500/10 sm:text-left">
-                  <p className="text-sm font-medium leading-6 text-slate-700 dark:text-slate-200">
-                    {popupMessage}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <StatusPopup
+        isOpen={Boolean(popupMessage)}
+        tone="success"
+        message={popupMessage ?? ""}
+        onClose={() => setPopupMessage(null)}
+        context="appearance"
+      />
     </>
   );
 }

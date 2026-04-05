@@ -268,10 +268,7 @@ export default function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
 
   return (
     <>
-      <aside
-        className="hidden md:flex fixed left-0 top-[65px] h-[calc(100vh-65px)] w-72 bg-white border-r border-[var(--border)] shadow-sm flex-col"
-        style={{ backgroundColor: "var(--card)" }}
-      >
+      <aside className="hidden md:flex fixed left-0 top-[65px] h-[calc(100vh-65px)] w-72 bg-white/95 backdrop-blur border-r border-slate-200/80 shadow-sm flex-col dark:bg-slate-900/95 dark:border-slate-700/80">
         {content}
       </aside>
 
@@ -388,7 +385,7 @@ function SidebarContent({
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 transition-colors hover:bg-slate-200 hover:text-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
             >
               <X size={14} />
             </button>
@@ -432,7 +429,7 @@ function SidebarContent({
           {isAuthenticated &&
             isPersonalizationLoaded &&
             visibleCategoryItems.length === 0 && (
-              <p className="px-4 py-2 text-xs text-gray-500">
+              <p className="px-4 py-2 text-xs text-slate-500">
                 No topics selected. Add topics in Personalization.
               </p>
             )}
@@ -458,7 +455,7 @@ function SidebarContent({
               <Link
                 href="/notes"
                 onClick={closeAndNavigate}
-                className="relative group z-10 flex items-center gap-3 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-gray-800 border border-transparent hover:text-purple-700 transition-colors duration-300"
+                className="relative group z-10 flex items-center gap-3 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-800 border border-transparent hover:text-indigo-700 transition-colors duration-300 dark:bg-slate-900 dark:text-slate-200 dark:hover:text-indigo-400"
               >
                 <StickyNote
                   size={18}
@@ -475,7 +472,7 @@ function SidebarContent({
           <CollapsibleSection title="Extra Options">
             <Link
               href="/personalization"
-              className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-1 text-sm text-slate-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
               onClick={closeAndNavigate}
             >
               <SlidersHorizontal size={14} />
@@ -483,7 +480,7 @@ function SidebarContent({
             </Link>
             <Link
               href="/appearance"
-              className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-1 text-sm text-slate-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
               onClick={closeAndNavigate}
             >
               <Palette size={14} />
@@ -491,7 +488,7 @@ function SidebarContent({
             </Link>
             <Link
               href="/plans"
-              className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-1 text-sm text-slate-600 hover:text-indigo-600 cursor-pointer transition-colors dark:text-slate-400 dark:hover:text-indigo-400"
               onClick={closeAndNavigate}
             >
               <Gem size={14} />
@@ -503,7 +500,7 @@ function SidebarContent({
         <CollapsibleSection title="More Info">
           <Link
             href="/about"
-            className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 transition-colors hover:text-[var(--primary)]"
+            className="inline-flex items-center gap-2 px-4 py-1 text-sm text-slate-600 transition-colors hover:text-[var(--primary)]"
             onClick={closeAndNavigate}
           >
             <Info size={14} />
@@ -511,7 +508,7 @@ function SidebarContent({
           </Link>
           <Link
             href="/support"
-            className="inline-flex items-center gap-2 px-4 py-1 text-sm text-gray-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-1 text-sm text-slate-600 hover:text-[var(--primary)] cursor-pointer transition-colors"
             onClick={closeAndNavigate}
           >
             <LifeBuoy size={14} />
@@ -525,7 +522,7 @@ function SidebarContent({
           <div className="relative">
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-3 w-full px-2 py-2 rounded-xl hover:bg-gray-50 transition-colors text-left focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]"
+              className="flex items-center gap-3 w-full px-2 py-2 rounded-xl hover:bg-slate-50 transition-colors text-left focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]"
             >
               <img
                 src={
@@ -536,16 +533,16 @@ function SidebarContent({
                 alt="User Avatar"
                 width={36}
                 height={36}
-                className="w-9 h-9 rounded-full border-2 border-gray-200"
+                className="w-9 h-9 rounded-full border-2 border-slate-200"
               />
               <div className="flex-1 min-w-0">
-                <span className="font-medium text-sm text-gray-700 block truncate">
+                <span className="font-medium text-sm text-slate-700 block truncate">
                   {userEmail}
                 </span>
               </div>
               <ChevronDown
                 size={16}
-                className={`text-gray-500 transition-transform duration-200 ${
+                className={`text-slate-500 transition-transform duration-200 ${
                   userMenuOpen ? "rotate-180" : ""
                 }`}
               />
@@ -553,23 +550,23 @@ function SidebarContent({
 
             {userMenuOpen && (
               <div className="absolute bottom-full left-0 mb-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-50">
-                <div className="px-4 py-2 text-sm text-gray-500 border-b">
+                <div className="px-4 py-2 text-sm text-slate-500 border-b">
                   Signed in as <br />
-                  <strong className="text-gray-800 truncate block">
+                  <strong className="text-slate-800 truncate block">
                     {userEmail}
                   </strong>
                 </div>
                 <Link
                   href="/settings"
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
                   onClick={closeAndNavigate}
                 >
-                  <Settings size={16} className="text-gray-500" />
+                  <Settings size={16} className="text-slate-500" />
                   Settings
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
                 >
                   <LogOut size={16} className="text-red-500" />
                   Logout
@@ -605,7 +602,7 @@ function CollapsibleSection({
     <div className="mt-2">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition"
+        className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-xl transition"
       >
         {title}
         <ChevronDown

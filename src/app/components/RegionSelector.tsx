@@ -231,15 +231,22 @@ export default function RegionSelector({
                   type="button"
                   onClick={handleAISuggest}
                   disabled={isSuggesting}
-                  className="group relative inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-[var(--primary)] to-[color:color-mix(in_srgb,var(--primary),#3b82f6)] px-8 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-[var(--primary)]/30 transition-all hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
+                  className="group relative inline-flex w-fit items-center gap-3 self-center overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-500 px-8 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/40 disabled:cursor-not-allowed disabled:opacity-70 lg:self-auto"
                 >
+                  {/* Shimmer sweep effect */}
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-in-out group-hover:translate-x-full" />
+
                   {isSuggesting ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Analyzing...
+                    </>
                   ) : (
-                    <Sparkles className="h-5 w-5 animate-pulse" />
+                    <>
+                      <Sparkles size={20} className="transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
+                      AI Suggest Region
+                    </>
                   )}
-                  <span className="tracking-tight">AI Suggest Region</span>
-                  <div className="absolute -inset-1 rounded-[2.2rem] bg-[var(--primary)]/20 opacity-0 blur-xl transition-opacity group-hover:opacity-100" />
                 </button>
               ) : (
                 <div className="w-full max-w-2xl rounded-3xl border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-sky-50 p-5 text-center shadow-sm dark:border-amber-900/40 dark:from-amber-950/20 dark:via-slate-900 dark:to-slate-900">

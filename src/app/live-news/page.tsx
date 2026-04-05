@@ -157,24 +157,24 @@ export default function LiveNewsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50 dark:bg-slate-950 px-4 py-8 md:px-8">
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-8 md:px-8">
         <div className="mx-auto max-w-6xl">
-          <h1 className="mb-2 text-3xl font-extrabold text-gray-900 dark:text-slate-100">
+          <h1 className="mb-2 text-3xl font-extrabold text-slate-900 dark:text-slate-100">
             🔴LiveNews
           </h1>
-          <p className="text-gray-600 dark:text-slate-400">Loading live streams...</p>
+          <p className="text-slate-600 dark:text-slate-400">Loading live streams...</p>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-slate-950 px-4 py-8 md:px-8">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-8 md:px-8">
       <div className="mx-auto max-w-6xl">
-        <h1 className="mb-2 text-3xl font-extrabold text-gray-900 dark:text-slate-100">
+        <h1 className="mb-2 text-3xl font-extrabold text-slate-900 dark:text-slate-100">
           🔴LiveNews
         </h1>
-        <p className="mb-6 text-gray-600 dark:text-slate-400">
+        <p className="mb-6 text-slate-600 dark:text-slate-400">
           Watch active YouTube live news streams in real time.
         </p>
 
@@ -189,13 +189,13 @@ export default function LiveNewsPage() {
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search live feeds (e.g. BBC live, India news live, Sports etc.)"
-              className="w-full rounded-xl bg-gray-100 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400 py-2 pl-10 pr-10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              className="w-full rounded-xl bg-slate-100 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400 py-2 pl-10 pr-10 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 rounded-full p-1 text-gray-400 dark:text-slate-400 transition-colors hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-gray-600 dark:hover:text-slate-200 -translate-y-1/2"
+                className="absolute right-3 top-1/2 rounded-full p-1 text-gray-400 dark:text-slate-400 transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-200 -translate-y-1/2"
               >
                 <X size={14} />
               </button>
@@ -211,10 +211,10 @@ export default function LiveNewsPage() {
                   <span className="text-xl">🔑</span>
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100">
+                  <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                     Unlock Custom Search
                   </h3>
-                  <p className="mx-auto mt-1 max-w-md text-sm text-gray-600 dark:text-slate-400">
+                  <p className="mx-auto mt-1 max-w-md text-sm text-slate-600 dark:text-slate-400">
                     Register to start search for specific live feeds, with more unlocked videos. We&apos;ve
                     curated some popular live news streams for you below.
                   </p>
@@ -262,7 +262,7 @@ export default function LiveNewsPage() {
             return (
               <article
                 key={video.id.videoId}
-                className="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm"
+                className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm"
               >
                 <div className="aspect-video w-full bg-black">
                   <iframe
@@ -276,10 +276,10 @@ export default function LiveNewsPage() {
                 </div>
 
                 <div className="space-y-3 p-4">
-                  <h2 className="line-clamp-2 text-lg font-semibold text-gray-900 dark:text-slate-100">
+                  <h2 className="line-clamp-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
                     {video.snippet.title}
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-slate-400">
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
                     {video.snippet.channelTitle}
                   </p>
                   <button

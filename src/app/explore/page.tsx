@@ -91,7 +91,7 @@ function PageSurface({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-      className={`rounded-3xl border border-slate-200/80 bg-white/92 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/88 ${className}`}
+      className={`rounded-3xl border border-slate-200/80 bg-white/92 shadow-[0_4px_20px_-2px_rgba(79,70,229,0.1)] transition-all duration-300 hover:shadow-[0_10px_25px_-5px_rgba(79,70,229,0.15),0_8px_10px_-6px_rgba(79,70,229,0.1)] dark:border-slate-700/80 dark:bg-slate-900/88 dark:shadow-[0_4px_20px_-2px_rgba(79,70,229,0.05)] dark:hover:shadow-[0_10px_25px_-5px_rgba(79,70,229,0.1)] ${className}`}
     >
       {children}
     </motion.div>
@@ -115,19 +115,19 @@ function SectionHeading({
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-sky-50/70 p-5 shadow-sm transition-transform duration-300 sm:p-6 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
+      className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/50 p-5 shadow-sm transition-transform duration-300 sm:p-6 dark:border-slate-700 dark:from-slate-900 dark:via-indigo-950/20 dark:to-violet-950/20"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           {eyebrow && (
-            <span className="mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+            <span className="mb-3 inline-flex rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
               {eyebrow}
             </span>
           )}
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
+          <h2 className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 sm:text-3xl dark:from-emerald-50 dark:via-indigo-100 dark:to-violet-200">
             {title}
           </h2>
-          <p className="mt-2 max-w-3xl text-sm text-slate-600 dark:text-slate-300 sm:text-base">
+          <p className="mt-2 max-w-3xl text-sm font-medium text-slate-600 dark:text-slate-400 sm:text-base">
             {description}
           </p>
         </div>
@@ -360,25 +360,28 @@ export default function ExplorePage() {
         ) : (
           <>
             <div className="space-y-6">
-              <PageSurface className="overflow-hidden">
-                <div className="px-6 py-8 sm:px-8">
-                  <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="max-w-3xl flex-1">
-                      <span className="mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                        World is Your's
-                      </span>
-                      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
-                        Explore
-                      </h1>
-                      <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300 sm:text-base">
-                        Switch regions or search a live topic. Stories, category
-                        paths, trends, and suggested sources all update around
-                        what is happening now.🧭🗺️
-                      </p>
+              <div className="relative">
+                <div className="pointer-events-none absolute left-8 top-0 -z-10 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-indigo-500/20 to-violet-500/20 blur-[80px] filter dark:from-indigo-500/10 dark:to-violet-500/10" />
+                <PageSurface className="relative overflow-hidden bg-white/60 backdrop-blur-xl dark:bg-slate-900/60">
+                  <div className="px-6 py-8 sm:px-8">
+                    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="max-w-3xl flex-1">
+                        <span className="mb-3 inline-flex rounded-full bg-indigo-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+                          World is Your's
+                        </span>
+                        <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 sm:text-5xl dark:from-white dark:via-indigo-100 dark:to-violet-200">
+                          Explore
+                        </h1>
+                        <p className="mt-2 max-w-2xl text-sm font-medium text-slate-600 dark:text-slate-400 sm:text-base">
+                          Switch regions or search a live topic. Stories, category
+                          paths, trends, and suggested sources all update around
+                          what is happening now. 🧭🗺️
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </PageSurface>
+                </PageSurface>
+              </div>
 
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
@@ -399,7 +402,7 @@ export default function ExplorePage() {
                 onSubmit={handleSearchSubmit}
                 className="mx-auto w-full max-w-4xl px-2"
               >
-                <div className="group relative rounded-2xl border border-slate-200/80 bg-gradient-to-r from-white via-slate-50 to-slate-100/60 shadow-sm transition focus-within:border-[var(--primary)]/50 focus-within:ring-2 focus-within:ring-[var(--primary)]/10 dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800/80">
+                <div className="group relative rounded-lg border border-slate-200/80 bg-gradient-to-r from-white via-slate-50 to-slate-100/60 shadow-sm transition-all focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-1 focus-within:border-indigo-500 dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800/80 dark:focus-within:ring-offset-slate-950">
                   <Search
                     className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--muted)] transition group-focus-within:text-[var(--primary)]"
                     aria-hidden
@@ -410,7 +413,7 @@ export default function ExplorePage() {
                     value={searchInput}
                     onChange={(event) => setSearchInput(event.target.value)}
                     placeholder={`Search any topic in ${data?.regionLabel || "world"}...`}
-                    className="w-full rounded-2xl bg-transparent px-12 py-3 text-sm font-medium text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none"
+                    className="w-full rounded-lg bg-transparent px-12 py-3 text-sm font-medium text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none"
                   />
                   {searchInput && (
                     <button
@@ -497,52 +500,54 @@ export default function ExplorePage() {
                                 href={heroArticle.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-8 text-base font-bold text-[var(--foreground)] transition-all hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5 active:translate-y-0 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
+                                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-6 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(79,70,229,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] active:translate-y-0"
                               >
                                 Open full story
-                                <ArrowUpRight className="h-5 w-5" />
+                                <ArrowUpRight className="h-4 w-4" />
                               </a>
                               <a
                                 href="#explore-categories"
-                                className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl bg-[var(--primary)]/[0.08] px-8 text-base font-bold text-[var(--primary)] transition-all hover:bg-[var(--primary)]/[0.14] hover:-translate-y-0.5 active:translate-y-0 dark:border dark:border-[var(--primary)]/20 dark:bg-[var(--primary)]/10 dark:text-slate-200 dark:hover:border-[var(--primary)]/40 dark:hover:bg-[var(--primary)]/20"
+                                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                               >
                                 Browse topics
-                                <ArrowRight className="h-5 w-5" />
+                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                               </a>
                             </div>
                           </div>
 
-                          <div className="flex flex-col rounded-3xl border border-[var(--primary)]/20 bg-[var(--primary)]/[0.03] p-6 dark:bg-[var(--primary)]/[0.05]">
-                            <div className="flex items-center gap-2">
-                              <Sparkles className="h-4 w-4 text-[var(--primary)]" />
-                              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--primary)]">
-                                AI Suggested Search Direction
-                              </p>
-                            </div>
-                            <p className="mt-4 text-base font-medium leading-relaxed text-[var(--foreground)]">
-                              {data?.heroSearchPrompt ||
-                                "How is this event affecting regional stability and what are the long-term economic implications?"}
-                            </p>
-                            <div className="mt-auto flex flex-col gap-6 pt-6 sm:flex-row sm:items-center sm:justify-between">
-                              <div className="flex -space-x-2">
-                                {[1, 2, 3].map((i) => (
-                                  <div
-                                    key={i}
-                                    className="h-8 w-8 rounded-full border-2 border-white bg-slate-200 dark:border-slate-900"
-                                  />
-                                ))}
-                                <div className="flex h-8 items-center pl-4 text-xs font-bold text-[var(--muted)]">
-                                  +12 related perspectives
-                                </div>
+                          <div className="group perspective-[2000px]">
+                            <div className="flex h-full flex-col rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-50/50 to-violet-50/50 p-6 transition-transform duration-500 hover:rotate-x-[2deg] hover:rotate-y-[-5deg] dark:from-indigo-950/20 dark:to-violet-950/20">
+                              <div className="flex items-center gap-2">
+                                <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">
+                                  AI Suggested Search Direction
+                                </p>
                               </div>
-                              <button
-                                type="button"
-                                onClick={handleHeroPromptSearch}
-                                className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[var(--primary)] px-5 text-sm font-bold text-white shadow-md shadow-[var(--primary)]/20 transition-all hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0"
-                              >
-                                Search this angle
-                                <Search className="h-4 w-4" />
-                              </button>
+                              <p className="mt-4 text-base font-medium leading-relaxed text-[var(--foreground)]">
+                                {data?.heroSearchPrompt ||
+                                  "How is this event affecting regional stability and what are the long-term economic implications?"}
+                              </p>
+                              <div className="mt-auto flex flex-col gap-6 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex -space-x-2">
+                                  {[1, 2, 3].map((i) => (
+                                    <div
+                                      key={i}
+                                      className="h-8 w-8 rounded-full border-2 border-white/50 bg-slate-200 dark:border-slate-800/50 dark:bg-slate-700"
+                                    />
+                                  ))}
+                                  <div className="flex h-8 items-center pl-4 text-xs font-bold text-[var(--muted)]">
+                                    +12 related perspectives
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={handleHeroPromptSearch}
+                                  className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(79,70,229,0.3)] transition-all hover:scale-[1.02] hover:-translate-y-0.5 active:translate-y-0"
+                                >
+                                  Search this angle
+                                  <Search className="h-4 w-4" />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -645,9 +650,9 @@ export default function ExplorePage() {
                                 <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600" />
                                 <span>Open topic</span>
                               </div>
-                              <div className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary)]">
+                              <div className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
                                 Open category
-                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                               </div>
                             </div>
                           </PageSurface>
@@ -778,10 +783,10 @@ export default function ExplorePage() {
                                   void handleToggleSource(source.name)
                                 }
                                 disabled={isSaving}
-                                className={`inline-flex min-w-[120px] shrink-0 items-center justify-center whitespace-nowrap rounded-xl border px-5 py-2.5 text-sm font-bold transition-all active:scale-95 ${
+                                className={`inline-flex min-w-[120px] shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-5 py-2.5 text-sm font-bold transition-all active:scale-95 ${
                                   isFollowing
-                                    ? "border-[var(--primary)]/30 bg-[var(--primary)]/5 text-[var(--primary)] hover:bg-[var(--primary)]/10"
-                                    : "border-slate-200 bg-slate-50 text-[var(--foreground)] hover:border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
+                                    ? "border-indigo-500/30 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20"
+                                    : "border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700"
                                 }`}
                               >
                                 {isSaving ? (

@@ -1,10 +1,15 @@
-
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import { AlertTriangle, ArrowRight, BellRing, CheckCircle2, X } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Loader2,
+  Save,
+  Trash2,
+  X,
+} from "lucide-react";
 import { supabase } from "../../../lib/superbaseClient";
 import {
   broadcastPersonalizationUpdated,
@@ -13,6 +18,7 @@ import {
   saveUserPersonalization,
 } from "../services/personalizationService";
 import PersonalizationAiSuggestions from "../components/personalizationAiSuggestions";
+import StatusPopup from "../components/statusPopup";
 
 type PopupMessage = {
   tone: "success" | "error" | "info";
@@ -65,7 +71,7 @@ const AVAILABLE_TOPICS = [
 ];
 
 const MAX_TOPICS = 10;
-const INITIAL_VISIBLE_TOPICS = 15;
+const INITIAL_VISIBLE_TOPICS = 12;
 const DEFAULT_TOPIC_SELECTION = [
   "Top Headlines",
   "Technology",
@@ -132,7 +138,9 @@ export default function PersonalizationPage() {
   }, [filteredTopics, showAllTopics, topicSearch]);
 
   const shouldShowMoreTopicsButton =
-    !topicSearch.trim() && !showAllTopics && filteredTopics.length > INITIAL_VISIBLE_TOPICS;
+    !topicSearch.trim() &&
+    !showAllTopics &&
+    filteredTopics.length > INITIAL_VISIBLE_TOPICS;
 
   const desktopPopupVariants = {
     initial: { opacity: 0, y: 20, scale: 0.95 },
@@ -161,7 +169,10 @@ export default function PersonalizationPage() {
         const { data, error: fetchError } = await getUserPersonalization();
         if (fetchError) {
           if (mounted) {
-            setPopupMessage({ tone: "error", text: `Oops! ${fetchError.message} 😕` });
+            setPopupMessage({
+              tone: "error",
+              text: `Oops! ${fetchError.message} 😕`,
+            });
           }
           return;
         }
@@ -238,7 +249,10 @@ export default function PersonalizationPage() {
       });
 
       if (saveError) {
-        setPopupMessage({ tone: "error", text: `Oops! ${saveError.message} 😕` });
+        setPopupMessage({
+          tone: "error",
+          text: `Oops! ${saveError.message} 😕`,
+        });
         return;
       }
 
@@ -304,7 +318,10 @@ export default function PersonalizationPage() {
     try {
       const { error: discardError } = await discardUserPersonalization();
       if (discardError) {
-        setPopupMessage({ tone: "error", text: `Oops! ${discardError.message} 😕` });
+        setPopupMessage({
+          tone: "error",
+          text: `Oops! ${discardError.message} 😕`,
+        });
         return;
       }
 
@@ -364,12 +381,12 @@ export default function PersonalizationPage() {
           custom={0}
           className="rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8"
         >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
               <span className="mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
                 Tailor Your Experience
               </span>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
+              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 bg-clip-text text-transparent dark:from-white dark:via-indigo-200 dark:to-violet-200">
                 Personalization
               </h1>
               <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300 sm:text-base">
@@ -378,7 +395,7 @@ export default function PersonalizationPage() {
                 reading experience.💪🏼
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-left sm:text-right dark:border-slate-700/80 dark:bg-slate-800/70">
+            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 dark:border-slate-700/80 dark:bg-slate-800/70 lg:shrink-0 lg:text-right">
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Logged in as
               </p>
@@ -441,20 +458,24 @@ export default function PersonalizationPage() {
           custom={2}
           className="rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8"
         >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                Topics
-              </h2>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                Select up to {MAX_TOPICS} topics for better recommendations
-              </p>
-            </div>
+          {/* Topics heading — full width divider */}
+          <div className="mb-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            <h2 className="whitespace-nowrap text-lg font-semibold text-slate-900 dark:text-slate-50">
+              Topics
+            </h2>
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+          </div>
 
-            <div className="flex items-center gap-4">
-              <div className="h-2.5 w-44 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 sm:w-52">
+          {/* Subtitle + progress bar row */}
+          <div className="flex flex-row items-center justify-between gap-2">
+            <p className="text-xs text-slate-600 dark:text-slate-300 sm:text-sm">
+              Select up to {MAX_TOPICS} topics
+            </p>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-700/80 sm:h-2.5 sm:w-52">
                 <motion.div
-                  className="h-full bg-[var(--primary)]"
+                  className="h-full rounded-full bg-gradient-to-r from-[var(--primary)] via-indigo-500 to-sky-400 shadow-[0_0_12px_rgba(99,102,241,0.35)]"
                   initial={{ width: 0 }}
                   animate={{
                     width: `${(favoriteTopics.length / MAX_TOPICS) * 100}%`,
@@ -462,7 +483,7 @@ export default function PersonalizationPage() {
                   transition={{ duration: 0.4 }}
                 />
               </div>
-              <span className="tabular-nums text-sm font-medium text-slate-500 dark:text-slate-400">
+              <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 sm:px-2.5 sm:text-xs">
                 {favoriteTopics.length}/{MAX_TOPICS}
               </span>
             </div>
@@ -557,37 +578,49 @@ export default function PersonalizationPage() {
           custom={4}
           className="rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8"
         >
-          <h2 className="mb-6 text-lg font-semibold text-slate-900 dark:text-slate-50">
-            Your Favorites
-          </h2>
+          <div className="mb-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            <h2 className="whitespace-nowrap text-lg font-semibold text-slate-900 dark:text-slate-50">
+              Your Favorites
+            </h2>
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+          </div>
 
           {!hasSelection ? (
-            <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-100/70 dark:bg-slate-800/70 py-12 text-center">
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Nothing selected yet. Your personalized feed will appear here
-                once you save.
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 py-12 px-6 text-center transition-all hover:border-slate-400 dark:border-slate-700 dark:bg-slate-800/30 dark:hover:border-slate-600">
+              <span className="mb-3 text-2xl opacity-90">🗂️</span>
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                No favorites selected
+              </p>
+              <p className="mt-1 max-w-[280px] text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                Your personalized feed will appear here once you select and save
+                your preferred sources and topics.
               </p>
             </div>
           ) : (
             <div className="space-y-8">
               {favoriteSources.length > 0 && (
                 <div>
-                  <p className="mb-3 text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                    Sources
-                  </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                      Sources
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2.5">
                     {favoriteSources.map((source) => (
                       <div
                         key={source}
-                        className="group flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-800 bg-blue-100/80 dark:bg-blue-950/70 px-4 py-1.5 text-sm text-blue-700 dark:text-blue-300"
+                        className="group flex flex-wrap items-center gap-2 rounded-full border border-blue-200/80 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 shadow-sm transition-all hover:bg-blue-100/70 hover:shadow dark:border-blue-800/60 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50 sm:px-4"
                       >
-                        {source}
+                        <span className="truncate">{source}</span>
                         <button
                           type="button"
                           onClick={() => removeFavoriteSource(source)}
-                          className="rounded-full p-0.5 opacity-60 hover:bg-blue-200 dark:hover:bg-blue-900 hover:opacity-100"
+                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-200/50 text-blue-600 transition-colors hover:bg-blue-600 hover:text-white dark:bg-blue-900/50 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white"
+                          aria-label={`Remove ${source}`}
                         >
-                          <X size={14} />
+                          <X size={12} strokeWidth={2.5} />
                         </button>
                       </div>
                     ))}
@@ -597,22 +630,26 @@ export default function PersonalizationPage() {
 
               {favoriteTopics.length > 0 && (
                 <div>
-                  <p className="mb-3 text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                    Topics
-                  </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                      Topics
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2.5">
                     {favoriteTopics.map((topic) => (
                       <div
                         key={topic}
-                        className="group flex items-center gap-2 rounded-full border border-emerald-200 dark:border-emerald-800 bg-emerald-100/80 dark:bg-emerald-950/70 px-4 py-1.5 text-sm text-emerald-700 dark:text-emerald-300"
+                        className="group flex flex-wrap items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 shadow-sm transition-all hover:bg-emerald-100/70 hover:shadow dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/50 sm:px-4"
                       >
-                        {topic}
+                        <span className="truncate">{topic}</span>
                         <button
                           type="button"
                           onClick={() => removeFavoriteTopic(topic)}
-                          className="rounded-full p-0.5 opacity-60 hover:bg-emerald-200 dark:hover:bg-emerald-900 hover:opacity-100"
+                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-200/50 text-emerald-600 transition-colors hover:bg-emerald-600 hover:text-white dark:bg-emerald-900/50 dark:text-emerald-400 dark:hover:bg-emerald-500 dark:hover:text-white"
+                          aria-label={`Remove ${topic}`}
                         >
-                          <X size={14} />
+                          <X size={12} strokeWidth={2.5} />
                         </button>
                       </div>
                     ))}
@@ -622,27 +659,76 @@ export default function PersonalizationPage() {
             </div>
           )}
 
-          <div className="mt-8 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/70 p-3 sm:p-4">
-            <div className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-              Save to apply these preferences across your feed.
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <button
-                type="button"
-                onClick={() => setIsDeletePopupOpen(true)}
-                disabled={isSaving || isDiscarding}
-                className="rounded-2xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 px-6 py-3 text-sm font-medium text-red-700 dark:text-red-300 transition hover:bg-red-100 dark:hover:bg-red-900 disabled:opacity-60"
-              >
-                {isDiscarding ? "Discarding..." : "Discard All"}
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={isSaving || isDiscarding}
-                className="rounded-2xl bg-[var(--primary)] px-8 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSaving ? "Saving..." : "Save My Preferences"}
-              </button>
+          {/* ── Premium Action Footer ── */}
+          <div className="relative mt-8 overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-700/60 bg-white/70 dark:bg-slate-900/70 shadow-lg shadow-slate-200/40 dark:shadow-slate-950/40 backdrop-blur-sm">
+            {/* Gradient shimmer band at top */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--primary)]/50 to-transparent" />
+            <div className="absolute -top-10 left-1/2 h-20 w-72 -translate-x-1/2 rounded-full bg-[var(--primary)]/8 blur-2xl dark:bg-[var(--primary)]/12" />
+
+            <div className="relative flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between lg:p-5">
+              {/* Left — info block */}
+              <div className="flex min-w-0 flex-col gap-1.5">
+                <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                  Ready to apply your changes?
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {favoriteSources.length > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-100/80 dark:bg-blue-900/40 border border-blue-200/60 dark:border-blue-800/60 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700 dark:text-blue-300">
+                      {favoriteSources.length} source
+                      {favoriteSources.length !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                  {favoriteTopics.length > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100/80 dark:bg-emerald-900/40 border border-emerald-200/60 dark:border-emerald-800/60 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                      {favoriteTopics.length} topic
+                      {favoriteTopics.length !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                    Your feed will sync after saving.
+                  </span>
+                </div>
+              </div>
+
+              {/* Right — action buttons */}
+              <div className="flex shrink-0 flex-row items-center justify-end gap-2">
+                {/* Discard button */}
+                <button
+                  type="button"
+                  onClick={() => setIsDeletePopupOpen(true)}
+                  disabled={isSaving || isDiscarding}
+                  className="group inline-flex items-center gap-2 rounded-md border border-red-200/70 dark:border-red-800/60 bg-transparent px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 transition-all duration-200 hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isDiscarding ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Trash2
+                      size={14}
+                      className="transition-transform group-hover:scale-110"
+                    />
+                  )}
+                  {isDiscarding ? "Discarding..." : "Discard All"}
+                </button>
+
+                {/* Save button */}
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={isSaving || isDiscarding}
+                  className="group relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-[var(--primary)] px-5 py-2 text-sm font-semibold text-white shadow-md shadow-[var(--primary)]/25 transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-[var(--primary)]/35 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                  {isSaving ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Save
+                      size={14}
+                      className="transition-transform group-hover:scale-110"
+                    />
+                  )}
+                  {isSaving ? "Saving..." : "Save All"}
+                </button>
+              </div>
             </div>
           </div>
         </motion.section>
@@ -664,106 +750,23 @@ export default function PersonalizationPage() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {popupMessage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-black/30 backdrop-blur-sm"
-            onClick={() => setPopupMessage(null)}
-          >
-            <motion.div
-              variants={isMobile ? mobilePopupVariants : desktopPopupVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.3 }}
-              className={`relative w-full overflow-hidden rounded-t-2xl shadow-xl sm:rounded-[28px] ${
-                popupMessage.tone === "success"
-                  ? "sm:max-w-lg border border-emerald-200/70 bg-white/95 p-0 dark:border-emerald-500/20 dark:bg-slate-900/95"
-                  : "sm:max-w-md bg-white p-5 dark:bg-slate-800 sm:p-6"
-              }`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {popupMessage.tone === "success" ? (
-                <>
-                  <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-emerald-400/20 via-sky-300/20 to-cyan-300/20 dark:from-emerald-400/10 dark:via-sky-400/10 dark:to-cyan-400/10" />
-                  <div className="absolute -right-10 top-8 h-32 w-32 rounded-full bg-emerald-300/20 blur-3xl dark:bg-emerald-400/10" />
-                  <div className="relative p-6 sm:p-7">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/20">
-                          <CheckCircle2 className="h-7 w-7" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-300">
-                            Preferences Updated
-                          </p>
-                          <h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-50">
-                            You're ready for a fresh start
-                          </h3>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setPopupMessage(null)}
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/80 text-slate-400 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800/80 dark:hover:border-slate-600 dark:hover:text-slate-200"
-                        aria-label="Close message"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-
-                    <div className="mt-5 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-4 dark:border-emerald-500/10 dark:from-emerald-500/10 dark:via-slate-900 dark:to-sky-500/10">
-                      <p className="text-sm leading-6 text-slate-700 dark:text-slate-200">
-                        {popupMessage.text}
-                      </p>
-                    </div>
-
-                    <div className="mt-5 flex justify-end">
-                      <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
-                      >
-                        Go Home
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-                      popupMessage.tone === "info"
-                        ? "bg-sky-100 text-sky-600"
-                        : "bg-red-100 text-red-600"
-                    }`}
-                  >
-                    {popupMessage.tone === "info" ? (
-                      <BellRing className="h-5 w-5" />
-                    ) : (
-                      <AlertTriangle className="h-5 w-5" />
-                    )}
-                  </div>
-                  <p className="flex-1 text-sm font-medium text-slate-800 dark:text-slate-100">
-                    {popupMessage.text}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setPopupMessage(null)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-200"
-                    aria-label="Close message"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <StatusPopup
+        isOpen={Boolean(popupMessage)}
+        tone={popupMessage?.tone ?? "success"}
+        message={popupMessage?.text ?? ""}
+        onClose={() => setPopupMessage(null)}
+        context="personalization"
+        isMobile={isMobile}
+        action={
+          popupMessage?.tone === "success"
+            ? {
+                label: "Go Home",
+                href: "/",
+                icon: <ArrowRight className="h-4 w-4" />,
+              }
+            : undefined
+        }
+      />
 
       <AnimatePresence>
         {isDeletePopupOpen && (

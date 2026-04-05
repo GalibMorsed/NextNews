@@ -1,25 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import clsx from "clsx";
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import {
-  AlertTriangle,
-  BellRing,
-  CheckCircle2,
-  Globe,
-  Lock,
-  Moon,
-  Save,
-  Shield,
-  ShieldCheck,
-  Sparkles,
-  Trash2,
-  UserRound,
-  X,
-  Zap,
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { EyeOff, Globe, Lock, Moon } from "lucide-react";
 import { supabase } from "../../../lib/superbaseClient";
 import {
   applyDarkMode,
@@ -29,6 +11,19 @@ import {
   readDarkModeSetting,
 } from "@/lib/accountSettings";
 import { clearClientSession, getVerifiedAuthUser } from "@/lib/clientAuth";
+import StatusPopup from "../components/statusPopup";
+import {
+  BillingSettingsCard,
+  DeleteAccountDialog,
+  InputField,
+  NotificationsSection,
+  PersonalDetailsSection,
+  PlanSettingsCard,
+  SettingsCard,
+  SettingsActionFooter,
+  SettingsHeaderSection,
+  ToggleRow,
+} from "../components/settingsSections";
 
 type NotificationSettings = {
   accountActivity: boolean;
@@ -43,12 +38,19 @@ type ProfileSettings = {
   email: string;
 };
 
+type PrivacySettings = {
+  profileVisibility: boolean;
+  searchIndexing: boolean;
+  dataSharing: boolean;
+};
+
 type AccountSettings = {
   darkMode: boolean;
   language: string;
   notificationsEnabled: boolean;
   notifications: NotificationSettings;
   profile: ProfileSettings;
+  privacy: PrivacySettings;
 };
 
 type FlashMessage = {
@@ -70,6 +72,11 @@ const DEFAULT_SETTINGS: AccountSettings = {
     gender: "",
     age: "",
     email: "",
+  },
+  privacy: {
+    profileVisibility: true,
+    searchIndexing: false,
+    dataSharing: false,
   },
 };
 
@@ -110,6 +117,15 @@ function mergeSettings(raw: unknown): AccountSettings {
       gender: data.profile?.gender ?? DEFAULT_SETTINGS.profile.gender,
       age: data.profile?.age ?? DEFAULT_SETTINGS.profile.age,
       email: data.profile?.email ?? DEFAULT_SETTINGS.profile.email,
+    },
+    privacy: {
+      profileVisibility:
+        data.privacy?.profileVisibility ??
+        DEFAULT_SETTINGS.privacy.profileVisibility,
+      searchIndexing:
+        data.privacy?.searchIndexing ?? DEFAULT_SETTINGS.privacy.searchIndexing,
+      dataSharing:
+        data.privacy?.dataSharing ?? DEFAULT_SETTINGS.privacy.dataSharing,
     },
   };
 }
@@ -239,18 +255,6 @@ export default function AccountSettingsPage() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const desktopPopupVariants = {
-    initial: { opacity: 0, y: 20, scale: 0.95 },
-    animate: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 20, scale: 0.95 },
-  };
-
-  const mobilePopupVariants = {
-    initial: { opacity: 0, y: "100%" },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: "100%" },
-  };
-
   const updateProfile = <K extends keyof ProfileSettings>(
     key: K,
     value: ProfileSettings[K],
@@ -268,6 +272,16 @@ export default function AccountSettingsPage() {
     setSettings((prev) => ({
       ...prev,
       notifications: { ...prev.notifications, [key]: value },
+    }));
+  };
+
+  const updatePrivacy = <K extends keyof PrivacySettings>(
+    key: K,
+    value: PrivacySettings[K],
+  ) => {
+    setSettings((prev) => ({
+      ...prev,
+      privacy: { ...prev.privacy, [key]: value },
     }));
   };
 
@@ -306,6 +320,7 @@ export default function AccountSettingsPage() {
         age: settings.profile.age ? Number(settings.profile.age) : null,
         language: settings.language,
         notifications: settings.notifications,
+        privacy: settings.privacy,
       };
 
       const payload: { data: Record<string, unknown>; password?: string } = {
@@ -399,23 +414,13 @@ export default function AccountSettingsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 px-4 py-8 sm:px-6 md:py-10 lg:px-8">
+    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 px-4 py-8 sm:px-6 md:py-10 lg:px-8 transition-colors duration-500">
       <div className="mx-auto w-full max-w-5xl space-y-6">
-        <motion.section
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm sm:p-6"
-        >
-          <span className="mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            User Profile
-          </span>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
-            Account Settings
-          </h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 sm:text-base">
-            Manage profile, security, preferences, and communication settings.🧠
-          </p>
-        </motion.section>
+        <SettingsHeaderSection
+          badge="User Profile"
+          title="Account Settings"
+          subtitle="Manage profile, security, preferences, and communication settings.🧠"
+        />
 
         <PlanSettingsCard />
 
@@ -444,7 +449,7 @@ export default function AccountSettingsPage() {
               onChange={(e) =>
                 setSettings((prev) => ({ ...prev, language: e.target.value }))
               }
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              className="w-full rounded-xl border border-slate-300/80 bg-white/50 px-3 py-2 text-sm text-slate-700 outline-none backdrop-blur-sm transition-all duration-200 hover:bg-white/80 focus:border-[var(--primary)] focus:bg-white focus:ring-2 focus:ring-[var(--primary)]/20 dark:border-slate-600/80 dark:bg-slate-900/50 dark:text-slate-100 dark:hover:bg-slate-900/80 dark:focus:bg-slate-900"
             >
               {LANGUAGES.map((language) => (
                 <option key={language.code} value={language.code}>
@@ -454,112 +459,24 @@ export default function AccountSettingsPage() {
             </select>
           </SettingsCard>
 
-          <SettingsCard
-            icon={<UserRound className="h-5 w-5 text-[var(--primary)]" />}
-            title="Personal Details"
-            description="Keep your account information up to date."
-            className="lg:col-span-2"
-          >
-            <div className="flex flex-col gap-6 sm:flex-row">
-              <div className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 sm:w-52">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-200 text-xl font-bold text-slate-700">
-                  {profileInitials}
-                </div>
-                <p className="mt-3 text-center text-xs text-slate-500">
-                  Avatar updates follow your account profile metadata.
-                </p>
-              </div>
+          <PersonalDetailsSection
+            profileInitials={profileInitials}
+            profile={settings.profile}
+            genders={GENDERS}
+            onUpdateProfile={updateProfile}
+          />
 
-              <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2">
-                <InputField
-                  label="Name"
-                  value={settings.profile.name}
-                  onChange={(value) => updateProfile("name", value)}
-                  placeholder="Your full name"
-                />
-                <div>
-                  <label className="text-sm font-medium text-slate-600">
-                    Gender
-                  </label>
-                  <select
-                    value={settings.profile.gender}
-                    onChange={(e) => updateProfile("gender", e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-[var(--primary)]"
-                  >
-                    <option value="">Select gender</option>
-                    {GENDERS.map((gender) => (
-                      <option key={gender} value={gender}>
-                        {gender}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <InputField
-                  label="Age"
-                  type="number"
-                  value={settings.profile.age}
-                  onChange={(value) => updateProfile("age", value)}
-                  placeholder="Age"
-                />
-                <InputField
-                  label="Email"
-                  value={settings.profile.email}
-                  disabled
-                  onChange={() => undefined}
-                />
-              </div>
-            </div>
-          </SettingsCard>
-
-          <SettingsCard
-            icon={<Shield className="h-5 w-5 text-[var(--primary)]" />}
-            title="Notifications"
-            description="Control when and what we notify you about."
-          >
-            <ToggleRow
-              label="Enable notifications"
-              checked={settings.notificationsEnabled}
-              onChange={(checked) =>
-                setSettings((prev) => ({
-                  ...prev,
-                  notificationsEnabled: checked,
-                }))
-              }
-            />
-
-            <AnimatePresence initial={false}>
-              {settings.notificationsEnabled && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="mt-4 space-y-3 overflow-hidden"
-                >
-                  <ToggleRow
-                    label="Account activity"
-                    checked={settings.notifications.accountActivity}
-                    onChange={(checked) =>
-                      updateNotification("accountActivity", checked)
-                    }
-                  />
-                  <ToggleRow
-                    label="Security alerts"
-                    checked={settings.notifications.securityAlerts}
-                    onChange={(checked) =>
-                      updateNotification("securityAlerts", checked)
-                    }
-                  />
-                  <ToggleRow
-                    label="Product updates"
-                    checked={settings.notifications.productUpdates}
-                    onChange={(checked) =>
-                      updateNotification("productUpdates", checked)
-                    }
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </SettingsCard>
+          <NotificationsSection
+            notificationsEnabled={settings.notificationsEnabled}
+            notifications={settings.notifications}
+            onToggleNotificationsEnabled={(checked) =>
+              setSettings((prev) => ({
+                ...prev,
+                notificationsEnabled: checked,
+              }))
+            }
+            onUpdateNotification={updateNotification}
+          />
 
           <SettingsCard
             icon={<Lock className="h-5 w-5 text-[var(--primary)]" />}
@@ -585,426 +502,69 @@ export default function AccountSettingsPage() {
               placeholder="Re-enter your password"
             />
           </SettingsCard>
-        </div>
 
-        <motion.section
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm sm:p-6"
-        >
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="sm:flex-1">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                Actions
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-300">
-                Save your preferences or request account deletion support.
-              </p>
-            </div>
-
-            <div className="flex w-full flex-col gap-3 lg:w-auto lg:flex-row">
-              <button
-                type="button"
-                onClick={handleSaveAll}
-                disabled={!isLoaded || isSaving}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <Save className="h-4 w-4" />
-                {isSaving ? "Saving..." : "Save changes"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setDeleteConfirmationText("");
-                  setIsDeletePopupOpen(true);
-                }}
-                disabled={!isLoaded || isSaving}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-100"
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete account
-              </button>
-            </div>
-          </div>
-          <div className="mt-4 text-sm text-slate-600 dark:text-slate-300">
-            Need help? Visit{" "}
-            <Link
-              href="/support"
-              className="font-medium text-[var(--primary)] underline"
-            >
-              Support
-            </Link>
-            .
-          </div>
-        </motion.section>
-      </div>
-
-      <AnimatePresence>
-        {flash && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 p-0 backdrop-blur-sm sm:items-center sm:p-6"
-            onClick={() => setFlash(null)}
+          <SettingsCard
+            icon={<EyeOff className="h-5 w-5 text-[var(--primary)]" />}
+            title="Privacy Controls"
+            description="Manage your profile visibility and data sharing."
           >
-            <motion.div
-              variants={isMobile ? mobilePopupVariants : desktopPopupVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.3 }}
-              className={`relative w-full overflow-hidden rounded-t-2xl border bg-white/95 shadow-xl dark:bg-slate-900/95 sm:max-w-md sm:rounded-[28px] ${
-                flash.tone === "success"
-                  ? "border-emerald-200/70 dark:border-emerald-500/20"
-                  : flash.tone === "info"
-                    ? "border-sky-200/70 dark:border-sky-500/20"
-                    : "border-red-200/70 dark:border-red-500/20"
-              }`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                className={`absolute inset-x-0 top-0 h-24 ${
-                  flash.tone === "success"
-                    ? "bg-gradient-to-r from-emerald-400/20 via-sky-300/20 to-cyan-300/20 dark:from-emerald-400/10 dark:via-sky-400/10 dark:to-cyan-400/10"
-                    : flash.tone === "info"
-                      ? "bg-gradient-to-r from-sky-400/20 via-cyan-300/20 to-indigo-300/20 dark:from-sky-400/10 dark:via-cyan-400/10 dark:to-indigo-400/10"
-                      : "bg-gradient-to-r from-red-400/20 via-rose-300/20 to-orange-300/20 dark:from-red-400/10 dark:via-rose-400/10 dark:to-orange-400/10"
-                }`}
-              />
-              <div
-                className={`absolute -right-10 top-8 h-32 w-32 rounded-full blur-3xl ${
-                  flash.tone === "success"
-                    ? "bg-emerald-300/20 dark:bg-emerald-400/10"
-                    : flash.tone === "info"
-                      ? "bg-sky-300/20 dark:bg-sky-400/10"
-                      : "bg-red-300/20 dark:bg-red-400/10"
-                }`}
-              />
-              <div className="relative px-4 pb-5 pt-4 sm:p-7">
-                <div className="flex items-start justify-end">
-                  <button
-                    type="button"
-                    onClick={() => setFlash(null)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/80 text-slate-400 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800/80 dark:hover:border-slate-600 dark:hover:text-slate-200"
-                    aria-label="Close message"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <div className="mt-1 flex flex-col items-center text-center sm:mt-0 sm:flex-row sm:items-center sm:gap-4 sm:text-left">
-                  <div
-                    className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-white shadow-lg ${
-                      flash.tone === "success"
-                        ? "bg-gradient-to-br from-emerald-500 to-teal-500 shadow-emerald-500/20"
-                        : flash.tone === "info"
-                          ? "bg-gradient-to-br from-sky-500 to-cyan-500 shadow-sky-500/20"
-                          : "bg-gradient-to-br from-red-500 to-orange-500 shadow-red-500/20"
-                    }`}
-                  >
-                    {flash.tone === "success" ? (
-                      <CheckCircle2 className="h-7 w-7" />
-                    ) : flash.tone === "info" ? (
-                      <BellRing className="h-7 w-7" />
-                    ) : (
-                      <AlertTriangle className="h-7 w-7" />
-                    )}
-                  </div>
-                  <div>
-                    <p
-                      className={`text-xs font-semibold uppercase tracking-[0.22em] ${
-                        flash.tone === "success"
-                          ? "text-emerald-600 dark:text-emerald-300"
-                          : flash.tone === "info"
-                            ? "text-sky-600 dark:text-sky-300"
-                            : "text-red-600 dark:text-red-300"
-                      }`}
-                    >
-                      {flash.tone === "success"
-                        ? "Settings Updated"
-                        : flash.tone === "info"
-                          ? "Settings Notice"
-                          : "Settings Alert"}
-                    </p>
-                    <h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      {flash.tone === "success"
-                        ? "Changes saved"
-                        : flash.tone === "info"
-                          ? "Please review"
-                          : "Something needs attention"}
-                    </h3>
-                  </div>
-                </div>
-
-                <div
-                  className={`mt-5 rounded-2xl p-4 text-center sm:text-left ${
-                    flash.tone === "success"
-                      ? "border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 dark:border-emerald-500/10 dark:from-emerald-500/10 dark:via-slate-900 dark:to-sky-500/10"
-                      : flash.tone === "info"
-                        ? "border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-cyan-50 dark:border-sky-500/10 dark:from-sky-500/10 dark:via-slate-900 dark:to-cyan-500/10"
-                        : "border border-red-100 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:border-red-500/10 dark:from-red-500/10 dark:via-slate-900 dark:to-orange-500/10"
-                  }`}
-                >
-                  <p className="text-sm font-medium leading-6 text-slate-700 dark:text-slate-200">
-                    {flash.text}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isDeletePopupOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-black/30 backdrop-blur-sm"
-            onClick={() => {
-              if (!isSaving) {
-                setIsDeletePopupOpen(false);
-                setDeleteConfirmationText("");
+            <ToggleRow
+              label="Public profile visibility"
+              checked={settings.privacy.profileVisibility}
+              onChange={(checked) =>
+                updatePrivacy("profileVisibility", checked)
               }
-            }}
-          >
-            <motion.div
-              variants={isMobile ? mobilePopupVariants : desktopPopupVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.3 }}
-              className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-xl bg-white dark:bg-slate-800 p-5 sm:p-6 shadow-xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-4 flex items-start gap-3">
-                <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
-                  <AlertTriangle className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                    Confirm account deletion
-                  </h3>
-                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                    This action is permanent and removes your account and saved
-                    data from our servers 😥.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isSaving) return;
-                    setIsDeletePopupOpen(false);
-                    setDeleteConfirmationText("");
-                  }}
-                  className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-200"
-                  aria-label="Close delete confirmation"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
+            />
+            <ToggleRow
+              label="Allow search indexing"
+              checked={settings.privacy.searchIndexing}
+              onChange={(checked) => updatePrivacy("searchIndexing", checked)}
+            />
+            <ToggleRow
+              label="Data sharing with partners"
+              checked={settings.privacy.dataSharing}
+              onChange={(checked) => updatePrivacy("dataSharing", checked)}
+            />
+          </SettingsCard>
 
-              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
-                Type <span className="font-bold">DELETE</span> to confirm
-              </label>
-              <input
-                type="text"
-                value={deleteConfirmationText}
-                onChange={(e) => setDeleteConfirmationText(e.target.value)}
-                placeholder="DELETE"
-                disabled={isSaving}
-                className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-slate-100 outline-none transition focus:ring-2 focus:ring-[var(--primary)] disabled:opacity-70"
-              />
-
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsDeletePopupOpen(false);
-                    setDeleteConfirmationText("");
-                  }}
-                  disabled={isSaving}
-                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDeleteAccount}
-                  disabled={isSaving}
-                  className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isSaving ? "Deleting..." : "Delete permanently"}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </main>
-  );
-}
-
-function PlanSettingsCard() {
-  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
-
-  useEffect(() => {
-    const savedPlan = localStorage.getItem("nextnews-plan");
-    if (savedPlan) setCurrentPlan(savedPlan);
-  }, []);
-
-  if (!currentPlan) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={clsx(
-        "flex items-center justify-between gap-4 rounded-2xl border p-4 shadow-sm transition-all sm:p-5",
-        currentPlan === "Pro+"
-          ? "border-orange-200 bg-orange-50 dark:border-orange-700/50 dark:bg-orange-950/20"
-          : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800",
-      )}
-    >
-      <div className="flex items-center gap-3.5">
-        <div
-          className={clsx(
-            "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
-            currentPlan === "Pro+"
-              ? "bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400"
-              : "bg-teal-50 text-teal-600 dark:bg-teal-900/20 dark:text-teal-400",
-          )}
-        >
-          {currentPlan === "Pro+" ? (
-            <Zap className="h-6 w-6" />
-          ) : currentPlan === "Pro" ? (
-            <ShieldCheck className="h-6 w-6" />
-          ) : (
-            <Sparkles className="h-6 w-6" />
-          )}
+          <BillingSettingsCard setFlash={setFlash} />
         </div>
-        <div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-            Current Plan
-          </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Your selected subscription is{" "}
-            <span className="font-medium">{currentPlan} Plan</span> currently
-            active on this account.
-          </p>
-        </div>
-      </div>
-      <Link
-        href="/plans"
-        className="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-      >
-        Manage
-      </Link>
-    </motion.div>
-  );
-}
 
-function SettingsCard({
-  icon,
-  title,
-  description,
-  className,
-  children,
-}: {
-  icon: ReactNode;
-  title: string;
-  description: string;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      whileHover={{ y: -2 }}
-      className={`rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm sm:p-6 ${className ?? ""}`}
-    >
-      <div className="mb-4 flex items-center gap-3">
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700">
-          {icon}
-        </span>
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            {title}
-          </h2>
-          <p className="text-sm text-slate-600 dark:text-slate-300">
-            {description}
-          </p>
-        </div>
-      </div>
-      <div className="space-y-4">{children}</div>
-    </motion.section>
-  );
-}
-
-function ToggleRow({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: (next: boolean) => void;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-        {label}
-      </span>
-      <button
-        type="button"
-        onClick={() => onChange(!checked)}
-        className={`relative h-7 w-12 rounded-full transition ${
-          checked ? "bg-[var(--primary)]" : "bg-slate-300 dark:bg-slate-600"
-        }`}
-      >
-        <span
-          className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
-            checked ? "left-6" : "left-1"
-          }`}
+        <SettingsActionFooter
+          isLoaded={isLoaded}
+          isSaving={isSaving}
+          onDeleteClick={() => {
+            setDeleteConfirmationText("");
+            setIsDeletePopupOpen(true);
+          }}
+          onSaveClick={handleSaveAll}
         />
-      </button>
-    </div>
-  );
-}
+      </div>
 
-function InputField({
-  label,
-  value,
-  onChange,
-  type = "text",
-  placeholder,
-  disabled = false,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  type?: "text" | "password" | "number";
-  placeholder?: string;
-  disabled?: boolean;
-}) {
-  return (
-    <div>
-      <label className="text-sm font-medium text-slate-600 dark:text-slate-300">
-        {label}
-      </label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        disabled={disabled}
-        className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-800 dark:text-slate-100 outline-none transition focus:ring-2 focus:ring-[var(--primary)] disabled:bg-slate-100 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-300"
+      <StatusPopup
+        isOpen={Boolean(flash)}
+        tone={flash?.tone ?? "success"}
+        message={flash?.text ?? ""}
+        onClose={() => setFlash(null)}
+        context="settings"
+        isMobile={isMobile}
       />
-    </div>
+
+      <DeleteAccountDialog
+        isOpen={isDeletePopupOpen}
+        isMobile={isMobile}
+        isSaving={isSaving}
+        confirmationText={deleteConfirmationText}
+        description="This action is permanent and removes your account and saved data from our servers😥."
+        onChangeConfirmationText={setDeleteConfirmationText}
+        onClose={() => {
+          if (!isSaving) {
+            setIsDeletePopupOpen(false);
+            setDeleteConfirmationText("");
+          }
+        }}
+        onConfirm={handleDeleteAccount}
+      />
+    </main>
   );
 }

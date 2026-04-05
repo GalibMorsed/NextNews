@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./index.css";
 import AppShell from "./components/appShell";
+
+const jakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "NextNews App",
@@ -13,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={jakartaSans.variable}>
+      <body className="min-h-screen font-sans antialiased" suppressHydrationWarning>
         <AppShell>{children}</AppShell>
       </body>
     </html>

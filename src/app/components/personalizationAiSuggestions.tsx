@@ -117,32 +117,40 @@ export default function PersonalizationAiSuggestions({
 
   return (
     <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/85 sm:p-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-50">
-            <Sparkles className="text-[var(--primary)]" />
-            AI Topic Suggestions
-          </h2>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-            Real-time recommendations based on trending global news
-          </p>
-        </div>
+      {/* Heading — full width divider */}
+      <div className="mb-4 flex items-center gap-3">
+        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+        <h2 className="flex items-center gap-2 whitespace-nowrap text-lg font-semibold text-slate-900 dark:text-slate-50">
+          <Sparkles size={18} className="text-[var(--primary)]" />
+          AI Topic Suggestions
+        </h2>
+        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+      </div>
+
+      {/* Subtitle + button row */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
+          Real-time recommendations based on trending global news
+        </p>
 
         <button
           type="button"
           onClick={handleGetAiSuggestions}
           disabled={isSuggesting}
-          className="inline-flex items-center gap-2 rounded-2xl bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+          className="group relative inline-flex w-fit items-center gap-2 self-center overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-500 px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/40 disabled:cursor-not-allowed disabled:opacity-70 lg:self-auto"
         >
+          {/* Shimmer sweep effect */}
+          <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-in-out group-hover:translate-x-full" />
+
           {isSuggesting ? (
             <>
-              <Loader2 className="animate-spin" size={18} />
-              Analyzing trends...
+              <Loader2 className="animate-spin" size={17} />
+              Analyzing...
             </>
           ) : (
             <>
-              <Sparkles size={18} />
-              Get Smart Suggestions
+              <Sparkles size={17} className="transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
+              Get Suggestions
             </>
           )}
         </button>
@@ -152,7 +160,10 @@ export default function PersonalizationAiSuggestions({
         <div className="mt-8">
           <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-800/70">
             <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
-              <Loader2 className="animate-spin text-[var(--primary)]" size={18} />
+              <Loader2
+                className="animate-spin text-[var(--primary)]"
+                size={18}
+              />
               {aiLoadingMessage}
             </div>
             <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
@@ -165,11 +176,11 @@ export default function PersonalizationAiSuggestions({
             <Loader2 className="animate-spin" size={18} />
             AI analysis in progress ({aiElapsedSeconds}s)
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="h-56 animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100/80 p-4 dark:border-slate-700 dark:bg-slate-800/70"
+                className="h-56 animate-pulse rounded-3xl border border-slate-200/80 bg-slate-100/80 p-4 dark:border-slate-700 dark:bg-slate-800/70"
               />
             ))}
           </div>
@@ -180,7 +191,7 @@ export default function PersonalizationAiSuggestions({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mt-8 grid gap-4 sm:grid-cols-2"
+          className="mt-8 grid gap-4 lg:grid-cols-2 xl:grid-cols-3"
         >
           {suggestions.map((item, index) => {
             const alreadySelected = favoriteTopics.includes(item.topic);
@@ -193,26 +204,26 @@ export default function PersonalizationAiSuggestions({
                 animate="visible"
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ y: -2 }}
-                className="group rounded-3xl border border-slate-200 bg-slate-50/80 p-6 transition hover:shadow-md dark:border-slate-700 dark:bg-slate-800/80"
+                className="flex h-full flex-col justify-between group rounded-3xl border border-slate-200 bg-slate-50/80 p-6 transition hover:shadow-md dark:border-slate-700 dark:bg-slate-800/80"
               >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                    {item.topic}
-                  </h3>
-                  <span
-                    className={`rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest ${
-                      item.confidence === "high"
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
-                        : item.confidence === "medium"
-                          ? "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
-                          : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
-                    }`}
-                  >
-                    {item.confidence}
-                  </span>
-                </div>
+                <div>
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-base font-semibold leading-snug text-slate-900 dark:text-slate-100">
+                      {item.topic}
+                    </h3>
+                    <span
+                      className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${item.confidence === "high"
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                          : item.confidence === "medium"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
+                            : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                        }`}
+                    >
+                      {item.confidence}
+                    </span>
+                  </div>
 
-                <div className="mt-5 space-y-3 text-xs">
+                <div className="mt-5 space-y-3 text-xs mb-6">
                   <div>
                     <span className="font-medium text-slate-500 dark:text-slate-400">
                       Why now -
@@ -230,12 +241,13 @@ export default function PersonalizationAiSuggestions({
                     </span>
                   </div>
                 </div>
+                </div>
 
                 <button
                   type="button"
                   onClick={() => onAddTopic(item.topic)}
                   disabled={alreadySelected}
-                  className="mt-6 w-full rounded-2xl border border-slate-300 bg-white py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                  className="mt-auto w-full rounded-2xl border border-slate-300 bg-white py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   {alreadySelected ? "Already added" : "Add to my topics"}
                 </button>

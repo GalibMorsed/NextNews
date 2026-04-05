@@ -1,19 +1,25 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+}
+
 :root {
   scroll-behavior: smooth;
   /* Light mode defaults */
   --background: #f8fafc;       /* slate-50 */
   --foreground: #0f172a;       /* slate-900 */
-  font-family: system-ui, -apple-system, sans-serif;
   --card: #ffffff;
-  --border: #e5e7eb;           /* gray-200 */
+  --border: #e2e8f0;           /* slate-200 */
   --muted: #64748b;            /* slate-500 */
 
-  /* Primary - controlled by Appearance page */
-  --primary: #34d399;
-  --primaryDark: #10b981;
+  /* Primary (Indigo 600) & Secondary (Violet 600) - Corporate Trust */
+  --primary: #4f46e5;
+  --primaryDark: #4338ca;
+  --secondary: #7c3aed;
 }
 
 @keyframes fade-up {
@@ -179,7 +185,6 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: inherit;
 }
 
 .line-clamp-3 {

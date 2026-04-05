@@ -57,10 +57,10 @@ export default async function Home() {
 
   if (!articles || articles.length === 0) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-8 text-center bg-gray-50">
+      <main className="flex min-h-screen flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-[#0B0F19]">
         <div className="max-w-md">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">News Feed</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">News Feed</h1>
+          <p className="text-slate-600">
             No news available at the moment. Please check back later.
           </p>
         </div>
@@ -70,14 +70,18 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-12">
+    <main className="relative min-h-screen bg-slate-50 p-6 md:p-8 lg:p-12 dark:bg-[#0B0F19] overflow-hidden">
+      {/* Decorative Orbs */}
+      <div className="pointer-events-none absolute left-[10%] top-[4%] -z-10 h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[100px] mix-blend-multiply dark:bg-indigo-500/20" />
+      <div className="pointer-events-none absolute right-[10%] top-[15%] -z-10 h-[600px] w-[600px] rounded-full bg-violet-500/10 blur-[120px] mix-blend-multiply dark:bg-violet-500/20" />
+      
       <RegisterReminder />
       <div className="max-w-7xl mx-auto">
         <header className="mb-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-2">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 bg-clip-text text-transparent dark:from-white dark:via-indigo-100 dark:to-violet-200">
             Top Headlines
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-slate-600 dark:text-slate-400">
             Stay updated with the latest stories from around the world.
           </p>
         </header>

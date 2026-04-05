@@ -81,7 +81,12 @@ export function applyAppearanceSettings(settings: AppearanceSettings): void {
   root.style.setProperty("--primary", settings.primaryColor);
   root.style.setProperty("--primaryDark", settings.primaryColor);
   root.style.fontSize = `${settings.fontSize}px`;
+  
+  // Set inline style for general inheritance
   root.style.fontFamily = settings.fontFamily;
+  // Override Tailwind's default sans variable to apply to .font-sans body tags
+  root.style.setProperty("--font-sans", settings.fontFamily);
+  
   root.classList.toggle("high-contrast", settings.highContrast);
   root.classList.toggle("reduced-motion", settings.reducedMotion);
 }

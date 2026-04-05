@@ -53,7 +53,7 @@ export default function Navbar({ onMenuToggle, isMobileOpen }: NavbarProps) {
 
   return (
     <nav
-      className="sticky top-0 z-30 flex items-center justify-between border-b border-[var(--border)] bg-white px-4 py-4 md:px-6"
+      className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200/80 bg-white/80 backdrop-blur-[40px] px-4 py-4 md:px-6 dark:border-slate-700/80 dark:bg-slate-900/80"
       style={{ backgroundColor: "var(--card)" }}
     >
       <div className="flex min-w-0 flex-1 items-center">
@@ -90,11 +90,11 @@ export default function Navbar({ onMenuToggle, isMobileOpen }: NavbarProps) {
               href="/notes"
               className={`
                 group relative inline-flex items-center gap-2
-                rounded-xl border border-gray-200
-                px-4 py-2 text-sm font-medium text-gray-700
+                rounded-xl border border-slate-140
+                px-4 py-2 text-sm font-medium text-slate-700 dark:border-slate-700 dark:text-slate-300
                 transition-all duration-300 ease-out
-                hover:border-[var(--primary)] hover:text-[var(--primary)] hover:shadow-md
-                ${isNotesActive ? "border-[var(--primary)] text-[var(--primary)] shadow-sm" : ""}
+                hover:border-indigo-600 hover:text-indigo-600 hover:shadow-md dark:hover:border-indigo-400 dark:hover:text-indigo-400
+                ${isNotesActive ? "border-indigo-600 text-indigo-600 shadow-sm dark:border-indigo-400 dark:text-indigo-400" : ""}
               `}
             >
               <StickyNote
@@ -109,7 +109,7 @@ export default function Navbar({ onMenuToggle, isMobileOpen }: NavbarProps) {
               <span
                 className={`
                   absolute bottom-0 left-4 right-4 h-0.5 
-                  bg-[var(--primary)] 
+                  bg-indigo-600 dark:bg-indigo-400
                   scale-x-0 transform origin-center
                   transition-transform duration-300 ease-out
                   group-hover:scale-x-100
@@ -132,7 +132,7 @@ export default function Navbar({ onMenuToggle, isMobileOpen }: NavbarProps) {
           type="button"
           onClick={onMenuToggle}
           aria-label="Toggle sidebar"
-          className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] p-2 text-[var(--foreground)] md:hidden transition-colors hover:bg-gray-50"
+          className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] p-2 text-[var(--foreground)] md:hidden transition-colors hover:bg-slate-50"
         >
           {isMobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>

@@ -79,7 +79,7 @@ export default function FeedbackToast({
                     layout
                     className="flex items-center justify-between gap-3"
                   >
-                    <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                       Was this helpful?
                     </p>
                     <div className="flex gap-2">
@@ -106,7 +106,7 @@ export default function FeedbackToast({
                 {selected === "down" && showReasonInput && (
                   <motion.div layout className="mt-2 space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                         What could be better?
                       </p>
                       <button
@@ -124,7 +124,7 @@ export default function FeedbackToast({
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
                       rows={3}
-                      className="w-full resize-none rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      className="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-teal-400 focus:ring-2 focus:ring-teal-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                     />
 
                     <div className="flex items-center justify-between gap-3">
@@ -159,7 +159,7 @@ export default function FeedbackToast({
             ) : (
               <motion.p
                 layout
-                className="text-sm text-gray-900 dark:text-slate-100"
+                className="text-sm text-slate-900 dark:text-slate-100"
               >
                 Thanks - we appreciate your feedback!
               </motion.p>
