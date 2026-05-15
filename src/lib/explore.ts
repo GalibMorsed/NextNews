@@ -57,6 +57,7 @@ export type ExploreSourceSuggestion = {
   name: string;
   regionHint: string;
   reason: string;
+  url?: string;
 };
 
 export type ExploreResponse = {

@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, Loader2, Newspaper, TrendingUp } from "lucide-react";
+import { ArrowUpRight, Loader2, Newspaper, TrendingUp, BadgeCheck } from "lucide-react";
 import { SOURCE_ACCENT_STYLES, type ExploreResponse } from "@/lib/explore";
+import SourceLogo from "@/app/components/sourceLogo";
+import { getSourceLogoSrc } from "@/lib/newsImage";
 import type { ReactElement, ReactNode, RefObject } from "react";
 
 type PageSurfaceProps = {
@@ -120,7 +122,7 @@ export default function ExploreLiveStoriesAndVoices({
             const isSaving = isSavingSource === source.name;
             const accentStyle =
               SOURCE_ACCENT_STYLES[index % SOURCE_ACCENT_STYLES.length];
-            const SourceIcon = accentStyle.icon;
+            const logoSrc = getSourceLogoSrc(source.url);
 
             return (
               <motion.div
@@ -132,17 +134,21 @@ export default function ExploreLiveStoriesAndVoices({
                 className={`group flex flex-col gap-4 rounded-2xl border border-slate-200 bg-gradient-to-r p-4 shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md sm:flex-row sm:items-center sm:justify-between dark:border-slate-700 dark:hover:border-slate-600 ${accentStyle.panel}`}
               >
                 <div className="flex min-w-0 flex-1 items-start gap-4">
-                  <div
-                    className={`mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-sm font-bold shadow-sm ${accentStyle.badge}`}
-                  >
-                    <SourceIcon className="h-5 w-5" />
-                  </div>
+                  <SourceLogo
+                    src={logoSrc}
+                    alt={source.name}
+                    fallbackLabel={source.name}
+                    sizeClassName="h-12 w-12"
+                  />
 
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5 xl:flex-row xl:items-center xl:gap-5">
                     <div className="min-w-0 xl:min-w-[140px]">
-                      <p className="truncate text-base font-bold text-[var(--foreground)]">
-                        {source.name}
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="truncate text-base font-bold text-[var(--foreground)]">
+                          {source.name}
+                        </p>
+                        <BadgeCheck size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
+                      </div>
                       <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">
                         {source.regionHint}
                       </p>

@@ -34,41 +34,49 @@ const FALLBACK_SOURCE_CATALOG: ExploreSourceSuggestion[] = [
     name: "Reuters",
     regionHint: "Global",
     reason: "Reliable global coverage with fast breaking-news updates.",
+    url: "https://www.reuters.com",
   },
   {
     name: "BBC News",
     regionHint: "World",
     reason: "Broad international reporting with strong live coverage.",
+    url: "https://www.bbc.com/news",
   },
   {
     name: "Al Jazeera",
     regionHint: "Middle East",
     reason: "Useful for cross-region context and political developments.",
+    url: "https://www.aljazeera.com",
   },
   {
     name: "The Times of India",
     regionHint: "India",
     reason: "Helpful for South Asia coverage and domestic India updates.",
+    url: "https://timesofindia.indiatimes.com",
   },
   {
     name: "Associated Press",
     regionHint: "US",
     reason: "Wire-style reporting that surfaces major developments quickly.",
+    url: "https://apnews.com",
   },
   {
     name: "Bloomberg",
     regionHint: "Markets",
     reason: "Strong business, economy, and financial impact reporting.",
+    url: "https://www.bloomberg.com",
   },
   {
     name: "The Guardian",
     regionHint: "Europe",
     reason: "Useful for politics, society, and international reaction.",
+    url: "https://www.theguardian.com",
   },
   {
     name: "France 24",
     regionHint: "Europe",
     reason: "Helpful for Europe, Africa, and diplomatic developments.",
+    url: "https://www.france24.com",
   },
 ];
 
@@ -200,11 +208,12 @@ function normalizeSources(raw: unknown): ExploreSourceSuggestion[] {
   const seen = new Set<string>();
 
   return raw
-    .map((item) => {
+    .map((item): ExploreSourceSuggestion | null => {
       if (!item || typeof item !== "object") return null;
       const name = safeTrim((item as { name?: string }).name);
       const regionHint = safeTrim((item as { regionHint?: string }).regionHint);
       const reason = safeTrim((item as { reason?: string }).reason);
+      const url = safeTrim((item as { url?: string }).url);
       const normalizedName = name.toLowerCase();
       if (!name || seen.has(normalizedName)) return null;
       seen.add(normalizedName);
@@ -212,6 +221,7 @@ function normalizeSources(raw: unknown): ExploreSourceSuggestion[] {
         name,
         regionHint: regionHint || "Regional coverage",
         reason: reason || "Frequently appearing in the latest coverage.",
+        ...(url ? { url } : {}),
       };
     })
     .filter((item): item is ExploreSourceSuggestion => Boolean(item))
@@ -266,11 +276,15 @@ function fallbackInsights(
   const sourceSuggestions = Array.from(sourceCounts.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6)
-    .map(([name]) => ({
-      name,
-      regionHint: regionLabel,
-      reason: "Appearing repeatedly across the current story mix.",
-    }));
+    .map(([name]) => {
+      const article = articles.find((a) => a.source.name === name);
+      return {
+        name,
+        regionHint: regionLabel,
+        reason: "Appearing repeatedly across the current story mix.",
+        url: article?.url,
+      };
+    });
 
   const fallbackCategories = EXPLORE_CATEGORY_OPTIONS.slice(0, 3).map((item) => ({
     slug: item.slug,
@@ -337,7 +351,7 @@ async function fetchAiInsights(
     '    { "slug": "allowed-category-slug", "description": "short description tied to current region situation" }',
     "  ],",
     '  "sourceSuggestions": [',
-    '    { "name": "Source name from current coverage if possible", "regionHint": "short region label", "reason": "why follow" }',
+    '    { "name": "Source name from current coverage if possible", "regionHint": "short region label", "reason": "why follow", "url": "homepage URL" }',
     "  ]",
     "}",
     "Rules:",
