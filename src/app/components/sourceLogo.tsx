@@ -21,7 +21,7 @@ export default function SourceLogo({
 
   return (
     <div
-      className={`${sizeClassName} shrink-0 overflow-hidden rounded-full border border-slate-200 bg-white/90 shadow-sm dark:border-slate-700 dark:bg-slate-800`}
+      className={`${sizeClassName} shrink-0 overflow-hidden rounded-full border border-slate-200 bg-white/90 shadow-sm dark:border-white/40 dark:bg-slate-900`}
     >
       {showImage ? (
         <img

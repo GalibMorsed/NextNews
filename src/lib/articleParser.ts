@@ -51,6 +51,23 @@ function normalizeParagraph(input: string): string {
     .trim();
 }
 
+function hasReadableSentenceShape(text: string): boolean {
+  const tokens = text.split(/\s+/).filter(Boolean);
+  if (tokens.length < 8) return false;
+
+  const alphaTokens = tokens.filter((token) => /[a-z]/i.test(token)).length;
+  const longTokenCount = tokens.filter((token) => token.length >= 18).length;
+  const sentenceLikeChunks = text
+    .split(/[.!?]+/)
+    .filter((chunk) => chunk.trim().split(/\s+/).length >= 5).length;
+
+  if (alphaTokens / tokens.length < 0.65) return false;
+  if (longTokenCount >= Math.ceil(tokens.length * 0.3)) return false;
+  if (sentenceLikeChunks === 0 && text.length > 90) return false;
+
+  return true;
+}
+
 function isLikelyNoiseParagraph(text: string): boolean {
   const lower = text.toLowerCase();
   const noisePhrases = [
@@ -81,6 +98,9 @@ function isLikelyNoiseParagraph(text: string): boolean {
     "register",
     "press",
     "archived",
+    "worldchinajapan",
+    "marketsmarkets",
+    "tech#tech",
   ];
 
   if (noisePhrases.some((phrase) => lower.includes(phrase))) return true;
@@ -88,6 +108,16 @@ function isLikelyNoiseParagraph(text: string): boolean {
   if (
     /(scriptoptions|_localizedstrings|redirect_overlay|window\.|document\.|\bfunction\s*\(|\bconst\s+|\blet\s+|\bvar\s+)/i.test(
       text
+    )
+  ) {
+    return true;
+  }
+
+  if (/^\s*\.[a-z0-9_-]+\s*\{/.test(text)) return true;
+  if (/[a-z][A-Z][a-z]/.test(text) && !/\s/.test(text.slice(0, 80))) return true;
+  if (
+    /(asia|china|japan|india|korea|taiwan){3,}/i.test(
+      lower.replace(/\s+/g, "")
     )
   ) {
     return true;
@@ -120,7 +150,13 @@ function isLikelyNoiseParagraph(text: string): boolean {
     }
   }
 
+  if (!hasReadableSentenceShape(text)) return true;
+
   return false;
+}
+
+function sanitizeExcerpt(paragraphs: string[]): string {
+  return paragraphs.find((paragraph) => paragraph.length >= 40) ?? "";
 }
 
 function dedupeParagraphs(paragraphs: string[]): string[] {
@@ -184,7 +220,9 @@ export async function extractArticleContent(url: string): Promise<ExtractedArtic
     // 5. Extract content from <p> tags
     const pMatches = html.match(/<p[^>]*>([\s\S]*?)<\/p>/gi);
     
-    if (!pMatches) return { title, content: "Content not available for this article.", excerpt: "", siteName, image };
+    if (!pMatches) {
+      return { title, content: "", excerpt: "", siteName, image };
+    }
 
     const cleanedParagraphs = pMatches
       .map((p) => normalizeParagraph(p.replace(/<[^>]*>?/gm, "")))
@@ -200,7 +238,7 @@ export async function extractArticleContent(url: string): Promise<ExtractedArtic
     if (!contentParts.length) {
       return {
         title,
-        content: "Content not available for this article.",
+        content: "",
         excerpt: "",
         siteName,
         image,
@@ -208,7 +246,7 @@ export async function extractArticleContent(url: string): Promise<ExtractedArtic
     }
 
     const fullContent = contentParts.join("\n\n");
-    const excerpt = normalizeParagraph(contentParts[0] || "");
+    const excerpt = sanitizeExcerpt(contentParts);
 
     return {
       title,

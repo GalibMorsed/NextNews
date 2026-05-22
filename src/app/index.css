@@ -352,3 +352,31 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+.scrollbar-active {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.75) transparent;
+}
+
+.scrollbar-active::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scrollbar-active::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-active::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.75);
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  background-clip: padding-box;
+}
+
+.dark .scrollbar-active {
+  scrollbar-color: rgba(71, 85, 105, 0.95) transparent;
+}
+
+.dark .scrollbar-active::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.95);
+}

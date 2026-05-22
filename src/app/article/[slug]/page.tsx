@@ -81,17 +81,21 @@ export default async function ArticlePage({ params }: PageProps) {
     extractedContent !== "Content not available for this article."
       ? extractedContent
       : extractedArticle?.excerpt?.trim() ||
-        "Open the original source to read the full story.";
+        "Open the original journal source to read the full story.";
   const articleTitle = extractedArticle?.title || "Article";
   const articleDescription = extractedArticle?.excerpt?.trim() || "";
+  const hasReadableArticleContent = articleContent.length > 0;
   const shouldShowDescription =
     articleDescription &&
+    hasReadableArticleContent &&
     !isDuplicateDescription(articleDescription, articleContent);
   const articleImage = extractedArticle?.image || null;
   const articlePublishedAt = extractedArticle?.publishedTime || null;
   const sourceName =
     extractedArticle?.siteName || new URL(url).hostname.replace(/^www\./, "");
-  const wordCount = articleContent.split(/\s+/).filter(Boolean).length;
+  const wordCount = hasReadableArticleContent
+    ? articleContent.split(/\s+/).filter(Boolean).length
+    : 0;
   const readTime = Math.max(1, Math.ceil(wordCount / 200));
   const sourceLogoSrc = getSourceLogoSrc(url);
 
@@ -155,18 +159,18 @@ export default async function ArticlePage({ params }: PageProps) {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600/10 hover:bg-blue-600 text-blue-600 hover:text-white dark:bg-blue-500/10 dark:hover:bg-blue-500 dark:text-blue-400 dark:hover:text-white rounded-full text-sm font-semibold transition-colors duration-200 group"
+              className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-white px-5 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-blue-500/60 dark:bg-slate-900/95 dark:text-blue-300 dark:shadow-blue-950/10 dark:focus-visible:ring-offset-slate-950 group"
             >
               <ExternalLink
                 size={16}
                 className="group-hover:scale-110 transition-transform"
               />
-              Open Real Journal
+              Open Journal
             </a>
             <ListenToDescriptionButton
               title={articleTitle}
-              text={articleDescription || articleContent}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-full text-sm font-semibold transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              text={articleContent}
+              className="inline-flex items-center gap-2 rounded-lg border border-cyan-200 bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-60 dark:border-cyan-500/60 dark:bg-slate-900/95 dark:text-white dark:shadow-cyan-950/10 dark:focus-visible:ring-offset-slate-950"
             />
             <AddNoteButton
               title={articleTitle}
@@ -175,7 +179,7 @@ export default async function ArticlePage({ params }: PageProps) {
               sourceName={sourceName}
               buttonLabel="Add Notes"
               buttonIcon="pencil"
-              buttonClassName="hidden md:inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-full text-sm font-semibold transition-colors duration-200 group"
+              buttonClassName="hidden md:inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-emerald-500/60 dark:bg-slate-900/95 dark:text-white dark:shadow-emerald-950/10 dark:focus-visible:ring-offset-slate-950 group"
             />
           </div>
         </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Pause, Play, Volume2 } from "lucide-react";
+import { Pause, Play } from "lucide-react";
+import LottiePlayer from "@/app/components/LottiePlayer";
 
 interface ListenToDescriptionButtonProps {
   text: string;
@@ -173,13 +174,9 @@ export default function ListenToDescriptionButton({
       aria-pressed={isPlaying}
       className={
         className ??
-        "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-200"
+        "inline-flex items-center gap-2 rounded-full border border-cyan-500/25 bg-cyan-500/10 px-5 py-2.5 text-sm font-semibold text-black shadow-sm shadow-cyan-500/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-600 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-60 dark:border-cyan-400/30 dark:bg-cyan-400/10 dark:text-white dark:hover:border-cyan-300 dark:hover:bg-cyan-500 dark:focus-visible:ring-offset-slate-950"
       }
-      title={
-        isSupported
-          ? "Listen news"
-          : "Speech unavailable"
-      }
+      title={isSupported ? "Listen news" : "Unavailable"}
     >
       {isPlaying ? (
         isPaused ? (
@@ -188,7 +185,14 @@ export default function ListenToDescriptionButton({
           <Pause size={16} />
         )
       ) : (
-        <Volume2 size={16} />
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center pointer-events-none">
+          <LottiePlayer
+            src="/explore/Listen.json"
+            className="h-full w-full"
+            loop
+            autoplay
+          />
+        </span>
       )}
       <span>
         {isPlaying

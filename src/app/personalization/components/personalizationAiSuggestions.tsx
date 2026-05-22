@@ -8,6 +8,7 @@ import { getExploreRegion } from "@/lib/explore";
 import { PERSONALIZATION_PROMO_HIDE_EVENT } from "./personalizatioPopup";
 import { useAILimit } from "@/hooks/useAILimit";
 import CreditAlertBanner from "@/app/components/CreditAlertBanner";
+import LottiePlayer from "@/app/components/LottiePlayer";
 
 type TopicSuggestion = {
   topic: string;
@@ -140,7 +141,14 @@ export default function PersonalizationAiSuggestions({
       <div className="mb-4 flex items-center gap-3">
         <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
         <h2 className="flex items-center gap-2 whitespace-nowrap text-lg font-semibold text-slate-900 dark:text-slate-50">
-          <Sparkles size={18} className="text-[var(--primary)]" />
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+            <LottiePlayer
+              src="/explore/AI.json"
+              className="h-full w-full"
+              loop
+              autoplay
+            />
+          </span>
           AI Topic Suggestions
         </h2>
         <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />

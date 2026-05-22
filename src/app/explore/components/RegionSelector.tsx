@@ -1,12 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { Compass, Sparkles, Loader2, ArrowRight, Globe2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Compass,
+  Sparkles,
+  Loader2,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Globe2,
+} from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { EXPLORE_REGIONS, type ExploreRegionId } from "@/lib/explore";
 import { incrementRegionSuggestionUsage } from "@/lib/activityAnalytics";
 import { useAILimit } from "@/hooks/useAILimit";
 import CreditAlertBanner from "@/app/components/CreditAlertBanner";
+import LottiePlayer from "@/app/components/LottiePlayer";
 
 export interface AIRegionSuggestion {
   label: string;
@@ -41,7 +50,7 @@ function RegionFlag({
   if (countryCode && /^[A-Z]{2}$/.test(countryCode)) {
     return (
       <div
-        className={`${sizeClasses} shrink-0 rounded-[3px] shadow-sm overflow-hidden flex items-center justify-center border border-black/5 dark:border-white/10 ${active ? "ring-1 ring-white/30" : ""}`}
+        className={`${sizeClasses} shrink-0 rounded-[3px] shadow-sm overflow-hidden flex items-center justify-center border border-black/5 dark:border-white/10 ${active ? "ring-1 ring-[var(--primary)]/30 dark:ring-white/30" : ""}`}
       >
         <ReactCountryFlag
           countryCode={countryCode}
@@ -60,7 +69,7 @@ function RegionFlag({
   if (!id) {
     return (
       <div
-        className={`${sizeClasses} shrink-0 rounded-[3px] shadow-sm overflow-hidden flex items-center justify-center border border-black/5 bg-slate-100 text-slate-500 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300 ${active ? "ring-1 ring-white/30" : ""}`}
+        className={`${sizeClasses} shrink-0 rounded-[3px] shadow-sm overflow-hidden flex items-center justify-center border border-black/5 bg-slate-100 text-slate-500 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300 ${active ? "ring-1 ring-[var(--primary)]/30 dark:ring-white/30" : ""}`}
       >
         <Globe2 className="h-3.5 w-3.5" />
       </div>
@@ -89,7 +98,7 @@ function RegionFlag({
 
   return (
     <div
-      className={`${sizeClasses} shrink-0 rounded-[3px] shadow-sm overflow-hidden flex items-center justify-center border border-black/5 dark:border-white/10 ${active ? "ring-1 ring-white/30" : ""}`}
+      className={`${sizeClasses} shrink-0 rounded-[3px] shadow-sm overflow-hidden flex items-center justify-center border border-black/5 dark:border-white/10 ${active ? "ring-1 ring-[var(--primary)]/30 dark:ring-white/30" : ""}`}
     >
       <ReactCountryFlag
         countryCode={code}
@@ -115,8 +124,71 @@ export default function RegionSelector({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<AIRegionSuggestion[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const scrollStopTimerRef = useRef<number | null>(null);
   const { isLocked, limit, isActive, nextAvailableAt, isFreePlanCooldown } =
     useAILimit();
+
+  const refreshScrollState = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    const hasOverflow = scrollWidth > clientWidth + 1;
+
+    setCanScrollLeft(hasOverflow && scrollLeft > 0);
+    setCanScrollRight(
+      hasOverflow && scrollLeft < scrollWidth - clientWidth - 1,
+    );
+  };
+
+  const handleTabsScroll = () => {
+    setIsScrolling(true);
+    refreshScrollState();
+
+    if (scrollStopTimerRef.current) {
+      window.clearTimeout(scrollStopTimerRef.current);
+    }
+
+    scrollStopTimerRef.current = window.setTimeout(() => {
+      setIsScrolling(false);
+    }, 900);
+  };
+
+  const scrollTabs = (direction: "left" | "right") => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const delta = Math.max(220, Math.round(container.clientWidth * 0.7));
+    container.scrollBy({
+      left: direction === "left" ? -delta : delta,
+      behavior: "smooth",
+    });
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return undefined;
+
+    const resizeObserver = new ResizeObserver(() => {
+      refreshScrollState();
+    });
+
+    resizeObserver.observe(container);
+    window.requestAnimationFrame(refreshScrollState);
+    window.addEventListener("resize", refreshScrollState);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", refreshScrollState);
+      if (scrollStopTimerRef.current) {
+        window.clearTimeout(scrollStopTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleAISuggest = async () => {
     if (isLocked) {
@@ -197,16 +269,12 @@ export default function RegionSelector({
         <div className="flex flex-col gap-8">
           {/* Section Header */}
           <div className="flex flex-col gap-3">
-            <h2 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">
+            <h4 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">
               Trending Regions
-            </h2>
-
-            <div className="h-1 w-32 rounded-full bg-[var(--primary)]/40" />
-
-            <div className="inline-flex max-w-fit items-center gap-2 rounded-full border border-sky-200/60 bg-sky-50/80 px-4 py-1.5 text-xs font-bold text-sky-700 shadow-sm dark:border-sky-900/40 dark:bg-sky-950/40 dark:text-sky-200">
-              <Compass className="h-3.5 w-3.5 text-sky-500 dark:text-sky-400" />
+            </h4>
+            <p className="text-sm text-[var(--muted)]">
               Switch regions to see localized analysis.
-            </div>
+            </p>
           </div>
 
           {/* Region Tabs */}
@@ -214,19 +282,31 @@ export default function RegionSelector({
             <p className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--muted)]">
               Select Area
             </p>
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex flex-1 gap-3 overflow-x-auto pb-1 no-scrollbar">
+            <div className="relative w-full">
+              <div
+                ref={scrollContainerRef}
+                onScroll={handleTabsScroll}
+                className={`flex gap-3 overflow-x-auto pb-2 pr-8 ${
+                  isScrolling ? "scrollbar-active" : "scrollbar-hide"
+                }`}
+              >
                 {EXPLORE_REGIONS.map((region) => (
                   <button
                     key={region.id}
                     type="button"
                     onClick={() => onRegionSelect(region.id)}
-                    className={`inline-flex shrink-0 items-center gap-2.5 rounded-full border px-5 py-3 text-sm font-bold tracking-tight transition-all duration-300 ${
+                    className={`inline-flex shrink-0 items-center gap-2.5 rounded-xl border px-5 py-3 text-sm font-bold tracking-tight transition-all duration-300 ${
                       selectedRegion === region.id
-                        ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)] shadow-lg shadow-black/5 scale-105"
-                        : "border-slate-200 bg-white text-[var(--foreground)] hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600 shadow-sm"
+                        ? "border-[var(--primary)] bg-[var(--primary)]/[0.08] text-[var(--primary)] dark:border-[var(--primary)] dark:bg-[var(--primary)]/[0.18] dark:text-white shadow-md shadow-[var(--primary)]/10 scale-[1.02]"
+                        : "border-slate-200 bg-white text-[var(--foreground)] shadow-sm hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
                     }`}
                   >
+                    {selectedRegion === region.id ? (
+                      <span className="relative flex h-2.5 w-2.5 shrink-0 items-center justify-center">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-[var(--primary)] opacity-40 animate-ping dark:opacity-50" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--primary)] shadow-[0_0_0_3px_rgba(59,130,246,0.12)] dark:shadow-[0_0_0_3px_rgba(96,165,250,0.16)]" />
+                      </span>
+                    ) : null}
                     <RegionFlag
                       id={region.id}
                       label={region.label}
@@ -237,6 +317,28 @@ export default function RegionSelector({
                   </button>
                 ))}
               </div>
+
+              {canScrollLeft && !isScrolling ? (
+                <button
+                  type="button"
+                  aria-label="Scroll region tabs left"
+                  onClick={() => scrollTabs("left")}
+                  className="absolute left-0 top-1/2 z-10 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/50 bg-white/30 text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_8px_24px_rgba(15,23,42,0.12)] backdrop-blur-[18px] transition-all duration-200 hover:-translate-y-1/2 hover:border-white/70 hover:bg-white/45 hover:text-slate-950 dark:border-white/15 dark:bg-slate-950/30 dark:text-slate-100 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_10px_26px_rgba(0,0,0,0.35)] dark:hover:border-white/25 dark:hover:bg-slate-950/45 dark:hover:text-white"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+              ) : null}
+
+              {canScrollRight && !isScrolling ? (
+                <button
+                  type="button"
+                  aria-label="Scroll region tabs right"
+                  onClick={() => scrollTabs("right")}
+                  className="absolute right-0 top-1/2 z-10 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/50 bg-white/30 text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_8px_24px_rgba(15,23,42,0.12)] backdrop-blur-[18px] transition-all duration-200 hover:-translate-y-1/2 hover:border-white/70 hover:bg-white/45 hover:text-slate-950 dark:border-white/15 dark:bg-slate-950/30 dark:text-slate-100 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_10px_26px_rgba(0,0,0,0.35)] dark:hover:border-white/25 dark:hover:bg-slate-950/45 dark:hover:text-white"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              ) : null}
             </div>
           </div>
 
@@ -244,6 +346,12 @@ export default function RegionSelector({
           <div className="flex flex-col gap-5 pt-2">
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
+              <LottiePlayer
+                src="/explore/AI.json"
+                className="h-5 w-5 shrink-0"
+                loop
+                autoplay
+              />
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted)]">
                 Personalized Assistant
               </p>
