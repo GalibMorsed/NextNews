@@ -1,4 +1,5 @@
 import RegisterReminder from "./components/registerReminder";
+import WeeklyRoundup from "./components/weeklyRoundup/WeeklyRoundup";
 import TopHeadlinesContent from "./components/topHeadlinesContent";
 
 // 1. Define types matching your API response
@@ -29,6 +30,8 @@ interface NewsResponse {
   news: CurrentsNewsItem[];
 }
 
+const TOP_HEADLINES_LOOKBACK_MS = 4 * 24 * 60 * 60 * 1000;
+
 function mapCurrentsNewsItem(item: CurrentsNewsItem): Article {
   return {
     source: { id: null, name: item.category?.[0] ?? "Currents" },
@@ -40,6 +43,19 @@ function mapCurrentsNewsItem(item: CurrentsNewsItem): Article {
     publishedAt: item.published ?? new Date().toISOString(),
     content: item.description ?? null,
   };
+}
+
+function isRecentHeadline(article: Article) {
+  const publishedAt = new Date(article.publishedAt).getTime();
+  if (Number.isNaN(publishedAt)) return false;
+
+  return publishedAt >= Date.now() - TOP_HEADLINES_LOOKBACK_MS;
+}
+
+function sortNewestFirst(left: Article, right: Article) {
+  return (
+    new Date(right.publishedAt).getTime() - new Date(left.publishedAt).getTime()
+  );
 }
 
 // 2. Create a data fetching function
@@ -72,7 +88,10 @@ async function getNews(): Promise<Article[]> {
     }
 
     const data: NewsResponse = await res.json();
-    return (data.news ?? []).map(mapCurrentsNewsItem);
+    return (data.news ?? [])
+      .map(mapCurrentsNewsItem)
+      .filter(isRecentHeadline)
+      .sort(sortNewestFirst);
   } catch (error) {
     console.error("Error fetching news:", error);
     // Return empty array or rethrow to trigger error.tsx
@@ -103,7 +122,7 @@ export default async function Home() {
       {/* Decorative Orbs */}
       <div className="pointer-events-none absolute left-[10%] top-[4%] -z-10 h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[100px] mix-blend-multiply dark:bg-indigo-500/20" />
       <div className="pointer-events-none absolute right-[10%] top-[15%] -z-10 h-[600px] w-[600px] rounded-full bg-violet-500/10 blur-[120px] mix-blend-multiply dark:bg-violet-500/20" />
-      
+
       <RegisterReminder />
       <div className="max-w-7xl mx-auto">
         <header className="mb-10">
@@ -114,6 +133,8 @@ export default async function Home() {
             Stay updated with the latest stories from around the world.
           </p>
         </header>
+
+        <WeeklyRoundup excludeArticles={articles} />
 
         <TopHeadlinesContent initialArticles={articles} pageSize={20} />
       </div>

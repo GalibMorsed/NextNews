@@ -100,6 +100,22 @@ function mapCurrentsNewsItem(item: CurrentsNewsItem) {
   };
 }
 
+const TOP_HEADLINES_LOOKBACK_MS = 4 * 24 * 60 * 60 * 1000;
+
+function isRecentHeadline(article: ReturnType<typeof mapCurrentsNewsItem>) {
+  const publishedAt = new Date(article.publishedAt).getTime();
+  if (Number.isNaN(publishedAt)) return false;
+
+  return publishedAt >= Date.now() - TOP_HEADLINES_LOOKBACK_MS;
+}
+
+function sortNewestFirst(
+  left: ReturnType<typeof mapCurrentsNewsItem>,
+  right: ReturnType<typeof mapCurrentsNewsItem>,
+) {
+  return new Date(right.publishedAt).getTime() - new Date(left.publishedAt).getTime();
+}
+
 export async function GET(req: Request) {
   try {
     // 1. Rate Limiting (60 requests per minute per IP)
@@ -167,12 +183,22 @@ export async function GET(req: Request) {
 
     const data: NewsResponse = await res.json();
 
+    const articles = (data.news ?? [])
+      .map(mapCurrentsNewsItem)
+      .filter(isRecentHeadline)
+      .sort(sortNewestFirst);
+
     return NextResponse.json(
       {
         ...data,
-        articles: (data.news ?? []).map(mapCurrentsNewsItem),
+        articles,
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=86400",
+        },
+      },
     );
   } catch (error: any) {
     console.error("News API Internal Error:", error);
@@ -183,4 +209,4 @@ export async function GET(req: Request) {
     
     return NextResponse.json({ error: message }, { status });
   }
-}
+}

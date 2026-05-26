@@ -770,7 +770,7 @@ function SidebarContent({
   return (
     <>
       <div
-        className={`flex-1 overflow-y-auto ${isDesktopCollapsed ? "p-3 overflow-x-hidden" : "p-6"}`}
+        className={`flex-1 overflow-y-auto sidebar-scrollbar ${isDesktopCollapsed ? "p-3 overflow-x-hidden" : "p-6"}`}
       >
         <div
           className={`flex items-center ${isDesktopCollapsed ? "flex-col gap-4" : "gap-3"} mb-8`}

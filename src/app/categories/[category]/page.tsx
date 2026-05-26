@@ -2,7 +2,15 @@ import CategoryContent from "./CategoryContent";
 import { fetchCategoryNews, type NewsApiArticle } from "@/lib/categoryNews";
 
 async function getCategoryNews(category: string, regionId?: string) {
-  return fetchCategoryNews({ category, regionId, page: 1, pageSize: 20 });
+  try {
+    return await fetchCategoryNews({ category, regionId, page: 1, pageSize: 20 });
+  } catch (error) {
+    console.error("Category page news fetch failed", {
+      category,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return { articles: [] };
+  }
 }
 
 export default async function CategoryPage({

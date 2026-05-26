@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import NewsFeedWithLoadMore from "@/app/components/newsFeedWithLoadMore";
+import WeeklyRoundup from "@/app/components/weeklyRoundup/WeeklyRoundup";
 import { supabase } from "../../../../../lib/superbaseClient";
 
 interface Article {
@@ -122,7 +123,7 @@ export default function IndianTadkaContent({
       const data = await response.json();
       setArticles(data.articles ?? []);
       setRefreshKey((prev) => prev + 1);
-    } catch (err) {
+    } catch {
       setRefreshError(
         "Could not refresh this feed right now. Please try again.",
       );
@@ -133,12 +134,20 @@ export default function IndianTadkaContent({
 
   return (
     <section className="relative">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4 sm:gap-6">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold capitalize tracking-tighter text-slate-900 dark:text-slate-100 sm:text-4xl">
           {sourceName}
         </h1>
+      </div>
 
-        {isAuthenticated && (
+      <WeeklyRoundup
+        section="indian-tadka"
+        source={source}
+        excludeArticles={articles}
+      />
+
+      {isAuthenticated && (
+        <div className="mb-8 flex justify-end">
           <button
             type="button"
             onClick={handleRefresh}
@@ -166,8 +175,8 @@ export default function IndianTadkaContent({
             </div>
             <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Refreshing status banner */}
       {isRefreshing && (

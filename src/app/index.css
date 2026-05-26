@@ -2,7 +2,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    "Plus Jakarta Sans", var(--font-jakarta), ui-sans-serif, system-ui,
+    sans-serif;
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
 }
@@ -10,11 +12,11 @@
 :root {
   scroll-behavior: smooth;
   /* Light mode defaults */
-  --background: #f8fafc;       /* slate-50 */
-  --foreground: #0f172a;       /* slate-900 */
+  --background: #f8fafc; /* slate-50 */
+  --foreground: #0f172a; /* slate-900 */
   --card: #ffffff;
-  --border: #e2e8f0;           /* slate-200 */
-  --muted: #64748b;            /* slate-500 */
+  --border: #e2e8f0; /* slate-200 */
+  --muted: #64748b; /* slate-500 */
 
   /* Primary (Indigo 600) & Secondary (Violet 600) - Corporate Trust */
   --primary: #4f46e5;
@@ -214,11 +216,11 @@
 }
 
 .dark {
-  --background: #0f172a;       /* slate-900 */
-  --foreground: #f8fafc;       /* slate-50 */
-  --card: #1e293b;             /* slate-800 */
-  --border: #334155;           /* slate-700 */
-  --muted: #94a3b8;            /* slate-400 */
+  --background: #0f172a; /* slate-900 */
+  --foreground: #f8fafc; /* slate-50 */
+  --card: #1e293b; /* slate-800 */
+  --border: #334155; /* slate-700 */
+  --muted: #94a3b8; /* slate-400 */
 }
 
 /* Global dark-mode bridge for pages still using static Tailwind colors */
@@ -379,4 +381,38 @@ body {
 
 .dark .scrollbar-active::-webkit-scrollbar-thumb {
   background-color: rgba(100, 116, 139, 0.95);
+}
+
+/* Custom Sidebar scrollbar styling */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 4px; /* Very slim 4px scrollbar */
+  height: 0px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.2);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.55);
+}
+
+.dark .sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.35);
+}
+
+.dark .sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.65);
+}
+
+/* Firefox compatibility */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
 }
