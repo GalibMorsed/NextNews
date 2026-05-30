@@ -49,6 +49,15 @@ export default function PersonalizationAiSuggestions({
   const { isLocked, limit, isActive, nextAvailableAt, isFreePlanCooldown } =
     useAILimit();
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   useEffect(() => {
     if (!isSuggesting) {
       setAiElapsedSeconds(0);
@@ -136,10 +145,10 @@ export default function PersonalizationAiSuggestions({
   };
 
   return (
-    <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-sm backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/85 sm:p-8">
+    <div className="border-none bg-transparent p-0 shadow-none sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur">
       {/* Heading — full width divider */}
       <div className="mb-4 flex items-center gap-3">
-        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+        <div className="h-px flex-1 bg-slate-300 dark:bg-slate-600" />
         <h2 className="flex items-center gap-2 whitespace-nowrap text-lg font-semibold text-slate-900 dark:text-slate-50">
           <span className="flex h-5 w-5 shrink-0 items-center justify-center">
             <LottiePlayer
@@ -151,7 +160,7 @@ export default function PersonalizationAiSuggestions({
           </span>
           AI Topic Suggestions
         </h2>
-        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+        <div className="h-px flex-1 bg-slate-300 dark:bg-slate-600" />
       </div>
 
       {/* Subtitle + button row */}

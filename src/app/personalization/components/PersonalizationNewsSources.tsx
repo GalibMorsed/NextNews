@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Loader2, X } from "lucide-react";
 import SourceLogo from "../../components/sourceLogo";
@@ -49,6 +49,24 @@ export default function PersonalizationNewsSources({
   const [isLoadingSources, setIsLoadingSources] = useState(true);
   const [sourceSearch, setSourceSearch] = useState("");
   const [showAllSources, setShowAllSources] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+  const [activePageIndex, setActivePageIndex] = useState(0);
+  const mobileContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    setActivePageIndex(0);
+    if (mobileContainerRef.current) {
+      mobileContainerRef.current.scrollLeft = 0;
+    }
+  }, [sourceSearch]);
 
   useEffect(() => {
     let mounted = true;
@@ -115,6 +133,36 @@ export default function PersonalizationNewsSources({
     );
   }, [availableSources, sourceSearch]);
 
+  const mobilePages = useMemo(() => {
+    const pagesList: NewsSourceOption[][] = [];
+    const itemsPerPage = 6;
+    for (let i = 0; i < filteredSources.length; i += itemsPerPage) {
+      pagesList.push(filteredSources.slice(i, i + itemsPerPage));
+    }
+    return pagesList;
+  }, [filteredSources]);
+
+  const handleMobileScroll = () => {
+    if (!mobileContainerRef.current) return;
+    const { scrollLeft, clientWidth } = mobileContainerRef.current;
+    if (clientWidth > 0) {
+      const newIndex = Math.round(scrollLeft / clientWidth);
+      if (newIndex !== activePageIndex) {
+        setActivePageIndex(newIndex);
+      }
+    }
+  };
+
+  const scrollToMobilePage = (index: number) => {
+    if (!mobileContainerRef.current) return;
+    const { clientWidth } = mobileContainerRef.current;
+    mobileContainerRef.current.scrollTo({
+      left: index * clientWidth,
+      behavior: "smooth",
+    });
+    setActivePageIndex(index);
+  };
+
   const visibleSources = useMemo(() => {
     if (sourceSearch.trim()) return filteredSources;
     if (showAllSources) return filteredSources;
@@ -139,11 +187,11 @@ export default function PersonalizationNewsSources({
   return (
     <>
       <div className="mb-6 flex items-center gap-3">
-        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+        <div className="h-px flex-1 bg-slate-300 dark:bg-slate-600" />
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
           News Sources
         </h2>
-        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+        <div className="h-px flex-1 bg-slate-300 dark:bg-slate-600" />
       </div>
 
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -175,79 +223,187 @@ export default function PersonalizationNewsSources({
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {visibleSources.map((source) => {
-          const isSelected = favoriteSources.includes(source.name);
-          const logoSrc = getSourceLogoSrc(source.url);
-
-          return (
-            <motion.label
-              key={source.id || source.name}
-              whileHover={{ y: -1, scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              className={`group relative flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm transition-all duration-300 hover:shadow-md sm:gap-4 sm:p-5 ${
-                isSelected
-                  ? "border-[var(--primary)] bg-[var(--primary)]/[0.08] ring-1 ring-[var(--primary)]/20 dark:bg-[var(--primary)]/[0.12]"
-                  : "border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-600"
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={isSelected}
-                onChange={() => handleSourceToggle(source.name)}
-                className="sr-only"
-              />
-              <div className="relative shrink-0">
-                <SourceLogo
-                  src={logoSrc}
-                  alt={`${source.name} logo`}
-                  fallbackLabel={source.name}
-                  sizeClassName="h-9 w-9"
-                />
+      {isMobile ? (
+        <div className="mt-6 flex flex-col">
+          <div
+            ref={mobileContainerRef}
+            onScroll={handleMobileScroll}
+            className="flex snap-x snap-mandatory overflow-x-auto scrollbar-none gap-4 pb-2"
+          >
+            {mobilePages.length > 0 ? (
+              mobilePages.map((page, pageIndex) => (
                 <div
-                  className={`absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full border transition-all duration-300 ${
-                    isSelected
-                      ? "border-[var(--primary)] bg-[var(--primary)] shadow-[0_0_10px_rgba(99,102,241,0.3)]"
-                      : "border-slate-300 bg-white opacity-0 dark:border-slate-600 dark:bg-slate-800 group-hover:opacity-100"
-                  }`}
+                  key={pageIndex}
+                  className="grid w-full shrink-0 snap-center grid-cols-2 gap-2"
                 >
-                  <AnimatePresence>
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 500,
-                          damping: 30,
-                        }}
+                  {page.map((source) => {
+                    const isSelected = favoriteSources.includes(source.name);
+                    const logoSrc = getSourceLogoSrc(source.url);
+
+                    return (
+                      <motion.label
+                        key={source.id || source.name}
+                        whileHover={{ y: -1, scale: 1.015 }}
+                        whileTap={{ scale: 0.985 }}
+                        className={`group relative flex cursor-pointer items-center justify-between gap-2 rounded-2xl border transition-all duration-300 px-3.5 py-3 shadow-sm hover:shadow-md ${
+                          isSelected
+                            ? "border-[var(--primary)] bg-[var(--primary)]/[0.06] dark:bg-[var(--primary)]/[0.12] ring-1 ring-[var(--primary)]/20"
+                            : "border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-600"
+                        }`}
                       >
-                        <Check
-                          size={11}
-                          strokeWidth={3.5}
-                          className="text-white"
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleSourceToggle(source.name)}
+                          className="sr-only"
                         />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="relative shrink-0">
+                            <SourceLogo
+                              src={logoSrc}
+                              alt={`${source.name} logo`}
+                              fallbackLabel={source.name}
+                              sizeClassName="h-9 w-9"
+                            />
+                          </div>
+                          <span className="text-xs sm:text-sm font-semibold tracking-tight text-slate-800 dark:text-slate-100 transition-colors group-hover:text-slate-900 dark:group-hover:text-white leading-tight">
+                            {source.name}
+                          </span>
+                        </div>
+
+                        <div
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                            isSelected
+                              ? "bg-[var(--primary)] border-[var(--primary)] text-white shadow-[0_0_10px_rgba(99,102,241,0.3)]"
+                              : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 group-hover:border-[var(--primary)]/50"
+                          }`}
+                        >
+                          <AnimatePresence>
+                            {isSelected && (
+                              <motion.div
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0, opacity: 0 }}
+                                transition={{
+                                  type: "spring",
+                                  stiffness: 500,
+                                  damping: 30,
+                                }}
+                              >
+                                <Check
+                                  size={13}
+                                  strokeWidth={4}
+                                  className="text-white"
+                                />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </motion.label>
+                    );
+                  })}
                 </div>
-              </div>
-              <span className="min-w-0 flex-1 truncate text-sm font-semibold tracking-tight text-slate-800 transition-colors group-hover:text-slate-900 dark:text-slate-100 dark:group-hover:text-white">
-                {source.name}
-              </span>
-            </motion.label>
-          );
-        })}
-      </div>
+              ))
+            ) : (
+              <p className="w-full text-center text-sm text-slate-500 dark:text-slate-400 py-4">
+                No news channels match your search.
+              </p>
+            )}
+          </div>
+
+          {/* Animated Carousel Indicators (Image 2 style) */}
+          {mobilePages.length > 1 && (
+            <div className="flex items-center justify-center gap-1.5 mt-5">
+              {mobilePages.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => scrollToMobilePage(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ease-out ${
+                    index === activePageIndex
+                      ? "w-8 bg-[var(--primary)] shadow-[0_0_8px_rgba(99,102,241,0.45)]"
+                      : "w-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-350 dark:hover:bg-slate-600"
+                  }`}
+                  aria-label={`Go to page ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {visibleSources.map((source) => {
+            const isSelected = favoriteSources.includes(source.name);
+            const logoSrc = getSourceLogoSrc(source.url);
+
+            return (
+              <motion.label
+                key={source.id || source.name}
+                whileHover={{ y: -1, scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className={`group relative flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm transition-all duration-300 hover:shadow-md sm:gap-4 sm:p-5 ${
+                  isSelected
+                    ? "border-[var(--primary)] bg-[var(--primary)]/[0.08] ring-1 ring-[var(--primary)]/20 dark:bg-[var(--primary)]/[0.12]"
+                    : "border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-600"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => handleSourceToggle(source.name)}
+                  className="sr-only"
+                />
+                <div className="relative shrink-0">
+                  <SourceLogo
+                    src={logoSrc}
+                    alt={`${source.name} logo`}
+                    fallbackLabel={source.name}
+                    sizeClassName="h-9 w-9"
+                  />
+                  <div
+                    className={`absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full border transition-all duration-300 ${
+                      isSelected
+                        ? "border-[var(--primary)] bg-[var(--primary)] shadow-[0_0_10px_rgba(99,102,241,0.3)]"
+                        : "border-slate-300 bg-white opacity-0 dark:border-slate-600 dark:bg-slate-800 group-hover:opacity-100"
+                    }`}
+                  >
+                    <AnimatePresence>
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 30,
+                          }}
+                        >
+                          <Check
+                            size={11}
+                            strokeWidth={3.5}
+                            className="text-white"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+                <span className="min-w-0 flex-1 truncate text-sm font-semibold tracking-tight text-slate-800 transition-colors group-hover:text-slate-900 dark:text-slate-100 dark:group-hover:text-white">
+                  {source.name}
+                </span>
+              </motion.label>
+            );
+          })}
+        </div>
+      )}
 
       {sourceSearch.trim() && filteredSources.length === 0 ? (
         <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
           No news channels match your search.
         </p>
       ) : null}
-
-      {shouldShowMoreSourcesButton && !showAllSources && (
+      {shouldShowMoreSourcesButton && !showAllSources && !isMobile && (
         <div className="mt-5 flex justify-center">
           <button
             type="button"

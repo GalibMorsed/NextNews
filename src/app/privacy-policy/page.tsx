@@ -17,14 +17,22 @@ import {
   ShieldCheck,
   Sparkles,
   UserRound,
+  Search,
+  X,
+  Key,
+  Users,
+  Lightbulb,
+  Filter,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 type PolicySection = {
   title: string;
   icon: typeof ShieldCheck;
   paragraphs: string[];
   bullets?: string[];
+  categories: string[];
 };
 
 const policySections: PolicySection[] = [
@@ -36,179 +44,342 @@ const policySections: PolicySection[] = [
       "If a user does not agree with the governing terms, conditions, privacy practices, or usage rules of the platform, that user should not create an account, should not activate a plan, and should discontinue use of authenticated or paid features of the application.",
     ],
     bullets: [
-      "Acceptance applies to account creation, authenticated use, plan activation, premium feature access, and continued use after policy updates where such continued use is presented as acceptance under the platform rules.",
-      "For stronger production readiness, this Privacy Policy should be read together with a dedicated Terms and Conditions page and any future billing, refund, or subscription-specific disclosures.",
+      "Acceptance applies to account creation, authenticated use, plan activation, premium feature access, and continued use after policy updates.",
+      "For stronger production readiness, this Privacy Policy should be read together with our dedicated Terms and Conditions page.",
     ],
+    categories: ["privacy-policies", "events-plan"],
   },
   {
     title: "Scope of This Policy",
     icon: ShieldCheck,
     paragraphs: [
-      "This Privacy Policy explains how NextNews collects, stores, uses, protects, and manages information when a person visits the app, creates an account, reads articles, uses personalization, generates AI features, saves notes, adjusts settings, interacts with support, or activates plan-related features.",
-      "This page is intended to be production-facing. It covers active production features, including domain launch, payment integration, subscription plans, and API credit-based access for news and AI usage.",
+      "This Privacy Policy explains how NextNews collects, stores, uses, protects, and manages information when a person visits the app, creates an account, reads articles, uses personalization, generates AI features, saves notes, adjusts settings, interacts with support, or activates plan-related features across the current Free, Pro, and Pro+ billing configurations.",
+      "This page is intended to be production-facing. It covers active production features, including domain launch, Dodo Payments checkout, subscription plans, and API credit-based access for news and AI usage.",
     ],
     bullets: [
       "This policy applies to public browsing, authenticated use, personalization, saved notes, AI tools, settings, support, and paid plan services.",
       "Features described on this page are operational as part of the NextNews production environment.",
     ],
+    categories: ["privacy-policies", "events-plan"],
   },
   {
     title: "Information We Collect",
     icon: Database,
     paragraphs: [
-      "NextNews may collect account details, session information, personalization choices, saved notes, settings, feature-usage activity, support inputs, and plan-related information needed to operate the product and improve the reader experience.",
-      "Some data is stored in app databases, some is processed by integrated providers, and some is stored locally in the browser to preserve session state, analytics, appearance preferences, and in-app settings.",
+      "NextNews collects account details, session tokens, personalization preferences, bookmark activity, saved notes, custom settings, and plan-related billing information to operate the application and improve the reading experience.",
+      "Data is stored securely in our databases, processed through integrated service providers, or cached locally inside the user's browser to preserve session state and performance.",
     ],
     bullets: [
-      "Account data may include email address, authentication identifiers, and profile metadata such as name, gender, age, language, notification preferences, and privacy settings.",
-      "Personalization data may include selected topics, preferred sources, and AI-assisted topic recommendations added by the user.",
-      "Reader data may include saved notes, article context attached to notes, favorite sources, favorite topics, and feature interactions across the app.",
-      "Usage and diagnostic data may include timestamps, activity events, approximate request context, rate-limit checks, and request metadata needed for abuse prevention and feature reliability.",
-      "Billing data may include selected plan, payment status, invoice records, entitlement status, API credit balances, reset dates, and plan-linked service usage.",
+      "Account data includes your email address, profile name, authentication identifiers, and user settings.",
+      "Personalization data captures selected topic filters, feed preferences, and accepted suggestions.",
+      "Reader activity indexes article logs, summaries created, and client diagnostic metrics.",
     ],
+    categories: ["account", "privacy-policies"],
   },
   {
-    title: "Account Registration and Authentication",
+    title: "Profile Metadata",
     icon: UserRound,
     paragraphs: [
-      "Users can create or access an account through NextNews authentication flows powered by Supabase, including email/password login and, where configured, supported third-party sign-in methods such as Google login.",
-      "To maintain the user session, NextNews currently stores session-related values such as email and access token in browser storage and also writes an auth cookie for session continuity across the app. These values are used to determine whether protected pages and authenticated features should be available.",
+      "When setting up or updating your account details, NextNews collects profile details such as display name, gender, age, language preferences, notification settings, and privacy permissions.",
+      "This metadata allows us to customize the layout, display content in preferred languages, and send notification updates relevant to your account tier.",
     ],
     bullets: [
-      "Protected areas currently include personalization, notes, explore, and certain AI-powered or account-linked features.",
-      "If a session becomes invalid, the app may clear local session state and require the user to log in again.",
-      "Account deletion is supported through an authenticated confirmation flow and is intended to remove the account plus related saved note records from server-side storage.",
+      "Display profile information is stored on secure databases using Supabase.",
+      "Users can edit, update, or empty profile fields at any time in their Account Settings.",
     ],
+    categories: ["account"],
   },
   {
-    title: "Cookies, Tokens, and Local Storage",
-    icon: ShieldCheck,
-    paragraphs: [
-      "NextNews uses browser cookies and local storage to keep sessions active, remember preferences, and support essential app functionality. These are primarily functional and security-related rather than advertising-oriented.",
-    ],
-    bullets: [
-      "Auth session cookie (first-party, set by Supabase): keeps you signed in and expires when the session token expires or is invalidated (duration depends on provider configuration).",
-      "Third-party sign-in cookies (Google OAuth, if you choose Google login): set on Google domains and governed by Google's own policies and retention windows.",
-      "Local storage items (first-party): store appearance preferences, UI settings, and limited in-browser activity analytics tied to your account.",
-    ],
-  },
-  {
-    title: "Feed Personalization and Preference Setup",
-    icon: Sparkles,
-    paragraphs: [
-      "NextNews includes a feed-personalization setup that allows users to tailor what they see across the app. This setup currently supports selecting preferred news sources and up to a limited number of preferred topics, saving those choices to the user profile, and using them to influence the reading experience.",
-      "The app also includes AI-assisted topic suggestions that use currently trending headline signals and the user's existing topic selections to recommend additional topics from an allowed in-app list. When a user accepts suggested topics, those preferences become part of their saved personalization profile.",
-    ],
-    bullets: [
-      "Current source preferences include items such as NewsAPI Top Headlines, NewsAPI Search, and YouTube Live News Streams.",
-      "Current topic preferences include multiple news categories and thematic areas such as politics, business, science, health, finance, artificial intelligence, cybersecurity, defense, travel, and more.",
-      "Personalization selections are stored against the authenticated user in the app database and may also be reflected in local app behavior across other screens.",
-      "Users can save, update, remove, or clear personalization choices.",
-      "Personalization reminder prompts may appear when setup is incomplete, and the app may use local state to decide when to re-show those reminders.",
-    ],
-  },
-  {
-    title: "Article Interaction, Notes, and Reader Activity",
-    icon: NotebookPen,
-    paragraphs: [
-      "NextNews allows authenticated users to create and maintain personal notes tied to articles. Notes may contain article title, article slug, article URL, article date, source name, user-written content, note ID, and timestamps.",
-      "The app also tracks certain reading and feature interactions to support user-facing activity insights such as summary counts, suggestion counts, top summarized topics, reading patterns, and category engagement. Some of this analytics data is currently stored locally in the browser under the signed-in user's email-based analytics key.",
-    ],
-    bullets: [
-      "Saved notes are intended to remain visible only to the owner of the authenticated account.",
-      "Activity analytics may include article opens, AI summaries, personalization suggestion usage, region suggestion usage, category visits, event timestamps, and optional source or category labels.",
-      "Local analytics currently support app features such as My Activity and may be limited in retention length inside the browser.",
-    ],
-  },
-  {
-    title: "AI Features and AI Processing",
-    icon: Bot,
-    paragraphs: [
-      "NextNews includes multiple AI-assisted features, including article summaries, topic suggestions, explore-page insights, and region recommendations. These features may process article titles, descriptions, content snippets, topic lists, current user selections, source names, and headline signals to generate useful outputs for the user.",
-      "At present, AI generation is routed through integrated model providers such as OpenRouter. The app uses authenticated server-side API routes, request validation, and rate limits to reduce misuse and control access to AI-powered endpoints.",
-    ],
-    bullets: [
-      "AI summary requests may include article title, description, content, and source name.",
-      "AI topic suggestions may include available topics, selected topics, and current headline signals.",
-      "AI region suggestions may include current explore context and live headline signals to suggest important countries, regions, or subregions.",
-      "AI outputs are intended as assistive product features, not as guarantees of factual completeness, legal advice, financial advice, or professional judgment.",
-      "Users should independently evaluate important decisions and critical facts rather than relying solely on AI-generated output.",
-    ],
-  },
-  {
-    title: "News, Explore, Search, and Live Coverage",
-    icon: Radio,
-    paragraphs: [
-      "NextNews relies on external news and media providers to power major parts of the reading experience. This includes top headlines, category pages, search results, explore-page article feeds, live headline signals used by AI helpers, short-form Shorts videos, and live-news video discovery.",
-      "Because these features depend on third-party providers, article availability, metadata quality, thumbnails, region targeting, headline freshness, and external link behavior may vary over time. The app may use source and region context to shape results, but some data shown in the app is supplied by external services rather than created directly by NextNews.",
-    ],
-    bullets: [
-      "News content and headline signals may be requested from NewsAPI or similar services configured by the app.",
-      "Shorts are fetched from the Dailymotion API (news channel) based on category queries and India-related keywords. We display metadata and play videos through the embedded Dailymotion player.",
-      "Shorts availability can vary by category and time because results are filtered to India-focused clips.",
-      "Live-news discovery may use the YouTube Data API and may direct users to YouTube or embedded live streams.",
-      "Live-stream videos, thumbnails, titles, channel names, and related metadata remain the property and responsibility of their respective owners, publishers, or platform providers, not NextNews.",
-      "NextNews acts as a discovery and access layer for third-party live coverage and does not claim ownership of, license to, or editorial control over third-party live-stream content unless explicitly stated otherwise.",
-      "Users are responsible for ensuring that any recording, redistribution, clipping, downloading, public replay, or other reuse of third-party live-stream content complies with the applicable platform terms, copyright laws, and permissions from the original rights holder.",
-      "Explore features may combine current article coverage with AI-generated context, category suggestions, trending topics, and source-follow recommendations.",
-      "Searches and live-news queries entered by the user may be sent to relevant service providers to retrieve results.",
-    ],
-  },
-  {
-    title: "Settings, Appearance, and Privacy Controls",
+    title: "Settings and Preferences",
     icon: Settings2,
     paragraphs: [
-      "NextNews gives users control over several settings that affect how the app behaves and appears. This includes dark mode, theme choices, custom colors, font preferences, reduced motion, high-contrast mode, language preference, notification preferences, profile metadata, and privacy-oriented account controls.",
-      "Some settings are persisted locally in the browser for immediate UI continuity, while some account-related settings may be saved to user metadata through authentication services. Certain privacy toggles already exist in the app interface even where broader public-profile or partner-sharing systems are still evolving.",
+      "The application permits users to store client-side preferences to control layout appearance and accessibility. This includes selecting theme modes (dark, light, system theme), color accents, custom fonts, reduced motion animations, and high contrast options.",
+      "These preferences are stored functional-only inside browser LocalStorage to provide immediate interface continuity.",
     ],
     bullets: [
-      "Current privacy controls include profile visibility, search indexing, and data-sharing preferences in the account settings area.",
-      "The presence of a privacy toggle does not mean every downstream product capability is fully live today; some controls may be preparatory for future production behavior.",
-      "Appearance settings may be stored in browser storage and applied across the app experience for convenience.",
+      "Theme options, typography size, and color presets are saved locally.",
+      "Accessibility settings automatically adjust motion animations based on device flags.",
     ],
+    categories: ["account", "privacy-policies"],
   },
   {
-    title: "Plans, Billing, Payments, and Future API Credits",
-    icon: CreditCard,
-    paragraphs: [
-      "NextNews offers plan options such as Free, Pro, and Pro+ and uses plan-related app state to gate or preview selected experiences. Paid monetization and formal payment integration are now active. This policy applies to the collection and processing of plan status, billing records, entitlement data, subscription lifecycle data, and API credit balances linked to news and AI usage.",
-      "Paid plan operations involve payment processors, invoice systems, transaction identifiers, renewal periods, refunds where applicable, and service-usage metering.",
-      "Plan-based API call credits for both News and AI features are part of the production model. These credits represent service entitlements rather than ownership rights in any underlying third-party API service.",
-    ],
-    bullets: [
-      "Free, Pro, and Pro+ plan descriptions are part of the production monetization model.",
-      "Plans include different limits for AI summaries, AI assistants, region suggestion tools, live-news access, premium reader tools, and deeper personalization features.",
-      "News API credits and AI API credits are allocated per plan, per billing period, or per promotional entitlement, with exact quantities disclosed on the plan page, checkout flow, or account dashboard.",
-      "Unless explicitly stated otherwise, credits should be treated as non-transferable, non-cash, non-refundable usage allowances tied to the relevant account and billing cycle.",
-      "NextNews tracks usage counts, remaining balances, reset dates, overage prevention, abuse controls, and service restrictions after exhaustion of available credits.",
-      "If payment providers are added, they may process payment credentials directly. NextNews may receive billing metadata such as payment status, partial card descriptors, plan identifiers, and transaction references rather than full raw card data.",
-    ],
-  },
-  {
-    title: "Support, Communications, and Feedback",
-    icon: Eye,
-    paragraphs: [
-      "NextNews may collect contact and support information when users submit support requests, request assistance, provide feedback, or interact with support-related interfaces. This may include issue type, name, email address, phone number, and comments voluntarily submitted by the user.",
-      "Support interactions may be used to troubleshoot account problems, investigate app issues, respond to billing concerns when launched, prioritize feature work, and improve customer experience.",
-    ],
-    bullets: [
-      "Support tools may include contact forms, live chat links, phone support references, and support feedback interactions.",
-      "Support and feedback information should not include unnecessary sensitive personal data unless specifically required to resolve an issue.",
-      "Privacy contact email: nextnews.co.in@gmail.com.",
-    ],
-  },
-  {
-    title: "How We Share Information",
+    title: "Account Security & Session Tokens",
     icon: LockKeyhole,
     paragraphs: [
-      "NextNews does not frame user data as a general-purpose asset for open resale. Information may, however, be processed by trusted service providers that help deliver authentication, database hosting, AI generation, news retrieval, video discovery, analytics-like functionality, customer support, and future billing workflows.",
-      "Information may also be disclosed where reasonably necessary to protect the service, enforce terms, investigate abuse, comply with valid legal processes, or complete a business or infrastructure transition if the app changes ownership structure in the future.",
+      "We secure user sessions by utilizing JSON Web Tokens (JWT) generated by our identity provider, Supabase. NextNews stores these credentials securely to maintain your login status and protect against unauthorized access.",
+      "Session tokens are transmitted over TLS and validated server-side on every request to premium or personalized features.",
     ],
     bullets: [
-      "Current service integrations include Supabase for authentication and database functions, NewsAPI for news retrieval, OpenRouter for AI requests, Dodo Payments for billing, Dailymotion for Shorts discovery and playback, and YouTube services for live-news discovery.",
-      "Integrations include payment processors, invoicing tools, anti-fraud tools, customer-support systems, and subscription-management platforms.",
-      "Partner-facing data-sharing features are governed by explicit product disclosures and operational controls.",
+      "Tokens are automatically refreshed to minimize interception risks.",
+      "Session invalidation immediately logs out all clients to secure compromised accounts.",
     ],
+    categories: ["account", "login-signup"],
+  },
+  {
+    title: "Data Sharing Controls",
+    icon: Settings2,
+    paragraphs: [
+      "NextNews provides explicit toggles within your Account Settings to control how your profile information is visible or indexed.",
+      "These controls govern whether your public profile is visible to other readers, whether your shared content can be indexed by search engines, and whether diagnostic data sharing is active.",
+    ],
+    bullets: [
+      "Profile Visibility toggle allows you to set your account to private or public.",
+      "Search Engine Indexing toggle requests search bots not to index your user page.",
+      "Data Sharing toggle lets you opt out of optional telemetry reporting.",
+    ],
+    categories: ["account", "privacy-policies"],
+  },
+  {
+    title: "User Choices and Rights",
+    icon: UserRound,
+    paragraphs: [
+      "Users can access, edit, download, or delete their profile information directly from the user interface. We recognize user rights to restrict processing, request corrections, or cancel service accounts.",
+      "If you reside in jurisdictions with specialized privacy frameworks (such as India's DPDP Act 2023), you may submit formal inquiries or exercise statutory rights through our support email.",
+    ],
+    bullets: [
+      "Immediate access to personalization history and profile parameters.",
+      "Right to request complete correction or updating of outdated records.",
+      "Support contact point: nextnews.co.in@gmail.com.",
+    ],
+    categories: ["account", "privacy-policies"],
+  },
+  {
+    title: "Permanent Account Deletion",
+    icon: UserRound,
+    paragraphs: [
+      "If you no longer wish to use NextNews, you can request permanent deletion of your account. This action can be triggered inside your account settings and requires password or security token confirmation.",
+      "Upon deletion, your account record, profile metadata, saved notes, custom topic lists, and session keys are deleted from our database tables.",
+    ],
+    bullets: [
+      "Deletion wipes linked personal database rows across Supabase tables.",
+      "Certain billing records are retained separately for tax, auditing, and compliance purposes.",
+    ],
+    categories: ["account", "login-signup"],
+  },
+  {
+    title: "Information Sharing with Partners",
+    icon: LockKeyhole,
+    paragraphs: [
+      "NextNews does not rent, sell, or trade user data. We share specific details with trusted service partners solely to facilitate application features like authentication, payment routing, and AI responses.",
+      "All partners are bound by confidentiality clauses and are prohibited from using your data for advertisement or marketing.",
+    ],
+    bullets: [
+      "Supabase handles secure database functions and user authentication.",
+      "Dodo Payments manages credit card processing and billing ledger entries.",
+      "OpenRouter processes anonymous content prompts to generate summaries.",
+    ],
+    categories: ["privacy-policies", "account"],
+  },
+  {
+    title: "Supabase Authentication Flows",
+    icon: Key,
+    paragraphs: [
+      "NextNews utilizes Supabase Auth to manage signups, logins, and identity verification. You can choose to sign up using your email and password, or authenticate using authorized OAuth credentials such as Google Sign-in.",
+      "Supabase verifies credentials, manages password resets, and issues signed tokens to confirm your identity.",
+    ],
+    bullets: [
+      "Supports email-based password authentication with encryption.",
+      "Integrates third-party Google authentication for instant login.",
+      "Enforces rate-limits on login attempts to block brute-force attacks.",
+    ],
+    categories: ["login-signup", "account"],
+  },
+  {
+    title: "Auth Session Cookies",
+    icon: Key,
+    paragraphs: [
+      "When you successfully authenticate, NextNews and Supabase issue functional cookies to keep you signed in as you browse. These cookies store cryptographically signed session tokens.",
+      "We also read standard OAuth authentication tokens if you log in via Google. These cookies are essential for security and are not used to track you across unrelated third-party websites.",
+    ],
+    bullets: [
+      "First-party authentication cookies keep your session active across tabs.",
+      "Third-party sign-in cookies are set and managed directly by Google Auth APIs.",
+      "Session cookies expire automatically or are cleared upon explicit logout.",
+    ],
+    categories: ["login-signup", "privacy-policies"],
+  },
+  {
+    title: "Session Expiration and Re-authentication",
+    icon: Key,
+    paragraphs: [
+      "To prevent hijacking, session tokens are configured with short lifespans and must be refreshed. If a token cannot be refreshed or becomes invalid, NextNews clears all in-memory state.",
+      "If the security token expires, the application automatically redirects the user to the login screen to re-authenticate.",
+    ],
+    bullets: [
+      "Automatic token refresh occurs in the background during active use.",
+      "Invalid or altered session tokens trigger immediate token revocation.",
+      "Redirects prevent unauthorized access to notes or personalization.",
+    ],
+    categories: ["login-signup"],
+  },
+  {
+    title: "Monetization and Subscriptions",
+    icon: CreditCard,
+    paragraphs: [
+      "NextNews operates on a freemium model with a Free plan and paid Pro and Pro+ plans available on monthly or yearly billing cycles. We record and utilize your selected plan status to gate access to premium features, AI usage, and advanced search configurations.",
+      "Subscription tiers determine your News and AI credit allocations, including the Free plan's 600 API call credits for 16 days, Pro's 8,000 monthly credits or 200,000 yearly credits, and Pro+'s 45,000 monthly credits or unlimited yearly credits.",
+    ],
+    bullets: [
+      "Free tier: standard feed access, default topic categories.",
+      "Free tier access is time-limited and subject to the configured free-plan cooldown if the allowance is exhausted.",
+      "Pro tier: full feed access, basic AI summaries, standard credit limits.",
+      "Pro+ tier: priority live streams, expanded AI access, and advanced personalization.",
+    ],
+    categories: ["billing", "events-plan"],
+  },
+  {
+    title: "Payment Processing and Invoices",
+    icon: CreditCard,
+    paragraphs: [
+      "All payment processing, plan checkouts, subscription upgrades, renewals, and invoice history are securely handled by Dodo Payments, our merchant of record.",
+      "NextNews does not receive or store your raw credit card numbers or billing CVV. We receive transaction status, plan identifiers, and partial card descriptors.",
+    ],
+    bullets: [
+      "Transactions are encrypted using TLS and compliant with PCI-DSS guidelines.",
+      "Invoices and subscription status codes are synced to our servers via secure webhooks.",
+      "Partial card details (e.g. brand, last 4 digits) are saved for account references.",
+    ],
+    categories: ["billing"],
+  },
+  {
+    title: "API Service Credits",
+    icon: CreditCard,
+    paragraphs: [
+      "Free, Pro, and Pro+ plans are allocated credits to query third-party APIs (including NewsAPI search calls and OpenRouter AI summary generations). These credits represent digital entitlements.",
+      "Credits are allocated at the beginning of each billing cycle, reset automatically on your subscription renewal date, and the free plan's access window and cooldown are enforced according to the configured plan rules.",
+    ],
+    bullets: [
+      "API credits have zero cash value and are non-transferable.",
+      "Credit logs track historical consumption metrics to prevent abuse.",
+      "Unused credits do not roll over to the next billing cycle.",
+      "The Free plan currently provides 600 API call credits for 16 days and uses a 30-day cooldown after exhaustion before reuse.",
+    ],
+    categories: ["billing", "events-plan"],
+  },
+  {
+    title: "Overage and Overage Prevention",
+    icon: CreditCard,
+    paragraphs: [
+      "To protect users from unexpected billing charges, NextNews blocks further premium calls once credit balances reach zero. We do not automatically charge overage fees.",
+      "When limits are reached, the app restricts access to summaries or search queries and suggests upgrading your plan.",
+    ],
+    bullets: [
+      "Hard caps block additional request processing to control costs.",
+      "Entitlement errors are displayed in the UI with a link to checkout options.",
+    ],
+    categories: ["billing"],
+  },
+  {
+    title: "Refunds, Renewals, and Cancellations",
+    icon: CreditCard,
+    paragraphs: [
+      "Subscriptions are set to renew automatically unless cancelled. You can cancel your plan at any time through your Billing Dashboard to stop future charges.",
+      "Refund requests are evaluated in compliance with our Terms and Conditions and processed by Dodo Payments if approved.",
+    ],
+    bullets: [
+      "Cancellations take effect at the end of the current billing cycle.",
+      "Refund evaluations check usage metrics to prevent policy exploitation.",
+      "Subscription cancellations downgrade accounts to the Free tier.",
+    ],
+    categories: ["billing"],
+  },
+  {
+    title: "Feed Personalization and Topic Selection",
+    icon: Sparkles,
+    paragraphs: [
+      "The feed personalization setup allows readers to select specific news categories and topics to customize their dashboard content.",
+      "Your selected choices are saved in our database against your authenticated ID, letting us prioritize articles matching your interest profile.",
+    ],
+    bullets: [
+      "Customizing topics shapes the dynamic news dashboard feed.",
+      "Personalized lists can be modified or cleared under Feed Settings.",
+      "Topic selection includes political, business, science, and AI categories.",
+    ],
+    categories: ["feature", "account"],
+  },
+  {
+    title: "AI-Assisted Topic Suggestions",
+    icon: Sparkles,
+    paragraphs: [
+      "NextNews employs server-side algorithms to evaluate live headline signals and cross-reference them with your selected interests to recommend new topics.",
+      "Accepting suggested topics adds them to your active personalization profile. The recommendation process does not share your private data with third parties.",
+    ],
+    bullets: [
+      "Suggestions leverage anonymous top headline statistics.",
+      "Algorithms identify trending tags related to your category views.",
+      "Topic expansion suggestions can be accepted or dismissed.",
+    ],
+    categories: ["feature"],
+  },
+  {
+    title: "Article Interaction and Bookmark Notes",
+    icon: NotebookPen,
+    paragraphs: [
+      "NextNews enables authenticated readers to write personal notes and bookmarks tied directly to articles. These notes may contain custom text, article reference URLs, slugs, titles, and creation timestamps.",
+      "These bookmarks are saved in our databases and are private to the account owner.",
+    ],
+    bullets: [
+      "Bookmarks link custom notes with article metadata.",
+      "Notes are editable, deletable, and private by default.",
+      "Account deletion cleans up all stored note rows.",
+    ],
+    categories: ["feature"],
+  },
+  {
+    title: "Reader Activity Analytics",
+    icon: NotebookPen,
+    paragraphs: [
+      "The application logs client-side event metadata, including read counts, summarization actions, and topic visits, to feed the 'My Activity' dashboard.",
+      "This tracking runs locally using browser cookies or LocalStorage. It helps you see your top topics, category split, and reading milestones.",
+    ],
+    bullets: [
+      "Analytics dashboards aggregate read counts and summarization frequencies.",
+      "Data is stored inside your browser under your profile key.",
+      "Clearing browser storage resets your local activity dashboard.",
+    ],
+    categories: ["feature"],
+  },
+  {
+    title: "AI Summaries and Explanations",
+    icon: Bot,
+    paragraphs: [
+      "We utilize large language models via OpenRouter to generate summaries, explain complex details, or translate articles. Requests send the article's text, title, and source to LLM APIs.",
+      "No account profile details are sent to LLM providers. Generated text is for reference purposes only and does not constitute official advice.",
+    ],
+    bullets: [
+      "Summaries synthesize text to highlight core points.",
+      "AI responses are subject to rate limiting and API credits.",
+      "AI outputs do not represent guaranteed facts or official NextNews opinions.",
+    ],
+    categories: ["feature"],
+  },
+  {
+    title: "News Explore and Live Discovery",
+    icon: Radio,
+    paragraphs: [
+      "NextNews relies on external API aggregators (like NewsAPI) and streaming APIs (such as YouTube Live and Dailymotion) to retrieve fresh articles and videos.",
+      "Searches, category choices, and region parameters are sent to external provider endpoints to retrieve relevant headlines.",
+    ],
+    bullets: [
+      "Live-stream videos and headlines belong to respective publishers.",
+      "Users are responsible for copyright compliance when referencing articles.",
+      "Search queries are processed dynamically without storing history on the server.",
+    ],
+    categories: ["feature"],
+  },
+  {
+    title: "Video Shorts Integration",
+    icon: Radio,
+    paragraphs: [
+      "We integrate short-form video discovery using Dailymotion video feeds. Shorts are filtered based on India-focused topics and news category queries.",
+      "Video streaming and playback are handled via the Dailymotion iframe player, which is governed by Dailymotion's privacy and cookie policies.",
+    ],
+    bullets: [
+      "Shorts play inside native iframe embeds without account registrations.",
+      "No personal search queries are passed to Dailymotion's server database.",
+      "Shorts availability depends on external publisher uploads.",
+    ],
+    categories: ["feature"],
   },
   {
     title: "International Data Transfers",
@@ -221,6 +392,7 @@ const policySections: PolicySection[] = [
       "Supabase, OpenRouter, and NewsAPI are currently operated by providers with infrastructure based in or routed through the United States.",
       "Where cross-border processing applies, NextNews aims to align with applicable Indian data-protection requirements, including DPDP Act 2023 obligations as they evolve.",
     ],
+    categories: ["privacy-policies"],
   },
   {
     title: "Storage, Retention, and Security",
@@ -235,21 +407,7 @@ const policySections: PolicySection[] = [
       "Local analytics may remain in the browser until overwritten, removed, or cleared by the user.",
       "Server-side request protection may include rate limiting and token verification for sensitive AI and account operations.",
     ],
-  },
-  {
-    title: "User Choices and Rights",
-    icon: UserRound,
-    paragraphs: [
-      "Users can review, change, or remove various categories of data through the app itself, including personalization choices, notes, appearance settings, account settings, passwords, and account deletion requests. Where functionality is available, users should use those controls first for the fastest privacy-related changes.",
-      "For production use, NextNews may expand its privacy request handling over time to support more structured access, correction, export, and deletion workflows depending on jurisdiction and platform maturity.",
-    ],
-    bullets: [
-      "Users can save or clear personalization preferences.",
-      "Users can create, edit, and delete notes.",
-      "Users can change account metadata and selected privacy settings.",
-      "Users can request permanent account deletion through the in-app deletion flow.",
-      "Users may contact support regarding account, privacy, feature, or upcoming billing questions.",
-    ],
+    categories: ["privacy-policies"],
   },
   {
     title: "Governing Law and Compliance",
@@ -259,46 +417,146 @@ const policySections: PolicySection[] = [
       "If local regulations require additional disclosures, controls, or user rights, this policy may be updated accordingly and reflected with a revised effective date.",
     ],
     bullets: [
-      "If you have questions about compliance or rights under Indian law, contact nextnews.co.in@gmail.com",
+      "Policy aligns with Indian digital personal data laws.",
+      "Statutory complaints can be sent to nextnews.co.in@gmail.com.",
     ],
+    categories: ["privacy-policies", "events-plan"],
   },
   {
     title: "Children, Production Growth, and Policy Changes",
     icon: Baby,
     paragraphs: [
-      "NextNews is designed as a general news application and is not intended for children under 13 years of age. We do not knowingly collect personal data from children under 13, and account validation flows are built for users old enough to manage an account responsibly.",
-      "As the application has moved toward full production readiness, this policy reflects active systems, billing providers, API credit mechanics, legal disclosures, and region-specific compliance requirements. Material updates will be reflected on this page with a revised effective date.",
+      "NextNews is designed as a general news application and is not intended for children under 13 years of age. We do not knowingly collect personal data from children under 13.",
+      "As the application has moved toward full production readiness, this policy reflects active systems, billing providers, API credit mechanics, legal disclosures, and region-specific compliance requirements.",
     ],
     bullets: [
-      "If you believe a child under 13 has provided personal data, contact nextnews.co.in@gmail.com so we can delete it.",
-      "Users should review this page periodically for changes.",
-      "Plan and credit language in this policy is especially likely to evolve as monetization becomes operational.",
+      "If you believe a child under 13 has registered, contact support to clear their database record.",
+      "Changes will be published with a revised effective date on this page.",
     ],
+    categories: ["privacy-policies", "events-plan"],
   },
 ];
 
+const categoriesList = [
+  {
+    id: "billing",
+    title: "Billing",
+    desc: "Subscription, credit, payment and other issues",
+    icon: CreditCard,
+  },
+  {
+    id: "account",
+    title: "Account",
+    desc: "Account email, password, settings and other issues",
+    icon: UserRound,
+  },
+  {
+    id: "login-signup",
+    title: "Login/Sign-up",
+    desc: "Verification code, login error and other issues",
+    icon: Key,
+  },
+  {
+    id: "events-plan",
+    title: "Events & Plan",
+    desc: "Events and Team plan related questions",
+    icon: Users,
+  },
+  {
+    id: "privacy-policies",
+    title: "Privacy and policies",
+    desc: "Terms of service, privacy policy and other issues",
+    icon: FileText,
+  },
+  {
+    id: "feature",
+    title: "Feature",
+    desc: "Feature issues, task errors and other issues",
+    icon: Lightbulb,
+  },
+];
+
+function HighlightText({ text, query }: { text: string; query: string }) {
+  if (!query || !query.trim()) return <>{text}</>;
+
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = text.split(new RegExp(`(${escapedQuery})`, "gi"));
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        const matches = part.toLowerCase() === query.toLowerCase();
+        return matches ? (
+          <mark
+            key={index}
+            className="bg-sky-100 text-sky-950 dark:bg-sky-950/80 dark:text-sky-100 rounded-[2px] px-0.5"
+          >
+            {part}
+          </mark>
+        ) : (
+          part
+        );
+      })}
+    </>
+  );
+}
+
 export default function PrivacyPolicyPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const getArticlesCount = (categoryId: string) => {
+    return policySections.filter((section) =>
+      section.categories.includes(categoryId),
+    ).length;
+  };
+
+  const filteredSections = policySections.filter((section) => {
+    // 1. Filter by category if selected
+    if (selectedCategory) {
+      if (!section.categories.includes(selectedCategory)) {
+        return false;
+      }
+    }
+
+    // 2. Filter by search query if typed
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      const matchesTitle = section.title.toLowerCase().includes(query);
+      const matchesParagraphs = section.paragraphs.some((p) =>
+        p.toLowerCase().includes(query),
+      );
+      const matchesBullets = section.bullets?.some((b) =>
+        b.toLowerCase().includes(query),
+      );
+
+      return matchesTitle || matchesParagraphs || matchesBullets;
+    }
+
+    return true;
+  });
+
   return (
     <motion.main
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
-      className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.08),transparent_28%),linear-gradient(to_bottom,#f8fafc,#ffffff_24%,#f8fafc)] px-4 py-8 dark:bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.10),transparent_24%),linear-gradient(to_bottom,#020617,#0f172a_36%,#020617)] sm:px-6 lg:px-8"
+      className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.08),transparent_28%),linear-gradient(to_bottom,#f8fafc,#ffffff_24%,#f8fafc)] px-4 py-8 dark:bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.10),transparent_24%),linear-gradient(to_bottom,#020617,#0f172a_36%,#020617)] sm:px-6 lg:px-8"
     >
-      <div className="mx-auto max-w-6xl space-y-8">
-        <section className="overflow-hidden rounded-[32px] border border-slate-200/80 bg-white/92 p-6 shadow-sm backdrop-blur sm:p-8 lg:p-10 dark:border-slate-700/80 dark:bg-slate-900/88">
+      <div className="mx-auto max-w-6xl space-y-12">
+        <section className="overflow-hidden rounded-[20px] border border-slate-200 bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:border-slate-800 dark:bg-slate-900/90 sm:p-8 lg:p-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-4xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/70 bg-emerald-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300">
-                <ShieldCheck className="h-4 w-4" />
-                Privacy Policy
+              <div className="inline-flex items-center gap-1.5 rounded-md border border-sky-100 bg-sky-50/50 px-2.5 py-1 text-xs font-medium tracking-wide text-sky-700 dark:border-sky-950 dark:bg-sky-950/30 dark:text-sky-300">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                PRIVACY POLICY
               </div>
 
-              <h1 className="mt-5 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl">
+              <h1 className="mt-4 text-3xl font-extrabold tracking-tight leading-tight text-slate-900 dark:text-slate-100 sm:text-4xl lg:text-4xl">
                 NextNews Privacy Policy and Data Use Overview
               </h1>
 
-              <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700/80 dark:text-emerald-300/80">
+              <p className="mt-2 text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">
                 Last updated: May, 2026
               </p>
 
@@ -312,37 +570,40 @@ export default function PrivacyPolicyPage() {
                 environment.
               </p>
 
-              <p className="mt-3 text-sm leading-7 text-slate-500 dark:text-slate-400 sm:text-base">
-                Privacy contact: nextnews.co.in@gmail.com
-              </p>
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <HeadphonesIcon className="h-3.5 w-3.5" />
+                  Privacy contact: nextnews.co.in@gmail.com
+                </span>
+                <span className="hidden sm:inline text-slate-300 dark:text-slate-700">
+                  |
+                </span>
+                <span>
+                  Production-facing policy reference for active systems &amp;
+                  monetization features.
+                </span>
+              </div>
 
-              <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-500 dark:text-slate-400 sm:text-base">
-                This page is intentionally detailed because it is meant to serve
-                as a serious production-facing reference for current app
-                behavior and monetization features.
-              </p>
-
-              <div className="mt-5 rounded-[22px] border border-amber-200/80 bg-amber-50/80 px-5 py-4 dark:border-amber-900/40 dark:bg-amber-950/20">
+              <div className="mt-6 rounded-[14px] border border-amber-200/50 bg-amber-50/30 px-5 py-4 dark:border-amber-950/20 dark:bg-amber-950/10">
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300">
-                    <FileText className="h-3 w-3" />
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded bg-amber-500/10 text-amber-700 dark:text-amber-400">
+                    <FileText className="h-3.5 w-3.5" />
                   </span>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
+                  <p className="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">
                     Important Notice
                   </p>
                 </div>
-                <p className="mt-2 text-sm leading-7 text-slate-700 dark:text-slate-200 sm:text-base">
+                <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
                   Account registration and use of authenticated NextNews
                   services are subject to acceptance of the platform&apos;s
                   governing terms, conditions, privacy practices, plan rules,
                   and related operational policies.
                 </p>
-                <div className="mt-3 border-t border-amber-200/60 pt-3 dark:border-amber-800/40">
+                <div className="mt-3 border-t border-amber-200/40 pt-3 dark:border-amber-800/20">
                   <Link
                     href="/terms-and-conditions"
-                    className="group inline-flex items-center gap-2 text-[13px] font-semibold text-amber-700 transition-all duration-200 hover:gap-3 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200"
+                    className="group inline-flex items-center gap-2 text-xs font-bold text-amber-700 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 transition-colors duration-200"
                   >
-                    <FileText className="h-3.5 w-3.5 shrink-0" />
                     Read our Terms &amp; Conditions
                     <ArrowRight className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </Link>
@@ -352,111 +613,232 @@ export default function PrivacyPolicyPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {[
-            {
-              title: "Accounts",
-              desc: "Authentication, sessions, profile data, and protected access",
-              icon: UserRound,
-            },
-            {
-              title: "Personalization",
-              desc: "Topics, sources, feed setup, AI suggestions, and saved preferences",
-              icon: Sparkles,
-            },
-            {
-              title: "AI and Notes",
-              desc: "Summaries, region/topic suggestions, and article-linked notes",
-              icon: Bot,
-            },
-            {
-              title: "Plans and Credits",
-              desc: "Plan details, active billing, and API-credit systems",
-              icon: CreditCard,
-            },
-          ].map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <motion.article
-                key={item.title}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: index * 0.06 }}
-                className="rounded-[24px] border border-slate-200/80 bg-white/92 p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/88"
+        {/* Search Bar section */}
+        <section className="flex flex-col items-center py-4">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl text-center">
+            Hi, how can we help?
+          </h2>
+
+          <div className="relative mt-6 w-full max-w-2xl">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+              <Search
+                className="h-[18px] w-[18px] text-slate-400 dark:text-slate-500"
+                strokeWidth={1.8}
+              />
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for articles..."
+              className="block w-full rounded-[14px] border border-slate-200/80 bg-white/90 py-2.5 pl-10 pr-10 text-sm text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-300/80 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-700/80 dark:bg-slate-900/60 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-600/80 dark:focus:border-sky-500 dark:focus:ring-sky-500/20"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
               >
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
+                <X className="h-4.5 w-4.5" />
+              </button>
+            )}
+          </div>
+        </section>
+
+        {/* Category Cards Section */}
+        <section className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-3">
+          {categoriesList.map((item) => {
+            const Icon = item.icon;
+            const isSelected = selectedCategory === item.id;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => setSelectedCategory(isSelected ? null : item.id)}
+                className={`group flex flex-col items-center justify-between rounded-[20px] sm:rounded-[24px] border p-4 sm:p-6 text-center shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer ${
+                  isSelected
+                    ? "border-sky-500 bg-sky-50/20 text-sky-950 dark:border-sky-500/80 dark:bg-sky-950/20 dark:text-sky-100 shadow-sky-100/50 dark:shadow-none"
+                    : "border-slate-200/80 bg-white/92 hover:border-sky-200 dark:border-slate-700/80 dark:bg-slate-900/88 dark:hover:border-sky-900/60"
+                }`}
+              >
+                <div
+                  className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl transition-colors duration-300 ${
+                    isSelected
+                      ? "text-sky-600 dark:text-sky-400"
+                      : "text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400"
+                  }`}
+                >
+                  <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.5} />
+                </div>
+
+                <h3
+                  className={`mt-3 sm:mt-4 text-sm sm:text-base md:text-lg font-semibold transition-colors duration-300 ${
+                    isSelected
+                      ? "text-sky-600 dark:text-sky-400"
+                      : "text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400"
+                  }`}
+                >
                   {item.title}
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                </h3>
+
+                <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm leading-relaxed text-slate-500 dark:text-slate-400 max-w-[240px] flex-grow">
                   {item.desc}
                 </p>
-              </motion.article>
+
+                <span className="mt-3 sm:mt-4 text-[10px] sm:text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">
+                  {getArticlesCount(item.id)} articles
+                </span>
+              </button>
             );
           })}
         </section>
 
-        <section className="space-y-5">
-          {policySections.map((section, index) => {
-            const Icon = section.icon;
+        {/* Results Info Bar */}
+        {(selectedCategory || searchQuery) && (
+          <div className="flex flex-row items-center justify-between gap-4 rounded-[14px] border border-slate-200 bg-slate-50/60 p-3 sm:px-5 backdrop-blur dark:border-slate-800 dark:bg-slate-900/60 shadow-sm">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-450">
+              <Filter
+                className="h-4 w-4 text-sky-600 dark:text-sky-400 shrink-0"
+                strokeWidth={2}
+              />
+              <span>
+                Found{" "}
+                <span className="font-bold text-slate-900 dark:text-slate-100">
+                  {filteredSections.length}
+                </span>{" "}
+                {filteredSections.length === 1 ? "article" : "articles"}{" "}
+                {selectedCategory && (
+                  <>
+                    under{" "}
+                    <span className="font-bold text-sky-600 dark:text-sky-400">
+                      {
+                        categoriesList.find((c) => c.id === selectedCategory)
+                          ?.title
+                      }
+                    </span>
+                  </>
+                )}
+                {searchQuery && (
+                  <>
+                    {" "}
+                    matching &ldquo;
+                    <span className="italic font-bold text-sky-600 dark:text-sky-400">
+                      {searchQuery}
+                    </span>
+                    &rdquo;
+                  </>
+                )}
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                setSelectedCategory(null);
+                setSearchQuery("");
+              }}
+              className="inline-flex items-center gap-1 text-xs font-bold text-sky-600 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300 transition-colors duration-200 cursor-pointer shrink-0"
+            >
+              Reset Filters
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
 
-            return (
-              <motion.article
-                key={section.title}
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.38, delay: index * 0.03 }}
-                className="rounded-[28px] border border-slate-200/80 bg-white/92 p-6 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/88 sm:p-8"
-              >
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-                    <Icon className="h-6 w-6" />
-                  </div>
+        {/* Detailed policy clauses */}
+        <section className="space-y-6">
+          {filteredSections.length > 0 ? (
+            filteredSections.map((section, index) => {
+              const Icon = section.icon;
 
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-                      {section.title}
-                    </h2>
-
-                    <div className="mt-4 space-y-4">
-                      {section.paragraphs.map((paragraph) => (
-                        <p
-                          key={paragraph}
-                          className="text-sm leading-7 text-slate-600 dark:text-slate-300 sm:text-[15px]"
-                        >
-                          {paragraph}
-                        </p>
-                      ))}
+              return (
+                <motion.article
+                  key={section.title}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.38,
+                    delay: Math.min(index * 0.03, 0.3),
+                  }}
+                  className="group rounded-[28px] border border-slate-200/80 bg-white/92 p-6 shadow-sm hover:border-sky-200 dark:border-slate-700/80 dark:bg-slate-900/88 dark:hover:border-sky-900/60 hover:-translate-y-1 hover:shadow-md transition-all duration-300 sm:p-8"
+                >
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 group-hover:bg-sky-100 group-hover:text-sky-800 dark:bg-sky-950/40 dark:text-sky-400 dark:group-hover:bg-sky-900/40 dark:group-hover:text-sky-300 transition-colors duration-300">
+                      <Icon className="h-6 w-6" strokeWidth={1.5} />
                     </div>
 
-                    {section.bullets?.length ? (
-                      <div className="mt-5 grid gap-3">
-                        {section.bullets.map((bullet) => (
-                          <div
-                            key={bullet}
-                            className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50/85 px-4 py-3 dark:border-slate-700/70 dark:bg-slate-950/40"
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-300">
+                        <HighlightText
+                          text={section.title}
+                          query={searchQuery}
+                        />
+                      </h2>
+
+                      <div className="mt-4 space-y-4">
+                        {section.paragraphs.map((paragraph, pIdx) => (
+                          <p
+                            key={pIdx}
+                            className="text-sm leading-7 text-slate-600 dark:text-slate-300 sm:text-[15px]"
                           >
-                            <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
-                            <p className="text-sm leading-6 text-slate-700 dark:text-slate-200">
-                              {bullet}
-                            </p>
-                          </div>
+                            <HighlightText
+                              text={paragraph}
+                              query={searchQuery}
+                            />
+                          </p>
                         ))}
                       </div>
-                    ) : null}
+
+                      {section.bullets?.length ? (
+                        <div className="mt-5 grid gap-3">
+                          {section.bullets.map((bullet, bIdx) => (
+                            <div
+                              key={bIdx}
+                              className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/30 px-4 py-3"
+                            >
+                              <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-500 dark:bg-sky-400" />
+                              <p className="text-sm leading-6 text-slate-700 dark:text-slate-200">
+                                <HighlightText
+                                  text={bullet}
+                                  query={searchQuery}
+                                />
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              </motion.article>
-            );
-          })}
+                </motion.article>
+              );
+            })
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-[28px] border border-slate-200/80 bg-white/92 p-12 text-center dark:border-slate-700/80 dark:bg-slate-900/88">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
+                <Search className="h-6 w-6" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
+                No policy articles found
+              </h3>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-sm">
+                No clauses match your query &ldquo;
+                <span className="italic">{searchQuery}</span>&rdquo;. Try
+                searching for something else or clearing the filters.
+              </p>
+              <button
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setSearchQuery("");
+                }}
+                className="mt-5 inline-flex items-center justify-center rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 dark:bg-sky-500 dark:hover:bg-sky-400 transition-colors duration-200 cursor-pointer"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
         </section>
 
-        <section className="rounded-[28px] border border-slate-200/80 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 p-6 text-slate-100 shadow-sm sm:p-8">
+        <section className="rounded-[28px] border border-slate-200/80 bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950 p-6 text-slate-100 shadow-sm sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="lg:max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-sky-200">
                 <LockKeyhole className="h-4 w-4" />
                 Questions or Requests
               </div>
@@ -474,9 +856,9 @@ export default function PrivacyPolicyPage() {
             <div className="flex w-full shrink-0 flex-col gap-3 border-t border-white/10 pt-5 lg:w-auto lg:max-w-xs lg:border-t-0 lg:pt-0">
               <Link
                 href="/support"
-                className="group flex items-center gap-3 rounded-[20px] border border-white/15 bg-white/10 px-5 py-4 backdrop-blur transition-all duration-200 hover:border-emerald-400/40 hover:bg-white/15"
+                className="group flex items-center gap-3 rounded-[20px] border border-white/15 bg-white/10 px-5 py-4 backdrop-blur transition-all duration-200 hover:border-sky-400/40 hover:bg-white/15"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300 transition-colors duration-200 group-hover:bg-emerald-500/30">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-500/20 text-sky-300 transition-colors duration-200 group-hover:bg-sky-500/30">
                   <HeadphonesIcon className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
@@ -487,7 +869,7 @@ export default function PrivacyPolicyPage() {
                     Get help with account, privacy, or billing queries
                   </p>
                 </div>
-                <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-emerald-300" />
+                <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-sky-300" />
               </Link>
               <p className="px-1 text-xs leading-5 text-slate-400">
                 Our support team can assist with policy questions, account data
