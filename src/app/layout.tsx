@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./index.css";
 import AppShell from "./components/appShell";
@@ -59,7 +60,9 @@ export default function RootLayout({
         className="min-h-screen font-sans antialiased"
         suppressHydrationWarning
       >
-        <script dangerouslySetInnerHTML={{ __html: authBootScript }} />
+        <Script id="auth-boot" strategy="beforeInteractive">
+          {authBootScript}
+        </Script>
         <AuthBootLoader />
         <AppShell>{children}</AppShell>
       </body>

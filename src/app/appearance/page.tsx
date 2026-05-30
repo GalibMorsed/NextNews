@@ -178,7 +178,7 @@ export default function AppearancePage() {
         </section>
 
         {/* Interface theme */}
-        <section className="relative rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8 transition-all hover:bg-white/95 dark:hover:bg-slate-900/90">
+        <section className="relative border-t border-slate-300 dark:border-slate-600 px-0 pb-0 pt-6 bg-transparent shadow-none transition-all sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur sm:hover:bg-white/95 sm:dark:hover:bg-slate-900/90">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               Visual Atmosphere
@@ -239,7 +239,7 @@ export default function AppearancePage() {
         </section>
 
         {/* Custom color */}
-        <section className="relative rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8 transition-all hover:bg-white/95 dark:hover:bg-slate-900/90">
+        <section className="relative border-t border-slate-300 dark:border-slate-600 px-0 pb-0 pt-6 bg-transparent shadow-none transition-all sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur sm:hover:bg-white/95 sm:dark:hover:bg-slate-900/90">
           <div className="mb-6">
             <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
               Customize main color
@@ -283,7 +283,7 @@ export default function AppearancePage() {
         </section>
 
         {/* Font size */}
-        <section className="relative rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8 transition-all hover:bg-white/95 dark:hover:bg-slate-900/90">
+        <section className="relative border-t border-slate-300 dark:border-slate-600 px-0 pb-0 pt-6 bg-transparent shadow-none transition-all sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur sm:hover:bg-white/95 sm:dark:hover:bg-slate-900/90">
           <div className="mb-6">
             <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
               Font size
@@ -326,7 +326,7 @@ export default function AppearancePage() {
         </section>
 
         {/* Font family */}
-        <section className="relative rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8 transition-all hover:bg-white/95 dark:hover:bg-slate-900/90">
+        <section className="relative border-t border-slate-300 dark:border-slate-600 px-0 pb-0 pt-6 bg-transparent shadow-none transition-all sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur sm:hover:bg-white/95 sm:dark:hover:bg-slate-900/90">
           <div className="mb-6">
             <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
               Font family
@@ -372,7 +372,7 @@ export default function AppearancePage() {
         </section>
 
         {/* Accessibility & Motion */}
-        <section className="relative rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8 transition-all hover:bg-white/95 dark:hover:bg-slate-900/90">
+        <section className="relative border-t border-slate-300 dark:border-slate-600 px-0 pb-0 pt-6 bg-transparent shadow-none transition-all sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur sm:hover:bg-white/95 sm:dark:hover:bg-slate-900/90">
           <div className="mb-6">
             <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100">
               Accessibility & Motion
@@ -400,7 +400,8 @@ export default function AppearancePage() {
                   onChange={(e) => setReducedMotion(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-10 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-[var(--primary)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                <div className="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full transition-colors duration-300 peer-checked:bg-[var(--primary)]" />
+                <span className="absolute left-[2px] top-[2px] h-5 w-5 bg-white rounded-full transition-all duration-300 shadow-sm transform peer-checked:translate-x-5" />
               </label>
             </div>
 
@@ -420,7 +421,8 @@ export default function AppearancePage() {
                   onChange={(e) => setHighContrast(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-10 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-[var(--primary)] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                <div className="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-none rounded-full transition-colors duration-300 peer-checked:bg-[var(--primary)]" />
+                <span className="absolute left-[2px] top-[2px] h-5 w-5 bg-white rounded-full transition-all duration-300 shadow-sm transform peer-checked:translate-x-5" />
               </label>
             </div>
           </div>

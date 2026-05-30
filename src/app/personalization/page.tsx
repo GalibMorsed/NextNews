@@ -1,20 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import {
-  AlertTriangle,
-  ArrowRight,
-  Check,
-  Loader2,
-  Save,
-  Trash2,
-  X,
-} from "lucide-react";
+import { ArrowRight, Check, Loader2, Save, Trash2, X } from "lucide-react";
 import {
   AVAILABLE_PERSONALIZATION_TOPICS,
   DEFAULT_PERSONALIZATION_TOPICS,
   MAX_PERSONALIZATION_TOPICS,
+  getPersonalizationTopicMetadata,
   sanitizePersonalizationTopic,
 } from "@/lib/personalizationTopics";
 import {
@@ -25,6 +18,10 @@ import {
 } from "../services/personalizationService";
 import PersonalizationAiSuggestions from "./components/personalizationAiSuggestions";
 import PersonalizationRegionSelector from "./components/PersonalizationRegionSelector";
+import PersonalizationNewsSources, {
+  PERSONALIZATION_DEFAULT_SOURCE_SELECTION,
+  PERSONALIZATION_MAX_SOURCES,
+} from "./components/PersonalizationNewsSources";
 import StatusPopup from "../components/statusPopup";
 import PersonalizationPromoAd, {
   PERSONALIZATION_PROMO_DISMISS_KEY,
@@ -41,16 +38,11 @@ type SuggestedTopicToast = {
   tone: "success" | "warning";
 } | null;
 
-const AVAILABLE_SOURCES = [
-  "NewsAPI Top Headlines",
-  "NewsAPI Search (Everything)",
-  "YouTube Live News Streams",
-];
-
 const AVAILABLE_TOPICS = [...AVAILABLE_PERSONALIZATION_TOPICS];
 const MAX_TOPICS = MAX_PERSONALIZATION_TOPICS;
 const INITIAL_VISIBLE_TOPICS = 12;
 const DEFAULT_TOPIC_SELECTION = [...DEFAULT_PERSONALIZATION_TOPICS];
+const getTopicMetadata = getPersonalizationTopicMetadata;
 
 function toggleValue(current: string[], value: string): string[] {
   if (current.includes(value)) {
@@ -74,11 +66,12 @@ const cardVariants: Variants = {
 };
 
 export default function PersonalizationPage() {
-  const [favoriteSources, setFavoriteSources] = useState<string[]>([]);
+  const [favoriteSources, setFavoriteSources] = useState<string[]>(
+    PERSONALIZATION_DEFAULT_SOURCE_SELECTION,
+  );
   const [favoriteTopics, setFavoriteTopics] = useState<string[]>([]);
   const [favoriteRegions, setFavoriteRegions] = useState<string[]>([]);
   const [topicSearch, setTopicSearch] = useState("");
-  const [userEmail, setUserEmail] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDiscarding, setIsDiscarding] = useState(false);
@@ -90,8 +83,21 @@ export default function PersonalizationPage() {
   const [showAllTopics, setShowAllTopics] = useState(false);
   const [promoResetKey, setPromoResetKey] = useState(0);
 
+  const [activePageIndex, setActivePageIndex] = useState(0);
+  const mobileContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setActivePageIndex(0);
+    if (mobileContainerRef.current) {
+      mobileContainerRef.current.scrollLeft = 0;
+    }
+  }, [topicSearch]);
+
   const hasSelection = useMemo(
-    () => favoriteSources.length > 0 || favoriteTopics.length > 0 || favoriteRegions.length > 0,
+    () =>
+      favoriteSources.length > 0 ||
+      favoriteTopics.length > 0 ||
+      favoriteRegions.length > 0,
     [favoriteSources.length, favoriteTopics.length, favoriteRegions.length],
   );
 
@@ -102,6 +108,35 @@ export default function PersonalizationPage() {
       ),
     [topicSearch],
   );
+  const mobilePages = useMemo(() => {
+    const pagesList: string[][] = [];
+    const itemsPerPage = 6;
+    for (let i = 0; i < filteredTopics.length; i += itemsPerPage) {
+      pagesList.push(filteredTopics.slice(i, i + itemsPerPage));
+    }
+    return pagesList;
+  }, [filteredTopics]);
+
+  const handleMobileScroll = () => {
+    if (!mobileContainerRef.current) return;
+    const { scrollLeft, clientWidth } = mobileContainerRef.current;
+    if (clientWidth > 0) {
+      const newIndex = Math.round(scrollLeft / clientWidth);
+      if (newIndex !== activePageIndex) {
+        setActivePageIndex(newIndex);
+      }
+    }
+  };
+
+  const scrollToMobilePage = (index: number) => {
+    if (!mobileContainerRef.current) return;
+    const { clientWidth } = mobileContainerRef.current;
+    mobileContainerRef.current.scrollTo({
+      left: index * clientWidth,
+      behavior: "smooth",
+    });
+    setActivePageIndex(index);
+  };
 
   const visibleTopics = useMemo(() => {
     if (topicSearch.trim()) return filteredTopics;
@@ -131,13 +166,6 @@ export default function PersonalizationPage() {
 
     const loadData = async () => {
       try {
-        // Read email from localStorage — no Supabase call needed
-        const cachedEmail =
-          localStorage.getItem("auth_email") ||
-          localStorage.getItem("userEmail") ||
-          "";
-        if (mounted) setUserEmail(cachedEmail);
-
         const { data, error: fetchError } = await getUserPersonalization();
         if (fetchError) {
           if (mounted) {
@@ -152,7 +180,7 @@ export default function PersonalizationPage() {
         if (!mounted) return;
 
         if (!data) {
-          setFavoriteSources([]);
+          setFavoriteSources(PERSONALIZATION_DEFAULT_SOURCE_SELECTION);
           setFavoriteTopics(DEFAULT_TOPIC_SELECTION);
           setFavoriteRegions([]);
           return;
@@ -162,7 +190,12 @@ export default function PersonalizationPage() {
           ? data.favorite_topics
           : [];
 
-        setFavoriteSources(data.favorite_sources ?? []);
+        setFavoriteSources(
+          Array.isArray(data.favorite_sources) &&
+            data.favorite_sources.length > 0
+            ? data.favorite_sources.slice(0, PERSONALIZATION_MAX_SOURCES)
+            : PERSONALIZATION_DEFAULT_SOURCE_SELECTION,
+        );
         setFavoriteTopics(
           Array.isArray(data.favorite_topics) && data.favorite_topics.length > 0
             ? persistedTopics
@@ -322,7 +355,7 @@ export default function PersonalizationPage() {
         return;
       }
 
-      setFavoriteSources([]);
+      setFavoriteSources(PERSONALIZATION_DEFAULT_SOURCE_SELECTION);
       setFavoriteTopics([]);
       setFavoriteRegions([]);
       localStorage.removeItem(PERSONALIZATION_PROMO_DISMISS_KEY);
@@ -397,79 +430,17 @@ export default function PersonalizationPage() {
             </div>
           </div>
         </motion.section>
-
         <motion.section
           initial="hidden"
           animate="visible"
           variants={sectionVariants}
           custom={1}
-          className="rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8"
+          className="border-none bg-transparent p-0 shadow-none sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur"
         >
-          <div className="mb-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-              News Sources
-            </h2>
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {AVAILABLE_SOURCES.map((source) => {
-              const isSelected = favoriteSources.includes(source);
-              return (
-                <motion.label
-                  key={source}
-                  whileHover={{ y: -1, scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  className={`group relative flex cursor-pointer items-center gap-3 rounded-2xl border transition-all duration-300 px-4 py-3 sm:gap-4 sm:p-5 shadow-sm hover:shadow-md ${
-                    isSelected
-                      ? "border-[var(--primary)] bg-[var(--primary)]/[0.08] dark:bg-[var(--primary)]/[0.12] ring-1 ring-[var(--primary)]/20"
-                      : "border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-600"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() =>
-                      setFavoriteSources((prev) => toggleValue(prev, source))
-                    }
-                    className="sr-only"
-                  />
-                  <div
-                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-300 ${
-                      isSelected
-                        ? "bg-[var(--primary)] border-[var(--primary)] shadow-[0_0_10px_rgba(99,102,241,0.3)]"
-                        : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 group-hover:border-[var(--primary)]/50"
-                    }`}
-                  >
-                    <AnimatePresence>
-                      {isSelected && (
-                        <motion.div
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 30,
-                          }}
-                        >
-                          <Check
-                            size={14}
-                            strokeWidth={3.5}
-                            className="text-white"
-                          />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  <span className="flex-1 text-sm font-semibold tracking-tight text-slate-800 dark:text-slate-100 transition-colors group-hover:text-slate-900 dark:group-hover:text-white">
-                    {source}
-                  </span>
-                </motion.label>
-              );
-            })}
-          </div>
+          <PersonalizationNewsSources
+            favoriteSources={favoriteSources}
+            onFavoriteSourcesChange={setFavoriteSources}
+          />
         </motion.section>
 
         <motion.section
@@ -477,9 +448,9 @@ export default function PersonalizationPage() {
           animate="visible"
           variants={sectionVariants}
           custom={2}
-          className="rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8"
+          className="border-none bg-transparent p-0 shadow-none sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur"
         >
-          <PersonalizationRegionSelector 
+          <PersonalizationRegionSelector
             favoriteRegions={favoriteRegions}
             onToggleRegion={handleRegionToggle}
           />
@@ -490,15 +461,15 @@ export default function PersonalizationPage() {
           animate="visible"
           variants={sectionVariants}
           custom={3}
-          className="rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8"
+          className="border-none bg-transparent p-0 shadow-none sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur"
         >
           {/* Topics heading — full width divider */}
           <div className="mb-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            <div className="h-px flex-1 bg-slate-300 dark:bg-slate-600" />
             <h2 className="whitespace-nowrap text-lg font-semibold text-slate-900 dark:text-slate-50">
               Category Topics
             </h2>
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            <div className="h-px flex-1 bg-slate-300 dark:bg-slate-600" />
           </div>
 
           {/* Subtitle + progress bar row */}
@@ -543,87 +514,215 @@ export default function PersonalizationPage() {
             )}
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
-            {visibleTopics.map((topic, index) => {
-              const isSelected = favoriteTopics.includes(topic);
-              const isDisabled =
-                !isSelected && favoriteTopics.length >= MAX_TOPICS;
-
-              return (
-                <motion.label
-                  key={topic}
-                  variants={cardVariants}
-                  initial="hidden"
-                  animate="visible"
-                  transition={{ delay: index * 0.012 }}
-                  whileHover={{ y: -1, scale: 1.015 }}
-                  whileTap={{ scale: 0.985 }}
-                  className={`group relative flex cursor-pointer items-center gap-3 rounded-2xl border transition-all duration-300 px-3.5 py-3 sm:gap-4 sm:px-5 sm:py-4 shadow-sm hover:shadow-md ${
-                    isSelected
-                      ? "border-[var(--primary)] bg-[var(--primary)]/[0.08] dark:bg-[var(--primary)]/[0.12] ring-1 ring-[var(--primary)]/20"
-                      : isDisabled
-                        ? "opacity-60 border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40"
-                        : "border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-600"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => handleTopicToggle(topic)}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-300 ${
-                      isSelected
-                        ? "bg-[var(--primary)] border-[var(--primary)] shadow-[0_0_10px_rgba(99,102,241,0.3)]"
-                        : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 group-hover:border-[var(--primary)]/50"
-                    }`}
-                  >
-                    <AnimatePresence>
-                      {isSelected && (
-                        <motion.div
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 30,
-                          }}
-                        >
-                          <Check
-                            size={14}
-                            strokeWidth={3.5}
-                            className="text-white"
-                          />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  <span className="text-sm font-semibold tracking-tight text-slate-800 dark:text-slate-100 transition-colors group-hover:text-slate-900 dark:group-hover:text-white">
-                    {topic}
-                  </span>
-                </motion.label>
-              );
-            })}
-          </div>
-
-          {shouldShowMoreTopicsButton && (
-            <div className="mt-5 flex justify-center">
-              <button
-                type="button"
-                onClick={() => setShowAllTopics(true)}
-                className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:border-[var(--primary)] hover:text-[var(--primary)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+          {/* Conditional Layout: Desktop Grid vs Mobile Horizontal Scroll */}
+          {isMobile ? (
+            <div className="mt-6 flex flex-col">
+              <div
+                ref={mobileContainerRef}
+                onScroll={handleMobileScroll}
+                className="flex snap-x snap-mandatory overflow-x-auto scrollbar-none gap-4 pb-2"
               >
-                See more options
-              </button>
-            </div>
-          )}
+                {mobilePages.length > 0 ? (
+                  mobilePages.map((page, pageIndex) => (
+                    <div
+                      key={pageIndex}
+                      className="grid w-full shrink-0 snap-center grid-cols-2 gap-2"
+                    >
+                      {page.map((topic, topicIndex) => {
+                        const isSelected = favoriteTopics.includes(topic);
+                        const isDisabled =
+                          !isSelected && favoriteTopics.length >= MAX_TOPICS;
+                        const metadata = getTopicMetadata(topic);
+                        const IconComponent = metadata.icon;
 
-          {filteredTopics.length === 0 && (
-            <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
-              No topics match your search.
-            </p>
+                        return (
+                          <motion.label
+                            key={topic}
+                            variants={cardVariants}
+                            initial="hidden"
+                            animate="visible"
+                            transition={{ delay: topicIndex * 0.012 }}
+                            whileHover={{ y: -1, scale: 1.015 }}
+                            whileTap={{ scale: 0.985 }}
+                            className={`group relative flex cursor-pointer items-center justify-between gap-2 rounded-2xl border transition-all duration-300 px-3.5 py-3 shadow-sm hover:shadow-md ${
+                              isSelected
+                                ? "border-[var(--primary)] bg-[var(--primary)]/[0.06] dark:bg-[var(--primary)]/[0.12] ring-1 ring-[var(--primary)]/20"
+                                : isDisabled
+                                  ? "opacity-60 border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40"
+                                  : "border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-600"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleTopicToggle(topic)}
+                              className="sr-only"
+                            />
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="flex shrink-0 items-center justify-center p-0.5 rounded-lg group-hover:scale-110 transition-transform">
+                                <IconComponent
+                                  className={`h-5 w-5 shrink-0 ${metadata.color}`}
+                                />
+                              </div>
+                              <span className="text-xs sm:text-sm font-semibold tracking-tight text-slate-800 dark:text-slate-100 transition-colors group-hover:text-slate-900 dark:group-hover:text-white leading-tight">
+                                {topic}
+                              </span>
+                            </div>
+
+                            <div
+                              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                                isSelected
+                                  ? "bg-[var(--primary)] border-[var(--primary)] text-white shadow-[0_0_10px_rgba(99,102,241,0.3)]"
+                                  : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 group-hover:border-[var(--primary)]/50"
+                              }`}
+                            >
+                              <AnimatePresence>
+                                {isSelected && (
+                                  <motion.div
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0, opacity: 0 }}
+                                    transition={{
+                                      type: "spring",
+                                      stiffness: 500,
+                                      damping: 30,
+                                    }}
+                                  >
+                                    <Check
+                                      size={13}
+                                      strokeWidth={4}
+                                      className="text-white"
+                                    />
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          </motion.label>
+                        );
+                      })}
+                    </div>
+                  ))
+                ) : (
+                  <p className="w-full text-center text-sm text-slate-500 dark:text-slate-400 py-4">
+                    No topics match your search.
+                  </p>
+                )}
+              </div>
+
+              {/* Animated Carousel Indicators (Image 2 style) */}
+              {mobilePages.length > 1 && (
+                <div className="flex items-center justify-center gap-1.5 mt-5">
+                  {mobilePages.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => scrollToMobilePage(index)}
+                      className={`h-2 rounded-full transition-all duration-300 ease-out ${
+                        index === activePageIndex
+                          ? "w-8 bg-[var(--primary)] shadow-[0_0_8px_rgba(99,102,241,0.45)]"
+                          : "w-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-350 dark:hover:bg-slate-600"
+                      }`}
+                      aria-label={`Go to page ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
+                {visibleTopics.map((topic, index) => {
+                  const isSelected = favoriteTopics.includes(topic);
+                  const isDisabled =
+                    !isSelected && favoriteTopics.length >= MAX_TOPICS;
+                  const metadata = getTopicMetadata(topic);
+                  const IconComponent = metadata.icon;
+
+                  return (
+                    <motion.label
+                      key={topic}
+                      variants={cardVariants}
+                      initial="hidden"
+                      animate="visible"
+                      transition={{ delay: index * 0.012 }}
+                      whileHover={{ y: -1, scale: 1.015 }}
+                      whileTap={{ scale: 0.985 }}
+                      className={`group relative flex cursor-pointer items-center justify-between gap-3 rounded-2xl border transition-all duration-300 px-3.5 py-3 sm:gap-4 sm:px-5 sm:py-4 shadow-sm hover:shadow-md ${
+                        isSelected
+                          ? "border-[var(--primary)] bg-[var(--primary)]/[0.06] dark:bg-[var(--primary)]/[0.12] ring-1 ring-[var(--primary)]/20"
+                          : isDisabled
+                            ? "opacity-60 border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40"
+                            : "border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-600"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleTopicToggle(topic)}
+                        className="sr-only"
+                      />
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex shrink-0 items-center justify-center p-1 rounded-lg group-hover:scale-110 transition-transform">
+                          <IconComponent
+                            className={`h-5 w-5 shrink-0 ${metadata.color}`}
+                          />
+                        </div>
+                        <span className="text-sm font-semibold tracking-tight text-slate-800 dark:text-slate-100 transition-colors group-hover:text-slate-900 dark:group-hover:text-white truncate">
+                          {topic}
+                        </span>
+                      </div>
+
+                      <div
+                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                          isSelected
+                            ? "bg-[var(--primary)] border-[var(--primary)] text-white shadow-[0_0_10px_rgba(99,102,241,0.3)]"
+                            : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 group-hover:border-[var(--primary)]/50"
+                        }`}
+                      >
+                        <AnimatePresence>
+                          {isSelected && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              exit={{ scale: 0, opacity: 0 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 500,
+                                damping: 30,
+                              }}
+                            >
+                              <Check
+                                size={14}
+                                strokeWidth={3.5}
+                                className="text-white"
+                              />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </motion.label>
+                  );
+                })}
+              </div>
+
+              {shouldShowMoreTopicsButton && (
+                <div className="mt-5 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowAllTopics(true)}
+                    className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:border-[var(--primary)] hover:text-[var(--primary)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  >
+                    See more options
+                  </button>
+                </div>
+              )}
+
+              {filteredTopics.length === 0 && (
+                <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
+                  No topics match your search.
+                </p>
+              )}
+            </>
           )}
         </motion.section>
 
@@ -650,14 +749,14 @@ export default function PersonalizationPage() {
           animate="visible"
           variants={sectionVariants}
           custom={5}
-          className="rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/85 p-6 shadow-sm backdrop-blur sm:p-8"
+          className="border-none bg-transparent p-0 shadow-none sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur"
         >
           <div className="mb-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            <div className="h-px flex-1 bg-slate-300 dark:bg-slate-600" />
             <h2 className="whitespace-nowrap text-lg font-semibold text-slate-900 dark:text-slate-50">
               Your Favorites
             </h2>
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            <div className="h-px flex-1 bg-slate-300 dark:bg-slate-600" />
           </div>
 
           {!hasSelection ? (
@@ -672,29 +771,31 @@ export default function PersonalizationPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {favoriteSources.length > 0 && (
                 <div>
-                  <div className="mb-3 flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                  <div className="mb-2 sm:mb-3 flex items-center gap-2.5">
+                    <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-blue-500/20">
+                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                    </div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       News Sources
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2.5">
+                  <div className="flex flex-wrap gap-2 sm:gap-2.5">
                     {favoriteSources.map((source) => (
                       <div
                         key={source}
-                        className="group flex flex-wrap items-center gap-2 rounded-full border border-blue-200/80 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 shadow-sm transition-all hover:bg-blue-100/70 hover:shadow dark:border-blue-800/60 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50 sm:px-4"
+                        className="group inline-flex items-center gap-2 rounded-full border border-blue-200/80 bg-blue-50/50 px-3 py-1 text-xs font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:border-blue-300 hover:bg-blue-100/50 hover:shadow dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-300 dark:hover:border-blue-800 dark:hover:bg-blue-900/30 sm:px-4 sm:py-1.5 sm:text-sm"
                       >
-                        <span className="truncate">{source}</span>
+                        <span className="truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">{source}</span>
                         <button
                           type="button"
                           onClick={() => removeFavoriteSource(source)}
-                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100/70 text-red-600 transition-colors hover:bg-red-600 hover:text-white dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-600"
+                          className="flex h-4 w-4 sm:h-5 sm:w-5 shrink-0 items-center justify-center rounded-full bg-blue-100/80 text-blue-600 transition-colors duration-300 hover:bg-red-500 hover:text-white dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-red-600 dark:hover:text-white"
                           aria-label={`Remove ${source}`}
                         >
-                          <X size={12} strokeWidth={2.5} />
+                          <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" strokeWidth={3} />
                         </button>
                       </div>
                     ))}
@@ -704,26 +805,28 @@ export default function PersonalizationPage() {
 
               {favoriteTopics.length > 0 && (
                 <div>
-                  <div className="mb-3 flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                  <div className="mb-2 sm:mb-3 flex items-center gap-2.5">
+                    <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-emerald-500/20">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    </div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Category Topics
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2.5">
+                  <div className="flex flex-wrap gap-2 sm:gap-2.5">
                     {favoriteTopics.map((topic) => (
                       <div
                         key={topic}
-                        className="group flex flex-wrap items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 shadow-sm transition-all hover:bg-emerald-100/70 hover:shadow dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/50 sm:px-4"
+                        className="group inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50/50 px-3 py-1 text-xs font-semibold text-emerald-700 shadow-sm transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-100/50 hover:shadow dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-300 dark:hover:border-emerald-800 dark:hover:bg-emerald-900/30 sm:px-4 sm:py-1.5 sm:text-sm"
                       >
-                        <span className="truncate">{topic}</span>
+                        <span className="truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">{topic}</span>
                         <button
                           type="button"
                           onClick={() => removeFavoriteTopic(topic)}
-                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100/70 text-red-600 transition-colors hover:bg-red-600 hover:text-white dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-600"
+                          className="flex h-4 w-4 sm:h-5 sm:w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100/80 text-emerald-600 transition-colors duration-300 hover:bg-red-500 hover:text-white dark:bg-emerald-900/40 dark:text-emerald-300 dark:hover:bg-red-600 dark:hover:text-white"
                           aria-label={`Remove ${topic}`}
                         >
-                          <X size={12} strokeWidth={2.5} />
+                          <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" strokeWidth={3} />
                         </button>
                       </div>
                     ))}
@@ -733,26 +836,32 @@ export default function PersonalizationPage() {
 
               {favoriteRegions.length > 0 && (
                 <div>
-                  <div className="mb-3 flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
-                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                  <div className="mb-2 sm:mb-3 flex items-center gap-2.5">
+                    <div className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-purple-500/20">
+                      <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
+                    </div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Preferred Region
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2.5">
+                  <div className="flex flex-wrap gap-2 sm:gap-2.5">
                     {favoriteRegions.map((region) => (
                       <div
                         key={region}
-                        className="group flex flex-wrap items-center gap-2 rounded-full border border-purple-200/80 bg-purple-50 px-3 py-1.5 text-sm font-medium text-purple-700 shadow-sm transition-all hover:bg-purple-100/70 hover:shadow dark:border-purple-800/60 dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-900/50 sm:px-4"
+                        className="group inline-flex items-center gap-2 rounded-full border border-purple-200/80 bg-purple-50/50 px-3 py-1 text-xs font-semibold text-purple-700 shadow-sm transition-all duration-300 hover:border-purple-300 hover:bg-purple-100/50 hover:shadow dark:border-purple-900/50 dark:bg-purple-950/20 dark:text-purple-300 dark:hover:border-purple-800 dark:hover:bg-purple-900/30 sm:px-4 sm:py-1.5 sm:text-sm"
                       >
-                        <span className="truncate">{region}</span>
+                        <span className="truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">{region}</span>
                         <button
                           type="button"
-                          onClick={() => setFavoriteRegions((prev) => prev.filter(r => r !== region))}
-                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100/70 text-red-600 transition-colors hover:bg-red-600 hover:text-white dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-600"
+                          onClick={() =>
+                            setFavoriteRegions((prev) =>
+                              prev.filter((r) => r !== region),
+                            )
+                          }
+                          className="flex h-4 w-4 sm:h-5 sm:w-5 shrink-0 items-center justify-center rounded-full bg-purple-100/80 text-purple-600 transition-colors duration-300 hover:bg-red-500 hover:text-white dark:bg-purple-900/40 dark:text-purple-300 dark:hover:bg-red-600 dark:hover:text-white"
                           aria-label={`Remove ${region}`}
                         >
-                          <X size={12} strokeWidth={2.5} />
+                          <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" strokeWidth={3} />
                         </button>
                       </div>
                     ))}

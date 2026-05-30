@@ -29,7 +29,10 @@ const MOBILE_POPUP_VARIANTS = {
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [authFinalizing, setAuthFinalizing] = useState(false);
@@ -60,6 +63,48 @@ export default function RegisterPage() {
 
   const clearPendingTermsAcceptance = () => {
     localStorage.removeItem(PENDING_TERMS_KEY);
+  };
+
+  const validateEmail = (value: string) => {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      return "Email is required.";
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(trimmedValue)) {
+      return "Enter a valid email address.";
+    }
+
+    return "";
+  };
+
+  const validatePassword = (value: string) => {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      return "Password is required.";
+    }
+
+    if (trimmedValue.length < 6 || !/\d/.test(trimmedValue)) {
+      return "Password must be at least 6 characters and include 1 number.";
+    }
+
+    return "";
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    setEmailError(validateEmail(value));
+    setErrorMessage("");
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordError(validatePassword(value));
+    setErrorMessage("");
   };
 
   const storePendingTermsAcceptance = (
@@ -222,9 +267,13 @@ export default function RegisterPage() {
     }
 
     const trimmedEmail = email.trim();
+    const nextEmailError = validateEmail(trimmedEmail);
+    const nextPasswordError = validatePassword(password);
 
-    if (!trimmedEmail || !password.trim()) {
-      showFormError("Email and password are required.");
+    setEmailError(nextEmailError);
+    setPasswordError(nextPasswordError);
+
+    if (nextEmailError || nextPasswordError) {
       return;
     }
 
@@ -296,9 +345,13 @@ export default function RegisterPage() {
     }
 
     const trimmedEmail = email.trim();
+    const nextEmailError = validateEmail(trimmedEmail);
+    const nextPasswordError = validatePassword(password);
 
-    if (!trimmedEmail || !password.trim()) {
-      showFormError("Email and password are required.");
+    setEmailError(nextEmailError);
+    setPasswordError(nextPasswordError);
+
+    if (nextEmailError || nextPasswordError) {
       return;
     }
 
@@ -498,18 +551,67 @@ export default function RegisterPage() {
             <input
               type="email"
               placeholder="Email address"
-              className="mb-3 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-all duration-300 focus:-translate-y-0.5 focus:border-slate-900 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-slate-500 dark:focus:ring-slate-800"
-              onChange={(e) => setEmail(e.target.value)}
+              className={`w-full rounded-lg border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-all duration-300 focus:-translate-y-0.5 focus:ring-2 dark:bg-slate-950 dark:text-white ${
+                emailError
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-200 dark:border-red-500 dark:focus:border-red-400 dark:focus:ring-red-900/40"
+                  : "border-slate-300 focus:border-slate-900 focus:ring-slate-200 dark:border-slate-700 dark:focus:border-slate-500 dark:focus:ring-slate-800"
+              }`}
+              onChange={(e) => handleEmailChange(e.target.value)}
               value={email}
+              onBlur={() => setEmailError(validateEmail(email))}
+              aria-invalid={Boolean(emailError)}
+              aria-describedby={emailError ? "email-error" : undefined}
             />
 
-            <input
-              type="password"
-              placeholder="Password"
-              className="mb-4 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-all duration-300 focus:-translate-y-0.5 focus:border-slate-900 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-slate-500 dark:focus:ring-slate-800"
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-            />
+            {emailError ? (
+              <p
+                id="email-error"
+                className="mb-3 text-xs text-red-600 dark:text-red-400"
+              >
+                {emailError}
+              </p>
+            ) : (
+              <div className="mb-3" />
+            )}
+
+            <div className="relative mb-1">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                className={`w-full rounded-lg border bg-white px-4 py-3 pr-20 text-sm text-slate-900 outline-none transition-all duration-300 focus:-translate-y-0.5 focus:ring-2 dark:bg-slate-950 dark:text-white ${
+                  passwordError
+                    ? "border-red-400 focus:border-red-500 focus:ring-red-200 dark:border-red-500 dark:focus:border-red-400 dark:focus:ring-red-900/40"
+                    : "border-slate-300 focus:border-slate-900 focus:ring-slate-200 dark:border-slate-700 dark:focus:border-slate-500 dark:focus:ring-slate-800"
+                }`}
+                onChange={(e) => handlePasswordChange(e.target.value)}
+                value={password}
+                onBlur={() => setPasswordError(validatePassword(password))}
+                aria-invalid={Boolean(passwordError)}
+                aria-describedby={passwordError ? "password-error" : undefined}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((currentValue) => !currentValue)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                <span className="mr-1" aria-hidden="true">
+                  {showPassword ? "🙈" : "🐵"}
+                </span>
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+
+            {passwordError ? (
+              <p
+                id="password-error"
+                className="mb-4 text-xs text-red-600 dark:text-red-400"
+              >
+                {passwordError}
+              </p>
+            ) : (
+              <div className="mb-4" />
+            )}
 
             <button
               onClick={handleRegister}
