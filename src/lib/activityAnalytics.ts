@@ -43,6 +43,14 @@ export type GoalTrackerState = {
   lastGoalUpdatedAt: number;
 };
 
+export type WeeklyGoalProgress = {
+  currentWeekProgress: number;
+  weekArticles: number;
+  weekNotes: number;
+  weekAi: number;
+  readingStreak: number;
+};
+
 export type ActivitySnapshot = {
   activityData: ActivityAnalytics;
   goalTracker: GoalTrackerState;
@@ -96,6 +104,14 @@ export const DEFAULT_GOAL_TRACKER_STATE: GoalTrackerState = {
   lastStreakUpdate: "",
   lastGoalCompletedAt: 0,
   lastGoalUpdatedAt: 0,
+};
+
+const DEFAULT_WEEKLY_PROGRESS: WeeklyGoalProgress = {
+  currentWeekProgress: 0,
+  weekArticles: 0,
+  weekNotes: 0,
+  weekAi: 0,
+  readingStreak: 0,
 };
 
 const coerceNumber = (value: unknown, fallback: number) => {
@@ -246,6 +262,40 @@ const getWeekStartTime = () => {
   const monday = new Date(now.setDate(diff));
   monday.setHours(0, 0, 0, 0);
   return monday.getTime();
+};
+
+const computeWeeklyProgress = (
+  activityData: ActivityAnalytics,
+  notes: UserNoteEntry[],
+): WeeklyGoalProgress => {
+  const mondayTime = getWeekStartTime();
+  const weekEvents = activityData.events.filter((event) => {
+    const time = new Date(event.timestamp).getTime();
+    return !Number.isNaN(time) && time >= mondayTime;
+  });
+  const weekNotes = notes.filter((note) => noteTimeOf(note) >= mondayTime);
+
+  const aiUsage = weekEvents.filter((event) =>
+    [
+      "ai_summary",
+      "personalization_suggestion",
+      "region_suggestion",
+    ].includes(event.type),
+  ).length;
+  const articles = weekEvents.filter(
+    (event) => event.type === "article_open",
+  ).length;
+  const noteCount = weekNotes.length;
+  const engagementDays = buildEngagementDays(notes, activityData.events);
+  const readingStreak = computeCurrentReadingStreak(engagementDays);
+
+  return {
+    currentWeekProgress: aiUsage + articles + noteCount + readingStreak,
+    weekArticles: articles,
+    weekNotes: noteCount,
+    weekAi: aiUsage,
+    readingStreak,
+  };
 };
 
 const getIsoWeekKey = (date: Date) => {
@@ -456,6 +506,19 @@ export async function readGoalTrackerState(): Promise<GoalTrackerState> {
   return snapshot.goalTracker;
 }
 
+export async function readWeeklyGoalProgress(): Promise<WeeklyGoalProgress> {
+  try {
+    const user = await getAuthenticatedUser();
+    const { data, error } = await fetchActivityRow(user.id);
+    if (error && !isMissingRelationError(error)) return DEFAULT_WEEKLY_PROGRESS;
+    const activityData = normalizeActivityAnalytics(data?.activity_data);
+    const notes = await fetchUserNotes(user.id);
+    return computeWeeklyProgress(activityData, notes);
+  } catch {
+    return DEFAULT_WEEKLY_PROGRESS;
+  }
+}
+
 export async function saveActivityAnalytics(next: ActivityAnalytics) {
   const user = await getAuthenticatedUser();
   const userEmail = resolveUserEmail(user.email);
@@ -494,28 +557,10 @@ export async function syncGoalTrackerProgress() {
     const goalTracker = normalizeGoalTrackerState(data?.goal_tracker);
     const notes = await fetchUserNotes(user.id);
 
-    const mondayTime = getWeekStartTime();
-    const weekEvents = activityData.events.filter((event) => {
-      const time = new Date(event.timestamp).getTime();
-      return !Number.isNaN(time) && time >= mondayTime;
-    });
-    const weekNotes = notes.filter((note) => noteTimeOf(note) >= mondayTime);
-
-    const aiUsage = weekEvents.filter((event) =>
-      [
-        "ai_summary",
-        "personalization_suggestion",
-        "region_suggestion",
-      ].includes(event.type),
-    ).length;
-    const articles = weekEvents.filter(
-      (event) => event.type === "article_open",
-    ).length;
-    const noteCount = weekNotes.length;
-    const engagementDays = buildEngagementDays(notes, activityData.events);
-    const readingStreak = computeCurrentReadingStreak(engagementDays);
-
-    const currentWeekProgress = aiUsage + articles + noteCount + readingStreak;
+    const { currentWeekProgress } = computeWeeklyProgress(
+      activityData,
+      notes,
+    );
     if (currentWeekProgress < goalTracker.weeklyGoal) return;
 
     const weekKey = getIsoWeekKey(new Date());

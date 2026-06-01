@@ -4,12 +4,20 @@ type PersonalizationSource = {
   id: string;
   name: string;
   url: string | null;
+  description?: string | null;
+  category?: string | null;
+  language?: string | null;
+  country?: string | null;
 };
 
 type NewsApiSource = {
   id?: string | null;
   name?: string | null;
   url?: string | null;
+  description?: string | null;
+  category?: string | null;
+  language?: string | null;
+  country?: string | null;
 };
 
 type NewsApiArticle = {
@@ -66,17 +74,31 @@ function addSource(
   if (!name) return;
 
   const key = sourceKey(name);
-  if (sources.has(key)) return;
+  const existing = sources.get(key);
+  const incomingDescription = cleanText(source.description);
+  const prefersIncoming = Boolean(incomingDescription);
 
   sources.set(key, {
-    id: cleanText(source.id) || key.replace(/\s+/g, "-"),
+    id: existing?.id || cleanText(source.id) || key.replace(/\s+/g, "-"),
     name,
-    url: cleanText(source.url) || null,
+    url:
+      (prefersIncoming ? cleanText(source.url) : "") ||
+      existing?.url ||
+      cleanText(source.url) ||
+      null,
+    description:
+      existing?.description || incomingDescription || null,
+    category:
+      existing?.category || cleanText(source.category) || null,
+    language:
+      existing?.language || cleanText(source.language) || null,
+    country:
+      existing?.country || cleanText(source.country) || null,
   });
 }
 
 async function fetchNewsApiOrgSources() {
-  const apiKey = process.env.NEWS_API_KEY4;
+  const apiKey = process.env.NEWS_API_KEY2 || process.env.NEWS_API_KEY4;
   if (!apiKey) return [] as PersonalizationSource[];
 
   const params = new URLSearchParams({
@@ -99,12 +121,16 @@ async function fetchNewsApiOrgSources() {
       id: cleanText(source.id),
       name: cleanText(source.name),
       url: cleanText(source.url) || null,
+      description: cleanText(source.description) || null,
+      category: cleanText(source.category) || null,
+      language: cleanText(source.language) || null,
+      country: cleanText(source.country) || null,
     }))
     .filter((source: PersonalizationSource) => source.name);
 }
 
 async function fetchNewsApiOrgHeadlineSources() {
-  const apiKey = process.env.NEWS_API_KEY4;
+  const apiKey = process.env.NEWS_API_KEY || process.env.NEWS_API_KEY4;
   if (!apiKey) return [] as PersonalizationSource[];
 
   const params = new URLSearchParams({
@@ -130,6 +156,10 @@ async function fetchNewsApiOrgHeadlineSources() {
         id: cleanText(article.source?.id) || name,
         name,
         url: cleanText(article.url) || null,
+        description: null,
+        category: null,
+        language: null,
+        country: null,
       };
     })
     .filter((source: PersonalizationSource) => source.name);
@@ -167,6 +197,10 @@ async function fetchCurrentsHeadlineSources() {
         id: name || url,
         name: name || "",
         url: url || null,
+        description: null,
+        category: null,
+        language: null,
+        country: null,
       };
     })
     .filter((source: PersonalizationSource) => source.name);

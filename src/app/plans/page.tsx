@@ -775,9 +775,9 @@ function PlansContent() {
                       {selectedPlan} selected
                     </h3>
                     <p className="leading-relaxed text-slate-600 dark:text-slate-300">
-                      Payment systems are currently in preparation. This page
-                      displays our upcoming premium features and planned
-                      offerings to help you explore available options.
+                      Your selected plan will take you to secure checkout, where
+                      you can complete activation and help support the ongoing
+                      development of NextNews.
                     </p>
                     {selectedPlanKey ? (
                       <ChoosePlan

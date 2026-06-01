@@ -145,7 +145,7 @@ export default function PersonalizationAiSuggestions({
   };
 
   return (
-    <div className="border-none bg-transparent p-0 shadow-none sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-900/85 sm:p-8 sm:shadow-sm sm:backdrop-blur">
+    <div className="border-none bg-transparent p-0 shadow-none sm:rounded-3xl sm:border sm:border-slate-200/80 sm:dark:border-slate-700/80 sm:bg-white/90 sm:dark:bg-slate-800/80 sm:p-8 sm:shadow-sm sm:backdrop-blur">
       {/* Heading — full width divider */}
       <div className="mb-4 flex items-center gap-3">
         <div className="h-px flex-1 bg-slate-300 dark:bg-slate-600" />

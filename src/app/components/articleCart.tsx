@@ -1,12 +1,13 @@
 "use client";
 
-import { Bot, Sparkles, X, ArrowUpRight, Clock, User, Share2 } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import AddNoteButton from "./addNoteButton";
 import AISummaryButton from "./aiSummaryButton";
 import { getNewsImageSrc } from "@/lib/newsImage";
 import { trackActivityEvent } from "@/lib/activityAnalytics";
 import Link from "next/link";
 import { encodeArticleId } from "@/lib/articleUtils";
+import ArticleViewsCounter from "./articleViewsCounter";
 
 interface Article {
   source: { id: string | null; name: string };
@@ -169,9 +170,19 @@ export default function ArticleCard({
         <div className="flex flex-1 flex-col p-5">
           <div
             suppressHydrationWarning
-            className="mb-3 flex items-center text-xs text-gray-500 font-medium uppercase tracking-wider"
+            className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 font-medium uppercase tracking-wider"
           >
-            {formattedDate || "Date Not Available"}
+            <span>{formattedDate || "Date Not Available"}</span>
+            <span className="h-1 w-1 rounded-full bg-gray-300" aria-hidden />
+            <ArticleViewsCounter
+              key={article.url || article.title}
+              articleKey={article.url || article.title}
+              title={article.title}
+              publishedAt={article.publishedAt}
+              compact
+              className="normal-case tracking-normal text-gray-500"
+              iconClassName="text-blue-500"
+            />
           </div>
 
           <h2 className="mb-3 text-lg font-bold text-gray-900 leading-snug line-clamp-3 group-hover:text-blue-600 transition-colors">

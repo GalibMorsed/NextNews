@@ -64,7 +64,7 @@ export default function PersonalizationRegionSelector({
 
   const mobilePages = useMemo(() => {
     const pagesList: (typeof EXPLORE_REGIONS)[] = [];
-    const itemsPerPage = 2;
+    const itemsPerPage = 4;
     for (let i = 0; i < EXPLORE_REGIONS.length; i += itemsPerPage) {
       pagesList.push(EXPLORE_REGIONS.slice(i, i + itemsPerPage));
     }
@@ -136,9 +136,9 @@ export default function PersonalizationRegionSelector({
                     return (
                       <motion.label
                         key={region.id}
-                        whileHover={{ y: -1, scale: 1.015 }}
-                        whileTap={{ scale: 0.985 }}
-                        className={`group relative flex cursor-pointer items-center justify-between gap-2 rounded-2xl border transition-all duration-300 px-3.5 py-3 shadow-sm hover:shadow-md ${
+                        whileHover={{ y: -1.5, scale: 1.018 }}
+                        whileTap={{ scale: 0.982 }}
+                        className={`group relative flex cursor-pointer items-center justify-between gap-2 rounded-[18px] border transition-all duration-300 px-3.5 py-3 shadow-sm hover:shadow-sm ${
                           isSelected
                             ? "border-purple-500 bg-purple-500/[0.06] dark:bg-purple-500/[0.12] ring-1 ring-purple-500/20"
                             : "border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900/60 hover:border-purple-300 dark:hover:border-purple-750/50"
@@ -168,20 +168,20 @@ export default function PersonalizationRegionSelector({
                         <div
                           className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
                             isSelected
-                              ? "border-purple-500 bg-purple-500 text-white shadow-[0_0_10px_rgba(168,85,247,0.3)]"
+                              ? "border-purple-500 bg-purple-500 text-white shadow-[0_0_8px_rgba(168,85,247,0.22)]"
                               : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 group-hover:border-purple-400"
                           }`}
                         >
                           <AnimatePresence>
                             {isSelected && (
                               <motion.div
-                                initial={{ scale: 0, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0, opacity: 0 }}
+                                initial={{ scale: 0, rotate: -35, opacity: 0 }}
+                                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                                exit={{ scale: 0, rotate: -35, opacity: 0 }}
                                 transition={{
                                   type: "spring",
-                                  stiffness: 500,
-                                  damping: 30,
+                                  stiffness: 450,
+                                  damping: 20,
                                 }}
                               >
                                 <Check
@@ -215,7 +215,7 @@ export default function PersonalizationRegionSelector({
                   onClick={() => scrollToMobilePage(index)}
                   className={`h-2 rounded-full transition-all duration-300 ease-out ${
                     index === activePageIndex
-                      ? "w-8 bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.45)]"
+                      ? "w-8 bg-purple-500 shadow-[0_0_6px_rgba(168,85,247,0.34)]"
                       : "w-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-350 dark:hover:bg-slate-600"
                   }`}
                   aria-label={`Go to page ${index + 1}`}
@@ -231,11 +231,11 @@ export default function PersonalizationRegionSelector({
             return (
               <motion.label
                 key={region.id}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                className={`group relative flex cursor-pointer items-center gap-3 rounded-2xl border p-4 transition-all duration-300 shadow-sm hover:shadow-md ${
+                whileHover={{ y: -1.5, scale: 1.018 }}
+                whileTap={{ scale: 0.982 }}
+                className={`group relative flex cursor-pointer items-center justify-between gap-3 rounded-[18px] border p-4 transition-all duration-300 shadow-sm hover:shadow-sm ${
                   isSelected
-                    ? "border-purple-500 bg-purple-500/[0.08] dark:bg-purple-500/[0.12] ring-1 ring-purple-500/20"
+                    ? "border-purple-500 bg-purple-500/[0.06] dark:bg-purple-500/[0.12] ring-1 ring-purple-500/20"
                     : "border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 hover:border-purple-300 dark:hover:border-purple-700/50"
                 }`}
               >
@@ -245,27 +245,7 @@ export default function PersonalizationRegionSelector({
                   checked={isSelected}
                   onChange={() => onToggleRegion(region.id)}
                 />
-                <div
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
-                    isSelected
-                      ? "border-purple-500 bg-purple-500"
-                      : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 group-hover:border-purple-400"
-                  }`}
-                >
-                  <AnimatePresence>
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                      >
-                        <Check className="h-3.5 w-3.5 stroke-[3.5] text-white" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <div className="flex flex-1 items-center gap-3 overflow-hidden">
+                <div className="flex items-center gap-3 min-w-0">
                   <RegionFlag id={region.id} label={region.label} />
                   <span
                     className={`truncate text-sm font-semibold transition-colors ${
@@ -277,6 +257,31 @@ export default function PersonalizationRegionSelector({
                     {region.label}
                   </span>
                 </div>
+
+                <div
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                    isSelected
+                      ? "border-purple-500 bg-purple-500 text-white shadow-[0_0_8px_rgba(168,85,247,0.22)]"
+                      : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800 group-hover:border-purple-400"
+                  }`}
+                >
+                  <AnimatePresence>
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0, rotate: -35, opacity: 0 }}
+                        animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                        exit={{ scale: 0, rotate: -35, opacity: 0 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 450,
+                          damping: 20,
+                        }}
+                      >
+                        <Check className="h-3.5 w-3.5 stroke-[3.5] text-white" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </motion.label>
             );
           })}
@@ -285,21 +290,25 @@ export default function PersonalizationRegionSelector({
 
       <div className="mt-5 flex justify-center gap-4">
         {!showAll && EXPLORE_REGIONS.length > 4 && !isMobile && (
-          <button
+          <motion.button
             type="button"
             onClick={() => setShowAll(true)}
-            className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:border-[var(--primary)] hover:text-[var(--primary)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="rounded-[18px] border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:border-[var(--primary)] hover:text-[var(--primary)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
           >
             See more options
-          </button>
+          </motion.button>
         )}
-        <button
+        <motion.button
           type="button"
           onClick={handleExplore}
-          className="group flex items-center gap-2 rounded-2xl bg-indigo-50 px-6 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm transition-all hover:scale-[1.02] hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="group flex items-center gap-2 rounded-[18px] bg-indigo-50 px-6 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm transition-all hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20"
         >
            Go Explore
-        </button>
+        </motion.button>
       </div>
     </>
   );

@@ -78,6 +78,8 @@ export const AVAILABLE_PERSONALIZATION_TOPICS = [
   "Law & Justice",
   "Social Media",
   "Personal Finance",
+  "Public Infrastructure",
+  "Philanthropy & NGOs",
 ] as const;
 
 export const DEFAULT_PERSONALIZATION_TOPICS = [
@@ -343,6 +345,18 @@ export const PERSONALIZATION_TOPIC_METADATA: Record<
     color: "text-green-600 dark:text-green-400",
     bgColor: "bg-green-50/50",
     darkBgColor: "dark:bg-green-950/20",
+  },
+  "Public Infrastructure": {
+    icon: Home,
+    color: "text-slate-600 dark:text-slate-400",
+    bgColor: "bg-slate-50",
+    darkBgColor: "dark:bg-slate-900/40",
+  },
+  "Philanthropy & NGOs": {
+    icon: Heart,
+    color: "text-rose-600 dark:text-rose-400",
+    bgColor: "bg-rose-50/50",
+    darkBgColor: "dark:bg-rose-950/20",
   },
 };
 

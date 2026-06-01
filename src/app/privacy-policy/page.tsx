@@ -53,8 +53,8 @@ const policySections: PolicySection[] = [
     title: "Scope of This Policy",
     icon: ShieldCheck,
     paragraphs: [
-      "This Privacy Policy explains how NextNews collects, stores, uses, protects, and manages information when a person visits the app, creates an account, reads articles, uses personalization, generates AI features, saves notes, adjusts settings, interacts with support, or activates plan-related features across the current Free, Pro, and Pro+ billing configurations.",
-      "This page is intended to be production-facing. It covers active production features, including domain launch, Dodo Payments checkout, subscription plans, and API credit-based access for news and AI usage.",
+      "This Privacy Policy explains how NextNews collects, stores, uses, protects, and manages information when a person visits the app, creates an account, reads articles, uses personalization, generates AI features, saves notes, adjusts settings, interacts with support, or activates plan-related features.",
+      "This page is intended to be production-facing. It covers active production features, including domain launch, payment integration, subscription plans, and API credit-based access for news and AI usage.",
     ],
     bullets: [
       "This policy applies to public browsing, authenticated use, personalization, saved notes, AI tools, settings, support, and paid plan services.",
@@ -66,13 +66,14 @@ const policySections: PolicySection[] = [
     title: "Information We Collect",
     icon: Database,
     paragraphs: [
-      "NextNews collects account details, session tokens, personalization preferences, bookmark activity, saved notes, custom settings, and plan-related billing information to operate the application and improve the reading experience.",
-      "Data is stored securely in our databases, processed through integrated service providers, or cached locally inside the user's browser to preserve session state and performance.",
+      "NextNews collects account details, session tokens, personalization preferences, article activity, saved notes, appearance settings, support details, and plan-related billing information to operate the application and improve the reading experience.",
+      "Data may be stored in Supabase database tables, processed through integrated service providers, or cached locally inside the user's browser to preserve session state, product preferences, and performance.",
     ],
     bullets: [
       "Account data includes your email address, profile name, authentication identifiers, and user settings.",
-      "Personalization data captures selected topic filters, feed preferences, and accepted suggestions.",
-      "Reader activity indexes article logs, summaries created, and client diagnostic metrics.",
+      "Personalization data captures selected sources, topics, regions, feed preferences, and accepted suggestions.",
+      "Reader activity can include article-open counts, AI summary usage, personalization usage, category visit duration, weekly goal state, and reading streak progress.",
+      "Support submissions may include name, email, issue type, optional contact number, submission timestamp, and anti-spam metadata.",
     ],
     categories: ["account", "privacy-policies"],
   },
@@ -147,12 +148,13 @@ const policySections: PolicySection[] = [
     title: "Permanent Account Deletion",
     icon: UserRound,
     paragraphs: [
-      "If you no longer wish to use NextNews, you can request permanent deletion of your account. This action can be triggered inside your account settings and requires password or security token confirmation.",
-      "Upon deletion, your account record, profile metadata, saved notes, custom topic lists, and session keys are deleted from our database tables.",
+      "If you no longer wish to use NextNews, you can request permanent deletion of your account. This action can be triggered inside account settings and requires an authenticated session plus explicit DELETE confirmation.",
+      "The current deletion workflow removes the Supabase authentication user, saved notes, and stored Terms acceptance records tied to the account. Some related operational, subscription, support, activity, or provider records may require separate handling where retention is needed for security, billing, legal, or support reasons.",
     ],
     bullets: [
-      "Deletion wipes linked personal database rows across Supabase tables.",
-      "Certain billing records are retained separately for tax, auditing, and compliance purposes.",
+      "Deletion requests are rate-limited to reduce abuse and accidental repeated submissions.",
+      "Local browser settings, cached plan labels, and appearance preferences may also need to be cleared from the device by logging out, clearing browser storage, or using product controls where available.",
+      "Certain billing, webhook, support, or audit records may be retained separately for tax, fraud-prevention, dispute, security, or compliance purposes.",
     ],
     categories: ["account", "login-signup"],
   },
@@ -167,6 +169,8 @@ const policySections: PolicySection[] = [
       "Supabase handles secure database functions and user authentication.",
       "Dodo Payments manages credit card processing and billing ledger entries.",
       "OpenRouter processes anonymous content prompts to generate summaries.",
+      "Google Sheets may store support or complaint submissions submitted through the support route.",
+      "Currents API, Dailymotion, YouTube, and original publishers provide external news, image, video, or stream content.",
     ],
     categories: ["privacy-policies", "account"],
   },
@@ -216,14 +220,14 @@ const policySections: PolicySection[] = [
     title: "Monetization and Subscriptions",
     icon: CreditCard,
     paragraphs: [
-      "NextNews operates on a freemium model with a Free plan and paid Pro and Pro+ plans available on monthly or yearly billing cycles. We record and utilize your selected plan status to gate access to premium features, AI usage, and advanced search configurations.",
-      "Subscription tiers determine your News and AI credit allocations, including the Free plan's 600 API call credits for 16 days, Pro's 8,000 monthly credits or 200,000 yearly credits, and Pro+'s 45,000 monthly credits or unlimited yearly credits.",
+      "NextNews operates on a freemium model offering Free, Pro, and Pro+ access. We record and use selected plan status, billing cycle, provider identifiers, product identifiers, current period dates, credit limits, and entitlement metadata to gate premium features, AI usage, and advanced discovery features.",
+      "Subscription tiers determine API credit allowances and feature access. The active codebase defines Free access as a limited 16-day credit window, Pro monthly and yearly credit pools, Pro+ monthly credits, and Pro+ yearly unlimited API credit access.",
     ],
     bullets: [
-      "Free tier: standard feed access, default topic categories.",
-      "Free tier access is time-limited and subject to the configured free-plan cooldown if the allowance is exhausted.",
-      "Pro tier: full feed access, basic AI summaries, standard credit limits.",
-      "Pro+ tier: priority live streams, expanded AI access, and advanced personalization.",
+      "Free tier: 600 API call credits for 16 days where available, followed by plan-specific access controls and cooldown logic.",
+      "Pro tier: 8,000 monthly credits or 200,000 yearly credits.",
+      "Pro+ tier: 45,000 monthly credits or unlimited yearly API credits.",
+      "Plan labels and expiry dates may also be cached locally to keep the UI responsive.",
     ],
     categories: ["billing", "events-plan"],
   },
@@ -245,14 +249,14 @@ const policySections: PolicySection[] = [
     title: "API Service Credits",
     icon: CreditCard,
     paragraphs: [
-      "Free, Pro, and Pro+ plans are allocated credits to query third-party APIs (including NewsAPI search calls and OpenRouter AI summary generations). These credits represent digital entitlements.",
-      "Credits are allocated at the beginning of each billing cycle, reset automatically on your subscription renewal date, and the free plan's access window and cooldown are enforced according to the configured plan rules.",
+      "Plan credits are used to control access to product actions such as news API requests, AI summaries, personalization suggestions, region suggestions, article opens, and other weighted usage events. These credits are digital service entitlements only.",
+      "Credit calculations may use weighted usage. For example, AI summaries and article opens can count differently from personalization or region suggestions depending on the feature being used.",
     ],
     bullets: [
       "API credits have zero cash value and are non-transferable.",
       "Credit logs track historical consumption metrics to prevent abuse.",
       "Unused credits do not roll over to the next billing cycle.",
-      "The Free plan currently provides 600 API call credits for 16 days and uses a 30-day cooldown after exhaustion before reuse.",
+      "Free users may be subject to stepped limits and cooldown windows before additional free usage becomes available.",
     ],
     categories: ["billing", "events-plan"],
   },
@@ -329,15 +333,31 @@ const policySections: PolicySection[] = [
     title: "Reader Activity Analytics",
     icon: NotebookPen,
     paragraphs: [
-      "The application logs client-side event metadata, including read counts, summarization actions, and topic visits, to feed the 'My Activity' dashboard.",
-      "This tracking runs locally using browser cookies or LocalStorage. It helps you see your top topics, category split, and reading milestones.",
+      "The application logs account-linked activity metadata, including article-open events, AI summary usage, personalization suggestions, region suggestions, category visits, duration estimates, weekly goal progress, notes-linked progress, and reading streaks to power the My Activity dashboard.",
+      "Activity data is stored in Supabase when the user is authenticated. It helps show reading milestones, weekly progress, AI usage, and engagement totals, and it also supports free-plan usage limits and cooldown behavior.",
     ],
     bullets: [
       "Analytics dashboards aggregate read counts and summarization frequencies.",
-      "Data is stored inside your browser under your profile key.",
-      "Clearing browser storage resets your local activity dashboard.",
+      "Recent activity history is capped to limit stored event volume.",
+      "Activity rows may include account email, account ID, timestamps, source names, categories, article metadata, and engagement scores.",
+      "Clearing browser storage may remove local UI caches but does not necessarily delete activity already saved in Supabase.",
     ],
     categories: ["feature"],
+  },
+  {
+    title: "Article Views Counter",
+    icon: Eye,
+    paragraphs: [
+      "Article cards and article detail pages may display a live-looking Views count next to the date and reading metadata. In the current implementation, this count is generated in the browser from the article URL, title, and published date, then incremented visually for product presentation.",
+      "This Views display is not currently fetched from a server-side analytics table and should not be interpreted as a verified, publisher-reported, or platform-wide real-time audience measurement.",
+    ],
+    bullets: [
+      "The counter is deterministic for each article so a story starts from a stable-looking baseline.",
+      "The visible number can animate in decimal steps such as 15.6K, 15.7K, and 15.8K.",
+      "The animation respects reduced-motion preferences and blinks only when the displayed value changes.",
+      "Future releases may replace the simulated display with authenticated, aggregated server-side view analytics.",
+    ],
+    categories: ["feature", "privacy-policies"],
   },
   {
     title: "AI Summaries and Explanations",
@@ -357,15 +377,30 @@ const policySections: PolicySection[] = [
     title: "News Explore and Live Discovery",
     icon: Radio,
     paragraphs: [
-      "NextNews relies on external API aggregators (like NewsAPI) and streaming APIs (such as YouTube Live and Dailymotion) to retrieve fresh articles and videos.",
-      "Searches, category choices, and region parameters are sent to external provider endpoints to retrieve relevant headlines.",
+      "NextNews relies on external news and media providers such as Currents API, original article publishers, YouTube, and Dailymotion to retrieve fresh articles, metadata, images, videos, and live stream search results.",
+      "Searches, category choices, country selections, region parameters, article URLs, and normalized video queries may be sent to external provider endpoints to retrieve relevant headlines, article text, thumbnails, embeds, or live videos.",
     ],
     bullets: [
       "Live-stream videos and headlines belong to respective publishers.",
       "Users are responsible for copyright compliance when referencing articles.",
-      "Search queries are processed dynamically without storing history on the server.",
+      "Article pages may fetch original publisher URLs server-side to extract readable title, image, source, publish time, and article text.",
+      "Remote news images may be retrieved through an image proxy so the app can show publisher images with fallback handling.",
     ],
     categories: ["feature"],
+  },
+  {
+    title: "Support, Complaints, and Contact Forms",
+    icon: HeadphonesIcon,
+    paragraphs: [
+      "When you submit a support or complaint form, NextNews collects the details you provide so the support team can understand and respond to the issue. This can include name, email address, issue subject, optional contact number, submission timestamp, and technical anti-spam signals.",
+      "Support submissions are validated, rate-limited, screened for automated bot behavior, and may be appended to a Google Sheets spreadsheet used for support operations.",
+    ],
+    bullets: [
+      "A hidden website field and minimum form-fill timing are used to reduce spam submissions.",
+      "IP address and user-agent-derived identifiers may be used for short-term support form rate limiting.",
+      "Do not include passwords, payment card numbers, government IDs, or highly sensitive personal information in support messages.",
+    ],
+    categories: ["account", "privacy-policies"],
   },
   {
     title: "Video Shorts Integration",
@@ -402,9 +437,10 @@ const policySections: PolicySection[] = [
       "Data retention may vary by feature. Some data remains until the user updates or deletes it, some remains while the account is active, some may be kept for limited operational or legal reasons, and some browser-stored state may persist until cleared by the user or replaced by newer values.",
     ],
     bullets: [
-      "Notes and saved personalization may remain available until the user edits, clears, or deletes them, or until account deletion occurs.",
+      "Notes and saved personalization may remain available until the user edits, clears, deletes them, or requests applicable deletion.",
       "Session-related data may remain in browser storage and cookies until logout, expiration, invalidation, or manual clearing.",
-      "Local analytics may remain in the browser until overwritten, removed, or cleared by the user.",
+      "Activity analytics may remain in Supabase until overwritten, deleted, or handled through account or privacy request workflows.",
+      "Support records may remain in operational support tools for as long as needed to investigate, resolve, audit, or defend against abuse.",
       "Server-side request protection may include rate limiting and token verification for sensitive AI and account operations.",
     ],
     categories: ["privacy-policies"],
@@ -480,21 +516,49 @@ function HighlightText({ text, query }: { text: string; query: string }) {
   if (!query || !query.trim()) return <>{text}</>;
 
   const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const parts = text.split(new RegExp(`(${escapedQuery})`, "gi"));
+  const matcher = new RegExp(escapedQuery, "gi");
+  const parts: { text: string; matches: boolean; start: number }[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = matcher.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({
+        text: text.slice(lastIndex, match.index),
+        matches: false,
+        start: lastIndex,
+      });
+    }
+
+    parts.push({
+      text: match[0],
+      matches: true,
+      start: match.index,
+    });
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push({
+      text: text.slice(lastIndex),
+      matches: false,
+      start: lastIndex,
+    });
+  }
 
   return (
     <>
-      {parts.map((part, index) => {
-        const matches = part.toLowerCase() === query.toLowerCase();
-        return matches ? (
+      {parts.map((part) => {
+        return part.matches ? (
           <mark
-            key={index}
-            className="bg-sky-100 text-sky-950 dark:bg-sky-950/80 dark:text-sky-100 rounded-[2px] px-0.5"
+            key={`match-${part.start}`}
+            className="bg-[#bae6fd] text-[#0369a1] dark:bg-[#0284c7]/40 dark:text-[#e0f2fe] rounded-[2px] px-0.5"
           >
-            {part}
+            {part.text}
           </mark>
         ) : (
-          part
+          <span key={`text-${part.start}`}>{part.text}</span>
         );
       })}
     </>
@@ -544,7 +608,7 @@ export default function PrivacyPolicyPage() {
       className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.08),transparent_28%),linear-gradient(to_bottom,#f8fafc,#ffffff_24%,#f8fafc)] px-4 py-8 dark:bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.10),transparent_24%),linear-gradient(to_bottom,#020617,#0f172a_36%,#020617)] sm:px-6 lg:px-8"
     >
       <div className="mx-auto max-w-6xl space-y-12">
-        <section className="overflow-hidden rounded-[20px] border border-slate-200 bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:border-slate-800 dark:bg-slate-900/90 sm:p-8 lg:p-10">
+        <section className="overflow-hidden rounded-[20px] border border-[#e2e8f0] bg-[#ffffff] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:border-[#1e293b] dark:bg-[#0f172a]/90 sm:p-8 lg:p-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-4xl">
               <div className="inline-flex items-center gap-1.5 rounded-md border border-sky-100 bg-sky-50/50 px-2.5 py-1 text-xs font-medium tracking-wide text-sky-700 dark:border-sky-950 dark:bg-sky-950/30 dark:text-sky-300">
@@ -552,25 +616,24 @@ export default function PrivacyPolicyPage() {
                 PRIVACY POLICY
               </div>
 
-              <h1 className="mt-4 text-3xl font-extrabold tracking-tight leading-tight text-slate-900 dark:text-slate-100 sm:text-4xl lg:text-4xl">
-                NextNews Privacy Policy and Data Use Overview
+              <h1 className="mt-4 text-3xl font-extrabold tracking-tight leading-tight text-[#0f172a] dark:text-[#f8fafc] sm:text-4xl lg:text-4xl">
+                NextNews Privacy Policy Overview
               </h1>
 
               <p className="mt-2 text-xs font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">
-                Last updated: May, 2026
+                Last updated: June, 2026
               </p>
 
-              <p className="mt-5 max-w-4xl text-sm leading-7 text-slate-600 dark:text-slate-300 sm:text-base">
-                NextNews is a news-reading and discovery platform that combines
-                headline browsing, category navigation, live-news discovery,
-                personalization, AI-powered assistance, notes, settings, support
-                tools, and active subscription capabilities. This policy
-                explains how those product areas interact with user information
-                and how NextNews approaches privacy in its production
-                environment.
+              <p className="mt-5 max-w-4xl text-sm leading-7 text-[#475569] dark:text-[#cbd5e1] sm:text-base">
+                NextNews is a platform for reading and discovering news. It
+                offers headline browsing, category navigation, live updates,
+                personalization, AI assistance, notes, settings, support tools,
+                and subscription features. This policy explains how these areas
+                use your information and how NextNews protects privacy in its
+                production environment.
               </p>
 
-              <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 text-xs text-[#64748b] dark:text-[#cbd5e1]">
                 <span className="flex items-center gap-1.5">
                   <HeadphonesIcon className="h-3.5 w-3.5" />
                   Privacy contact: nextnews.co.in@gmail.com
@@ -579,21 +642,20 @@ export default function PrivacyPolicyPage() {
                   |
                 </span>
                 <span>
-                  Production-facing policy reference for active systems &amp;
-                  monetization features.
+                  Policy reference for active systems and monetization.
                 </span>
               </div>
 
-              <div className="mt-6 rounded-[14px] border border-amber-200/50 bg-amber-50/30 px-5 py-4 dark:border-amber-950/20 dark:bg-amber-950/10">
+              <div className="mt-6 rounded-[14px] border border-amber-200/50 bg-amber-50/35 px-5 py-4 dark:border-amber-900/30 dark:bg-amber-950/20">
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded bg-amber-500/10 text-amber-700 dark:text-amber-400">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded bg-amber-500/10 text-[#b45309] dark:text-amber-400">
                     <FileText className="h-3.5 w-3.5" />
                   </span>
-                  <p className="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#b45309] dark:text-[#f59e0b]">
                     Important Notice
                   </p>
                 </div>
-                <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                <p className="mt-2 text-sm leading-relaxed text-[#334155] dark:text-[#cbd5e1]">
                   Account registration and use of authenticated NextNews
                   services are subject to acceptance of the platform&apos;s
                   governing terms, conditions, privacy practices, plan rules,
@@ -602,7 +664,7 @@ export default function PrivacyPolicyPage() {
                 <div className="mt-3 border-t border-amber-200/40 pt-3 dark:border-amber-800/20">
                   <Link
                     href="/terms-and-conditions"
-                    className="group inline-flex items-center gap-2 text-xs font-bold text-amber-700 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 transition-colors duration-200"
+                    className="group inline-flex items-center gap-2 text-xs font-bold text-[#b45309] hover:text-[#92400e] dark:text-amber-400 dark:hover:text-amber-305 transition-colors duration-200"
                   >
                     Read our Terms &amp; Conditions
                     <ArrowRight className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -615,7 +677,10 @@ export default function PrivacyPolicyPage() {
 
         {/* Search Bar section */}
         <section className="flex flex-col items-center py-4">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl text-center">
+          <h2
+            style={{ fontFamily: "cursive" }}
+            className="text-2xl font-bold tracking-tight text-[#000000] dark:text-[#ffffff] sm:text-3xl text-center"
+          >
             Hi, how can we help?
           </h2>
 
@@ -631,7 +696,7 @@ export default function PrivacyPolicyPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for articles..."
-              className="block w-full rounded-[14px] border border-slate-200/80 bg-white/90 py-2.5 pl-10 pr-10 text-sm text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-300/80 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-700/80 dark:bg-slate-900/60 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-600/80 dark:focus:border-sky-500 dark:focus:ring-sky-500/20"
+              className="block w-full rounded-[14px] border border-slate-200/80 bg-white/90 py-2.5 pl-10 pr-10 text-sm text-[#0f172a] shadow-sm outline-none transition-all placeholder:text-slate-400 hover:border-slate-300/80 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-700/80 dark:bg-slate-900/60 dark:text-[#f8fafc] dark:placeholder:text-slate-500 dark:hover:border-slate-600/80 dark:focus:border-sky-500 dark:focus:ring-sky-500/20"
             />
             {searchQuery && (
               <button
@@ -656,7 +721,7 @@ export default function PrivacyPolicyPage() {
                 onClick={() => setSelectedCategory(isSelected ? null : item.id)}
                 className={`group flex flex-col items-center justify-between rounded-[20px] sm:rounded-[24px] border p-4 sm:p-6 text-center shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer ${
                   isSelected
-                    ? "border-sky-500 bg-sky-50/20 text-sky-950 dark:border-sky-500/80 dark:bg-sky-950/20 dark:text-sky-100 shadow-sky-100/50 dark:shadow-none"
+                    ? "border-sky-500 bg-sky-50/20 text-sky-955 dark:border-sky-500/80 dark:bg-sky-950/20 dark:text-sky-100 shadow-sky-100/50 dark:shadow-none"
                     : "border-slate-200/80 bg-white/92 hover:border-sky-200 dark:border-slate-700/80 dark:bg-slate-900/88 dark:hover:border-sky-900/60"
                 }`}
               >
@@ -664,7 +729,7 @@ export default function PrivacyPolicyPage() {
                   className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl transition-colors duration-300 ${
                     isSelected
                       ? "text-sky-600 dark:text-sky-400"
-                      : "text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400"
+                      : "text-[#0f172a] dark:text-[#f8fafc] group-hover:text-sky-600 dark:group-hover:text-sky-400"
                   }`}
                 >
                   <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.5} />
@@ -674,7 +739,7 @@ export default function PrivacyPolicyPage() {
                   className={`mt-3 sm:mt-4 text-sm sm:text-base md:text-lg font-semibold transition-colors duration-300 ${
                     isSelected
                       ? "text-sky-600 dark:text-sky-400"
-                      : "text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400"
+                      : "text-[#0f172a] dark:text-[#f8fafc] group-hover:text-sky-600 dark:group-hover:text-sky-400"
                   }`}
                 >
                   {item.title}
@@ -695,14 +760,14 @@ export default function PrivacyPolicyPage() {
         {/* Results Info Bar */}
         {(selectedCategory || searchQuery) && (
           <div className="flex flex-row items-center justify-between gap-4 rounded-[14px] border border-slate-200 bg-slate-50/60 p-3 sm:px-5 backdrop-blur dark:border-slate-800 dark:bg-slate-900/60 shadow-sm">
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-450">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#475569] dark:text-[#cbd5e1] font-sans">
               <Filter
                 className="h-4 w-4 text-sky-600 dark:text-sky-400 shrink-0"
                 strokeWidth={2}
               />
               <span>
                 Found{" "}
-                <span className="font-bold text-slate-900 dark:text-slate-100">
+                <span className="font-bold text-[#0f172a] dark:text-[#f8fafc]">
                   {filteredSections.length}
                 </span>{" "}
                 {filteredSections.length === 1 ? "article" : "articles"}{" "}
@@ -757,15 +822,15 @@ export default function PrivacyPolicyPage() {
                     duration: 0.38,
                     delay: Math.min(index * 0.03, 0.3),
                   }}
-                  className="group rounded-[28px] border border-slate-200/80 bg-white/92 p-6 shadow-sm hover:border-sky-200 dark:border-slate-700/80 dark:bg-slate-900/88 dark:hover:border-sky-900/60 hover:-translate-y-1 hover:shadow-md transition-all duration-300 sm:p-8"
+                  className="group rounded-[28px] border border-[#e2e8f0]/85 bg-[#ffffff]/92 p-6 shadow-sm hover:border-[#bae6fd] dark:border-[#334155]/85 dark:bg-[#1e293b]/92 dark:hover:border-[#0284c7]/40 hover:-translate-y-1 hover:shadow-md transition-all duration-300 sm:p-8"
                 >
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 group-hover:bg-sky-100 group-hover:text-sky-800 dark:bg-sky-950/40 dark:text-sky-400 dark:group-hover:bg-sky-900/40 dark:group-hover:text-sky-300 transition-colors duration-300">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 group-hover:bg-sky-105 group-hover:text-sky-800 dark:bg-sky-950/40 dark:text-sky-400 dark:group-hover:bg-sky-900/40 dark:group-hover:text-sky-300 transition-colors duration-300">
                       <Icon className="h-6 w-6" strokeWidth={1.5} />
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-300">
+                      <h2 className="text-2xl font-semibold tracking-tight text-[#0f172a] dark:text-[#f8fafc] group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-300">
                         <HighlightText
                           text={section.title}
                           query={searchQuery}
@@ -776,7 +841,7 @@ export default function PrivacyPolicyPage() {
                         {section.paragraphs.map((paragraph, pIdx) => (
                           <p
                             key={pIdx}
-                            className="text-sm leading-7 text-slate-600 dark:text-slate-300 sm:text-[15px]"
+                            className="text-sm leading-7 text-[#475569] dark:text-[#cbd5e1] sm:text-[15px]"
                           >
                             <HighlightText
                               text={paragraph}
@@ -791,10 +856,10 @@ export default function PrivacyPolicyPage() {
                           {section.bullets.map((bullet, bIdx) => (
                             <div
                               key={bIdx}
-                              className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/30 px-4 py-3"
+                              className="flex items-start gap-3 rounded-2xl border border-[#f1f5f9] bg-[#f8fafc]/50 dark:border-[#334155]/50 dark:bg-[#0f172a]/30 px-4 py-3"
                             >
                               <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-500 dark:bg-sky-400" />
-                              <p className="text-sm leading-6 text-slate-700 dark:text-slate-200">
+                              <p className="text-sm leading-6 text-[#334155] dark:text-[#cbd5e1]">
                                 <HighlightText
                                   text={bullet}
                                   query={searchQuery}

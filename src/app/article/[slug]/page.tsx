@@ -1,6 +1,7 @@
 import { decodeArticleId } from "@/lib/articleUtils";
 import { extractArticleContent } from "@/lib/articleParser";
 import AddNoteButton from "@/app/components/addNoteButton";
+import ArticleViewsCounter from "@/app/components/articleViewsCounter";
 import ListenToDescriptionButton from "@/app/article/[slug]/component/listenToDescriptionButton";
 import Topbar from "@/app/article/[slug]/component/topbar";
 import SourceLogo from "@/app/components/sourceLogo";
@@ -214,6 +215,14 @@ export default async function ArticlePage({ params }: PageProps) {
               <Clock size={14} />
               <span>{readTime} min read</span>
             </div>
+            <ArticleViewsCounter
+              key={url}
+              articleKey={url}
+              title={articleTitle}
+              publishedAt={articlePublishedAt}
+              className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm text-emerald-700 ring-1 ring-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-300 dark:ring-emerald-900/60"
+              iconClassName="text-emerald-600 dark:text-emerald-300"
+            />
           </div>
 
           {/* Title */}

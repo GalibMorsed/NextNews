@@ -16,7 +16,8 @@
   --foreground: #0f172a; /* slate-900 */
   --card: #ffffff;
   --border: #e2e8f0; /* slate-200 */
-  --muted: #64748b; /* slate-500 */
+  --muted: #64748b; /* slate-50 */
+  --navbar-bg: rgba(255, 255, 255, 0.72);
 
   /* Primary (Indigo 600) & Secondary (Violet 600) - Corporate Trust */
   --primary: #4f46e5;
@@ -221,6 +222,7 @@
   --card: #1e293b; /* slate-800 */
   --border: #334155; /* slate-700 */
   --muted: #94a3b8; /* slate-400 */
+  --navbar-bg: rgba(15, 23, 42, 0.72);
 }
 
 /* Global dark-mode bridge for pages still using static Tailwind colors */
@@ -297,6 +299,7 @@
   --card: #ffffff;
   --border: #000000;
   --muted: #333333;
+  --navbar-bg: #ffffff;
 }
 
 .high-contrast.dark {
@@ -305,6 +308,12 @@
   --card: #000000;
   --border: #ffffff;
   --muted: #cccccc;
+  --navbar-bg: #1e293b;
+}
+
+.high-contrast nav,
+.high-contrast .border-b {
+  border-color: var(--border) !important;
 }
 
 /* Respect user's reduced motion preference */

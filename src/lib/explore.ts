@@ -170,13 +170,6 @@ export const EXPLORE_REGIONS: ExploreRegionConfig[] = [
     searchContext: "China news",
   },
   {
-    id: "russia",
-    label: "Russia & Central Asia",
-    chipLabel: "Russia & CA",
-    topicQuery: "(Russia OR Moscow OR Putin OR Central Asia OR Kazakhstan OR Uzbekistan)",
-    searchContext: "Russia and Central Asia news",
-  },
-  {
     id: "japan",
     label: "Japan",
     chipLabel: "Japan",
@@ -196,6 +189,13 @@ export const EXPLORE_REGIONS: ExploreRegionConfig[] = [
     chipLabel: "Oceania",
     topicQuery: "(Oceania OR Australia OR New Zealand OR Pacific Islands)",
     searchContext: "Oceania news",
+  },
+  {
+    id: "russia",
+    label: "Russia & Central Asia",
+    chipLabel: "Russia & CA",
+    topicQuery: "(Russia OR Moscow OR Putin OR Central Asia OR Kazakhstan OR Uzbekistan)",
+    searchContext: "Russia and Central Asia news",
   },
   {
     id: "southeast-asia",

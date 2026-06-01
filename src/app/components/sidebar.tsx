@@ -32,11 +32,10 @@ import {
   getUserPersonalization,
 } from "../services/personalizationService";
 import {
-  readActivityAnalytics,
   readGoalTrackerState,
+  readWeeklyGoalProgress,
   ACTIVITY_DATA_EVENT,
   GOAL_TRACKER_EVENT,
-  type ActivityAnalytics,
 } from "@/lib/activityAnalytics";
 import {
   ACCOUNT_SETTINGS_EVENT,
@@ -555,7 +554,7 @@ export default function Sidebar({
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl md:hidden flex flex-col"
+              className="fixed inset-y-0 left-0 z-50 w-[calc(100vw-64px)] sm:w-80 bg-white shadow-xl md:hidden flex flex-col"
               style={{ backgroundColor: "var(--card)" }}
             >
               {mobileContent}
@@ -651,34 +650,11 @@ function SidebarContent({
       }
 
       // Load Analytics & Goal
-      const analytics = await readActivityAnalytics();
       const goalState = await readGoalTrackerState();
-
-      // Calculate Weekly Progress
-      const now = new Date();
-      const day = now.getDay();
-      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-      const monday = new Date(now.setDate(diff));
-      monday.setHours(0, 0, 0, 0);
-      const mondayTime = monday.getTime();
-
-      const weekEvents = (analytics.events || []).filter(
-        (e) => new Date(e.timestamp).getTime() >= mondayTime,
-      );
-
-      const aiUsage = weekEvents.filter((e) =>
-        [
-          "ai_summary",
-          "personalization_suggestion",
-          "region_suggestion",
-        ].includes(e.type),
-      ).length;
-      const articles = weekEvents.filter(
-        (e) => e.type === "article_open",
-      ).length;
+      const weeklyProgress = await readWeeklyGoalProgress();
 
       setRealGoal({
-        current: aiUsage + articles,
+        current: weeklyProgress.currentWeekProgress,
         target: goalState.weeklyGoal || 15,
       });
     };
@@ -704,10 +680,10 @@ function SidebarContent({
     }, 150);
   };
   const navItemClass = (active: boolean) =>
-    `group flex items-center ${isDesktopCollapsed ? "justify-center px-0 w-12 h-12 mx-auto" : "gap-3 px-4 py-2"} transition-all duration-300 text-sm font-medium ${
+    `group flex items-center ${isDesktopCollapsed ? "justify-center px-0 w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-2"} transition-all duration-300 text-sm font-medium ${
       active
-        ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
-        : "rounded-xl text-gray-700 hover:bg-gray-100 hover:text-[var(--primary)] dark:text-slate-300 dark:hover:bg-slate-800"
+        ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+        : "rounded-none text-gray-700 hover:bg-gray-100 hover:text-[var(--primary)] dark:text-slate-300 dark:hover:bg-slate-800"
     }`;
 
   const selectedTopicLabels = selectedTopics
@@ -770,7 +746,7 @@ function SidebarContent({
   return (
     <>
       <div
-        className={`flex-1 overflow-y-auto sidebar-scrollbar ${isDesktopCollapsed ? "p-3 overflow-x-hidden" : "p-6"}`}
+        className={`flex-1 overflow-y-auto sidebar-scrollbar ${isDesktopCollapsed ? "p-3 overflow-x-hidden" : "py-6 px-2.5"}`}
       >
         <div
           className={`flex items-center ${isDesktopCollapsed ? "flex-col gap-4" : "gap-3"} mb-8`}
@@ -778,22 +754,24 @@ function SidebarContent({
           {/* Header Action Row Removed */}
 
           {isMobile ? (
-            <motion.h2
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{
-                type: "spring",
-                stiffness: 600,
-                damping: 12,
-                bounce: 0.4,
-                duration: 0.4,
-              }}
-              className="text-3xl font-bold italic tracking-tight bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent cursor-default overflow-hidden whitespace-nowrap drop-shadow-sm"
-              style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
-            >
-              NextSpace
-            </motion.h2>
+            <div className="w-[80%] mx-auto flex justify-center text-center">
+              <motion.h2
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.05 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 600,
+                  damping: 12,
+                  bounce: 0.4,
+                  duration: 0.4,
+                }}
+                className="text-3xl font-bold italic tracking-tight bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent cursor-default overflow-hidden whitespace-nowrap drop-shadow-sm text-center w-full"
+                style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
+              >
+                NextSpace
+              </motion.h2>
+            </div>
           ) : (
             <>
               {!isDesktopCollapsed ? (
@@ -813,7 +791,7 @@ function SidebarContent({
                     />
                     <div className="absolute right-3.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded border border-slate-200 bg-white text-[10px] font-bold text-slate-400 shadow-sm pointer-events-none group-focus-within:opacity-0 transition-opacity dark:bg-slate-800 dark:border-slate-700/80 dark:text-slate-500">
                       <span className="text-[12px] leading-none mt-0.5">⌘</span>
-                      <span>/</span>
+                      <span>K</span>
                     </div>
                     {query && (
                       <button
@@ -873,7 +851,7 @@ function SidebarContent({
                   aria-label="Search news"
                   className="absolute right-3 top-1/2 inline-flex h-8 min-w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-slate-200/80 bg-slate-50 px-2.5 text-slate-500 shadow-sm transition-all hover:bg-slate-100 hover:text-[var(--primary)] dark:border-slate-700/80 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                 >
-                  <span className="text-sm font-semibold leading-none">/</span>
+                  <span className="text-sm font-semibold leading-none">K</span>
                 </button>
               )}
             </form>
@@ -883,6 +861,7 @@ function SidebarContent({
         <nav className="space-y-2">
           <CollapsibleSection
             title="Streamings"
+            showTreeLines={true}
             isDesktopCollapsed={isDesktopCollapsed}
             onToggleDesktop={onToggleDesktop}
             defaultOpen={
@@ -898,10 +877,10 @@ function SidebarContent({
           >
             <Link
               href="/live-news"
-              className={`flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 px-4 py-2"} transition-all duration-300 text-sm font-medium ${
+              className={`flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-2"} transition-all duration-300 text-sm font-medium ${
                 pathname.startsWith("/live-news")
-                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
-                  : "rounded-xl text-gray-600 hover:bg-gray-100 hover:text-[var(--primary)] dark:text-slate-400 dark:hover:bg-slate-800"
+                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+                  : "rounded-none text-gray-600 hover:bg-gray-100 hover:text-[var(--primary)] dark:text-slate-400 dark:hover:bg-slate-800"
               }`}
               onClick={closeAndNavigate}
               title={isDesktopCollapsed ? "News Streaming" : undefined}
@@ -924,10 +903,10 @@ function SidebarContent({
             </Link>
             <Link
               href="/shorts"
-              className={`flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 px-4 py-2"} transition-all duration-300 text-sm font-medium ${
+              className={`flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-2"} transition-all duration-300 text-sm font-medium ${
                 pathname.startsWith("/shorts")
-                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
-                  : "rounded-xl text-gray-600 hover:bg-gray-100 hover:text-[var(--primary)] dark:text-slate-400 dark:hover:bg-slate-800"
+                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+                  : "rounded-none text-gray-600 hover:bg-gray-100 hover:text-[var(--primary)] dark:text-slate-400 dark:hover:bg-slate-800"
               }`}
               onClick={closeAndNavigate}
               title={isDesktopCollapsed ? "Shorts" : undefined}
@@ -950,6 +929,7 @@ function SidebarContent({
                 Indian Tadka
               </span>
             }
+            showTreeLines={true}
             isDesktopCollapsed={isDesktopCollapsed}
             onToggleDesktop={onToggleDesktop}
             defaultOpen={INDIAN_TADKA_SOURCES.some((s) => pathname === s.href)}
@@ -964,10 +944,10 @@ function SidebarContent({
               <Link
                 key={source.id}
                 href={source.href}
-                className={`flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 px-4 py-2"} transition-all duration-300 text-sm font-medium ${
+                className={`flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-2"} transition-all duration-300 text-sm font-medium ${
                   pathname === source.href
-                    ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
-                    : "rounded-xl text-gray-600 hover:bg-gray-100 hover:text-[var(--primary)] dark:text-slate-400 dark:hover:bg-slate-800"
+                    ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+                    : "rounded-none text-gray-600 hover:bg-gray-100 hover:text-[var(--primary)] dark:text-slate-400 dark:hover:bg-slate-800"
                 }`}
                 onClick={closeAndNavigate}
                 title={isDesktopCollapsed ? source.name : undefined}
@@ -987,6 +967,7 @@ function SidebarContent({
           </CollapsibleSection>
           <CollapsibleSection
             title="Catagories"
+            showTreeLines={true}
             isDesktopCollapsed={isDesktopCollapsed}
             onToggleDesktop={onToggleDesktop}
             defaultOpen={true}
@@ -1038,7 +1019,7 @@ function SidebarContent({
               )}
           </div>
           {isAuthenticated && (
-            <div className="relative md:hidden my-2">
+            <div className="relative md:hidden my-2 w-[80%] mx-auto">
               {/* Animated border */}
               <div
                 className={`
@@ -1072,11 +1053,13 @@ function SidebarContent({
         </nav>
 
         {/* Divider */}
-        <div className="h-px bg-slate-400/40 dark:bg-slate-600/40 my-6 mx-4 transition-all duration-300" />
+        <div className="h-px bg-slate-500/50 dark:bg-slate-500/50 my-6 mx-4 transition-all duration-300" />
 
         {/* Dark Mode Toggle */}
         {isAuthenticated && (
-          <div className={`${isDesktopCollapsed ? "px-0" : "px-4"} mb-2`}>
+          <div
+            className={`${isDesktopCollapsed ? "px-0" : "w-[80%] mx-auto"} mb-2`}
+          >
             <button
               onClick={toggleDarkMode}
               className={`group flex items-center ${
@@ -1127,9 +1110,9 @@ function SidebarContent({
             >
               <Link
                 href="/personalization"
-                className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 px-4 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-xl ${
+                className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-none ${
                   pathname.startsWith("/personalization")
-                    ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+                    ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
                     : "text-slate-600 hover:text-[var(--primary)] hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
                 onClick={closeAndNavigate}
@@ -1147,9 +1130,9 @@ function SidebarContent({
               </Link>
               <Link
                 href="/appearance"
-                className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 px-4 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-xl ${
+                className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-none ${
                   pathname.startsWith("/appearance")
-                    ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+                    ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
                     : "text-slate-600 hover:text-[var(--primary)] hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
                 onClick={closeAndNavigate}
@@ -1168,9 +1151,9 @@ function SidebarContent({
               </Link>
               <Link
                 href="/plans"
-                className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 px-4 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-xl ${
+                className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-none ${
                   pathname.startsWith("/plans")
-                    ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+                    ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
                     : "text-slate-600 hover:text-indigo-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-slate-800"
                 }`}
                 onClick={closeAndNavigate}
@@ -1204,9 +1187,9 @@ function SidebarContent({
           >
             <Link
               href="/about"
-              className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 px-4 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-xl ${
+              className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-none ${
                 pathname.startsWith("/about")
-                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
                   : "text-slate-600 hover:text-[var(--primary)] hover:bg-slate-100 dark:hover:bg-slate-800"
               }`}
               onClick={closeAndNavigate}
@@ -1225,9 +1208,9 @@ function SidebarContent({
             </Link>
             <Link
               href="/support"
-              className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 px-4 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-xl ${
+              className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-none ${
                 pathname.startsWith("/support")
-                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
                   : "text-slate-600 hover:text-[var(--primary)] hover:bg-slate-100 dark:hover:bg-slate-800"
               }`}
               onClick={closeAndNavigate}
@@ -1245,9 +1228,9 @@ function SidebarContent({
             </Link>
             <Link
               href="/privacy-policy"
-              className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 px-4 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-xl ${
+              className={`inline-flex items-center ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "gap-3 pl-4 pr-2.5 -mr-2.5 py-1.5 w-full"} text-sm font-medium transition-all duration-300 rounded-none ${
                 pathname.startsWith("/privacy-policy")
-                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-xl bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+                  ? "text-[var(--primary)] dark:text-sky-400 font-bold relative rounded-none bg-indigo-50/30 dark:bg-sky-400/10 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:bg-[var(--primary)] dark:before:bg-sky-400 before:rounded-full before:shadow-[0_0_12px_var(--primary)] dark:before:shadow-[0_0_15px_rgba(56,189,248,0.5)]"
                   : "text-slate-600 hover:text-[var(--primary)] hover:bg-slate-100 dark:hover:bg-slate-800"
               }`}
               onClick={closeAndNavigate}
@@ -1269,7 +1252,7 @@ function SidebarContent({
       </div>
 
       <div
-        className={`p-4 border-t border-[var(--border)] ${isDesktopCollapsed ? "flex justify-center p-3" : ""}`}
+        className={`py-2 px-2.5 border-t border-[var(--border)] ${isDesktopCollapsed ? "flex justify-center p-2" : ""}`}
       >
         {isAuthenticated ? (
           <div className={`relative ${isDesktopCollapsed ? "" : "w-full"}`}>
@@ -1284,9 +1267,9 @@ function SidebarContent({
               }}
               className={`flex items-center ${
                 isDesktopCollapsed
-                  ? "justify-center w-12 h-12 mx-auto bg-slate-50/80 shadow-sm border border-slate-200/60 dark:bg-slate-800/80 dark:border-slate-700/60"
-                  : "gap-3 px-2 w-full"
-              } py-2 rounded-xl hover:bg-slate-100 transition-all text-left focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)] dark:hover:bg-slate-800`}
+                  ? "justify-center w-10 h-10 mx-auto bg-slate-50/80 shadow-sm border border-slate-200/60 dark:bg-slate-800/80 dark:border-slate-700/60"
+                  : "gap-2.5 px-2 w-full"
+              } py-1.5 rounded-xl hover:bg-slate-100 transition-all text-left focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)] dark:hover:bg-slate-800`}
               title={
                 isDesktopCollapsed ? `Signed in as ${userEmail}` : undefined
               }
@@ -1298,12 +1281,12 @@ function SidebarContent({
                     : `https://ui-avatars.com/api/?name=User&background=random`
                 }
                 alt="User Avatar"
-                width={36}
-                height={36}
-                className="w-9 h-9 rounded-full border-2 border-slate-200 dark:border-slate-700/80 shrink-0"
+                width={32}
+                height={32}
+                className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700/80 shrink-0"
               />
               <div
-                className={`flex items-center overflow-hidden transition-all duration-300 ${isDesktopCollapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100 flex-1 min-w-0"}`}
+                className={`flex items-center overflow-hidden transition-all duration-300 ${isDesktopCollapsed ? "max-w-0 opacity-0" : "max-w-full opacity-100 flex-1 min-w-0"}`}
               >
                 <div className="flex-1 min-w-0">
                   <span className="font-medium text-sm text-slate-700 block truncate dark:text-slate-200">

@@ -53,8 +53,8 @@ export default function Navbar({ onMenuToggle, isMobileOpen }: NavbarProps) {
 
   return (
     <nav
-      className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200/80 bg-white/80 backdrop-blur-[40px] px-4 py-4 md:px-6 dark:border-slate-700/80 dark:bg-slate-900/80"
-      style={{ backgroundColor: "var(--card)" }}
+      className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200/50 backdrop-blur-xl px-4 py-4 md:px-6 dark:border-slate-800/50 shadow-[0_2px_20px_rgba(0,0,0,0.02)] dark:shadow-[0_2px_20px_rgba(0,0,0,0.15)] transition-all duration-300"
+      style={{ backgroundColor: "var(--navbar-bg)" }}
     >
       <div className="flex min-w-0 flex-1 items-center">
         <Link
