@@ -582,7 +582,7 @@ export default function AccountSettingsPage() {
         isMobile={isMobile}
         isSaving={isSaving}
         confirmationText={deleteConfirmationText}
-        description="This action is permanent and removes your account and saved data from our servers😥."
+        description="Your account and data will be permanently removed from our servers😥."
         onChangeConfirmationText={setDeleteConfirmationText}
         onClose={() => {
           if (!isSaving) {

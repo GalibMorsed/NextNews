@@ -997,26 +997,18 @@ export default function PersonalizationPage() {
                     Clear all personalization? 🗑️
                   </h3>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                    This will remove all saved sources and topics. You can set
-                    everything again anytime.
+                    This will clear all saved sources and topics. You can set
+                    them up again anytime.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => !isDiscarding && setIsDeletePopupOpen(false)}
-                  className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-200"
-                  aria-label="Close discard confirmation"
-                >
-                  <X className="h-4 w-4" />
-                </button>
               </div>
 
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <div className="mt-5 flex flex-row items-center justify-end gap-3 w-full">
                 <button
                   type="button"
                   onClick={() => setIsDeletePopupOpen(false)}
                   disabled={isDiscarding}
-                  className="rounded-xl border border-slate-300 dark:border-slate-600 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 transition hover:bg-slate-50 dark:hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex-initial shrink-0 text-center rounded-xl border border-slate-300 dark:border-slate-600 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 transition hover:bg-slate-50 dark:hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Keep my settings
                 </button>
@@ -1024,7 +1016,7 @@ export default function PersonalizationPage() {
                   type="button"
                   onClick={confirmDiscard}
                   disabled={isDiscarding}
-                  className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex-1 sm:flex-none text-center rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isDiscarding ? "Clearing... 🧹" : "Yes, clear all"}
                 </button>

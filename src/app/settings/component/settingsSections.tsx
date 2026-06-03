@@ -639,7 +639,7 @@ export function SettingsActionFooter({
             type="button"
             onClick={onDeleteClick}
             disabled={!isLoaded || isSaving}
-            className="group inline-flex items-center gap-2 rounded-md border border-red-200/70 dark:border-red-800/60 bg-transparent px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 transition-all duration-200 hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="group inline-flex items-center gap-1.5 rounded-md border border-red-200/70 dark:border-red-800/60 bg-transparent px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-medium text-red-600 dark:text-red-400 transition-all duration-200 hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap"
           >
             <Trash2
               size={14}
@@ -652,7 +652,7 @@ export function SettingsActionFooter({
             type="button"
             onClick={onSaveClick}
             disabled={!isLoaded || isSaving}
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-[var(--primary)] px-5 py-2 text-sm font-semibold text-white shadow-md shadow-[var(--primary)]/25 transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-[var(--primary)]/35 disabled:cursor-not-allowed disabled:opacity-60"
+            className="group relative inline-flex items-center gap-1.5 overflow-hidden rounded-md bg-[var(--primary)] px-3 py-1.5 text-xs sm:px-5 sm:py-2 sm:text-sm font-semibold text-white shadow-md shadow-[var(--primary)]/25 transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-[var(--primary)]/35 disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap"
           >
             <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             {isSaving ? (
@@ -732,16 +732,6 @@ export function DeleteAccountDialog({
                     "This action is permanent and removes your account and saved data from our servers."}
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  if (!isSaving) onClose();
-                }}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-200"
-                aria-label="Close delete confirmation"
-              >
-                <X className="h-4 w-4" />
-              </button>
             </div>
 
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
@@ -756,12 +746,12 @@ export function DeleteAccountDialog({
               className="w-full rounded-xl border border-slate-300/80 dark:border-slate-600/80 bg-white/50 dark:bg-slate-900/50 px-3 py-2 text-sm text-slate-800 dark:text-slate-100 outline-none backdrop-blur-sm transition-all duration-200 hover:bg-white/80 hover:dark:bg-slate-900/80 focus:border-[var(--primary)] focus:bg-white focus:ring-2 focus:ring-[var(--primary)]/20 dark:focus:bg-slate-900 disabled:opacity-70"
             />
 
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <div className="mt-5 flex flex-row items-center justify-end gap-3 w-full">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isSaving}
-                className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                className="flex-initial shrink-0 text-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 Cancel
               </button>
@@ -769,7 +759,7 @@ export function DeleteAccountDialog({
                 type="button"
                 onClick={onConfirm}
                 disabled={isSaving}
-                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 sm:flex-none text-center rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving ? "Deleting..." : "Delete permanently"}
               </button>

@@ -220,8 +220,9 @@ export default async function ArticlePage({ params }: PageProps) {
               articleKey={url}
               title={articleTitle}
               publishedAt={articlePublishedAt}
-              className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm text-emerald-700 ring-1 ring-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-300 dark:ring-emerald-900/60"
-              iconClassName="text-emerald-600 dark:text-emerald-300"
+              className="text-sm text-slate-500 dark:text-slate-400"
+              iconClassName="text-slate-400 dark:text-slate-500"
+              iconType="trending"
             />
           </div>
 

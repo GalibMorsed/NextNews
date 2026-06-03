@@ -16,7 +16,6 @@ import {
   ArrowRight,
   Compass,
   Construction,
-  PanelsTopLeft,
   UserRound,
   Users,
   X,
@@ -98,6 +97,79 @@ const springToggle = {
   damping: 28,
 };
 
+const AnimatedPanelsIcon = ({ isOpen }: { isOpen: boolean }) => {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <motion.svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="overflow-visible"
+      animate={reduceMotion ? {} : { rotate: isOpen ? 90 : 0 }}
+      transition={{ type: "spring", stiffness: 260, damping: 22 }}
+    >
+      {/* Top Header Panel */}
+      <motion.rect
+        x="3"
+        y="3"
+        width="18"
+        height="5"
+        rx="1"
+        animate={
+          reduceMotion
+            ? {}
+            : {
+                y: isOpen ? -1.5 : 0,
+                opacity: isOpen ? 0.8 : 1,
+              }
+        }
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      />
+      {/* Bottom Left Panel (Sidebar) */}
+      <motion.rect
+        x="3"
+        y="10"
+        width="5"
+        height="11"
+        rx="1"
+        animate={
+          reduceMotion
+            ? {}
+            : {
+                x: isOpen ? -1.5 : 0,
+                opacity: isOpen ? 0.8 : 1,
+              }
+        }
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      />
+      {/* Bottom Right Panel (Content) */}
+      <motion.rect
+        x="10"
+        y="10"
+        width="11"
+        height="11"
+        rx="1"
+        animate={
+          reduceMotion
+            ? {}
+            : {
+                x: isOpen ? 1.5 : 0,
+                y: isOpen ? 1.5 : 0,
+                stroke: isOpen ? "var(--primary)" : "currentColor",
+              }
+        }
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      />
+    </motion.svg>
+  );
+};
+
 interface MemberDropdownMenuProps {
   className?: string;
 }
@@ -112,7 +184,10 @@ export default function MemberDropdownMenu({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -327,13 +402,9 @@ export default function MemberDropdownMenu({
             }
           `}
         >
-          <motion.span
-            className={`inline-flex ${isOpen ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}
-            animate={reduceMotion ? {} : { rotate: isOpen ? 180 : 0 }}
-            transition={{ type: "spring", stiffness: 280, damping: 22 }}
-          >
-            <PanelsTopLeft size={18} strokeWidth={1.75} aria-hidden />
-          </motion.span>
+          <span className={`inline-flex ${isOpen ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>
+            <AnimatedPanelsIcon isOpen={isOpen} />
+          </span>
         </motion.button>
 
         <AnimatePresence>

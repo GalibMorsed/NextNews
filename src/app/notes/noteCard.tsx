@@ -266,12 +266,12 @@ export default function NoteCard({
                 </button>
               </div>
 
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <div className="mt-5 flex flex-row items-center justify-end gap-3 w-full">
                 <button
                   type="button"
                   onClick={() => setIsDeletePopupOpen(false)}
                   disabled={isDeleting}
-                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+                  className="flex-1 sm:flex-none text-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>
@@ -279,7 +279,7 @@ export default function NoteCard({
                   type="button"
                   onClick={confirmDelete}
                   disabled={isDeleting}
-                  className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex-1 sm:flex-none text-center rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isDeleting ? "Deleting..." : "Delete"}
                 </button>

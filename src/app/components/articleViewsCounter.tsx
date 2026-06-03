@@ -11,6 +11,7 @@ interface ArticleViewsCounterProps {
   className?: string;
   iconClassName?: string;
   compact?: boolean;
+  iconType?: "eye" | "trending";
 }
 
 function stableHash(value: string) {
@@ -64,6 +65,7 @@ export default function ArticleViewsCounter({
   className = "",
   iconClassName = "",
   compact = false,
+  iconType = "eye",
 }: ArticleViewsCounterProps) {
   const prefersReducedMotion = useReducedMotion();
   const seed = useMemo(
@@ -94,11 +96,19 @@ export default function ArticleViewsCounter({
       title={`${new Intl.NumberFormat("en-US").format(views)} views`}
     >
       <span className="relative inline-flex h-4 w-4 items-center justify-center">
-        <Eye
-          size={compact ? 13 : 14}
-          className={`shrink-0 ${iconClassName}`}
-          aria-hidden
-        />
+        {iconType === "trending" ? (
+          <TrendingUp
+            size={compact ? 13 : 14}
+            className={`shrink-0 ${iconClassName}`}
+            aria-hidden
+          />
+        ) : (
+          <Eye
+            size={compact ? 13 : 14}
+            className={`shrink-0 ${iconClassName}`}
+            aria-hidden
+          />
+        )}
         {!prefersReducedMotion && (
           <motion.span
             key={formattedViews}
@@ -119,7 +129,7 @@ export default function ArticleViewsCounter({
         {formattedViews}
         <span>Views</span>
       </motion.span>
-      {!compact && (
+      {!compact && iconType !== "trending" && (
         <TrendingUp size={13} className="text-emerald-500" aria-hidden />
       )}
     </span>

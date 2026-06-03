@@ -2,12 +2,24 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { Menu, X, StickyNote } from "lucide-react";
+import { useEffect, useState, ComponentProps } from "react";
+import { StickyNote } from "lucide-react";
+import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { supabase } from "../../../lib/superbaseClient";
 import { getVerifiedAuthUser } from "@/lib/clientAuth";
 import MemberDropdownMenu from "./memberDropdownMenu";
+
+const Path = (props: ComponentProps<typeof motion.path>) => (
+  <motion.path
+    fill="transparent"
+    strokeWidth="2.5"
+    stroke="currentColor"
+    strokeLinecap="round"
+    {...props}
+  />
+);
+
 
 interface NavbarProps {
   onMenuToggle: () => void;
@@ -128,14 +140,41 @@ export default function Navbar({ onMenuToggle, isMobileOpen }: NavbarProps) {
         </div>
 
         {/* Mobile Menu Button */}
-        <button
+        <motion.button
           type="button"
           onClick={onMenuToggle}
+          animate={isMobileOpen ? "open" : "closed"}
+          initial={false}
           aria-label="Toggle sidebar"
-          className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] p-2 text-[var(--foreground)] md:hidden transition-colors hover:bg-slate-50"
+          className="inline-flex items-center justify-center rounded-xl border border-[var(--border)] p-2 text-[var(--foreground)] md:hidden bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm shadow-sm transition-all duration-300 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 hover:border-slate-300/80 dark:hover:border-slate-700/80 focus:outline-none"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          {isMobileOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
+          <svg width="18" height="18" viewBox="0 0 24 24" className="w-[18px] h-[18px]">
+            <Path
+              variants={{
+                closed: { d: "M 4 6 L 20 6" },
+                open: { d: "M 6 6 L 18 18" }
+              }}
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            />
+            <Path
+              d="M 4 12 L 20 12"
+              variants={{
+                closed: { opacity: 1, scale: 1 },
+                open: { opacity: 0, scale: 0 }
+              }}
+              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            />
+            <Path
+              variants={{
+                closed: { d: "M 4 18 L 20 18" },
+                open: { d: "M 6 18 L 18 6" }
+              }}
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            />
+          </svg>
+        </motion.button>
       </div>
     </nav>
   );

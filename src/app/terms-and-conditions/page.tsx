@@ -14,6 +14,7 @@ import {
   UserRound,
   Search,
   X,
+  Mail,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -371,7 +372,7 @@ export default function TermsAndConditionsPage() {
       className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.08),transparent_28%),linear-gradient(to_bottom,#f8fafc,#ffffff_24%,#f8fafc)] px-4 py-8 dark:bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.10),transparent_24%),linear-gradient(to_bottom,#020617,#0f172a_36%,#020617)] sm:px-6 lg:px-8"
     >
       <div className="mx-auto max-w-6xl space-y-12">
-        <section className="overflow-hidden rounded-[20px] border border-[#e2e8f0] bg-[#ffffff] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:border-[#1e293b] dark:bg-[#0f172a]/90 sm:p-8 lg:p-10">
+        <section className="py-6 sm:py-8 lg:py-10 border-b border-[#e2e8f0]/85 dark:border-[#1e293b]/60">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-4xl">
               <div className="inline-flex items-center gap-1.5 rounded-md border border-sky-100 bg-sky-50/50 px-2.5 py-1 text-xs font-medium tracking-wide text-sky-700 dark:border-sky-950 dark:bg-sky-950/30 dark:text-sky-300">
@@ -440,7 +441,7 @@ export default function TermsAndConditionsPage() {
         </section>
 
         {/* Detailed terms clauses */}
-        <section className="space-y-6">
+        <section className="space-y-0">
           {filteredSections.length > 0 ? (
             filteredSections.map((section, index) => {
               const Icon = section.icon;
@@ -451,10 +452,10 @@ export default function TermsAndConditionsPage() {
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.38, delay: Math.min(index * 0.03, 0.3) }}
-                  className="group rounded-[28px] border border-[#e2e8f0]/85 bg-[#ffffff]/92 p-6 shadow-sm hover:border-[#bae6fd] dark:border-[#334155]/85 dark:bg-[#1e293b]/92 dark:hover:border-[#0284c7]/40 hover:-translate-y-1 hover:shadow-md transition-all duration-300 sm:p-8"
+                  className="group py-8 sm:py-10 border-b border-[#cbd5e1] dark:border-[#475569] last:border-b-0 transition-all duration-300"
                 >
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 group-hover:bg-sky-105 group-hover:text-sky-800 dark:bg-sky-950/40 dark:text-sky-400 dark:group-hover:bg-sky-900/40 dark:group-hover:text-sky-300 transition-colors duration-300">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 group-hover:bg-sky-100 group-hover:text-sky-800 dark:bg-sky-950/40 dark:text-sky-400 dark:group-hover:bg-sky-900/40 dark:group-hover:text-sky-300 transition-colors duration-300">
                       <Icon className="h-6 w-6" strokeWidth={1.5} />
                     </div>
 
@@ -479,7 +480,7 @@ export default function TermsAndConditionsPage() {
                           {section.bullets.map((bullet, bIdx) => (
                             <div
                               key={bIdx}
-                              className="flex items-start gap-3 rounded-2xl border border-[#f1f5f9] bg-[#f8fafc]/50 dark:border-[#334155]/50 dark:bg-[#0f172a]/30 px-4 py-3"
+                              className="flex items-start gap-3 py-1.5"
                             >
                               <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-500 dark:bg-sky-400" />
                               <p className="text-sm leading-6 text-[#334155] dark:text-[#cbd5e1]">
@@ -518,49 +519,36 @@ export default function TermsAndConditionsPage() {
           )}
         </section>
 
-        <section className="rounded-[28px] border border-slate-200/80 bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950 p-6 text-slate-100 shadow-sm sm:p-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="lg:max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-sky-200">
-                <LockKeyhole className="h-4 w-4" />
+        <section className="rounded-[20px] border border-[#cbd5e1] bg-white/70 p-6 shadow-sm dark:border-[#475569] dark:bg-[#1e293b]/30 sm:p-8">
+          <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <div className="max-w-3xl xl:max-w-xl">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-sky-100 bg-sky-50 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-sky-700 dark:border-sky-950/50 dark:bg-sky-950/40 dark:text-sky-300">
+                <LockKeyhole className="h-3.5 w-3.5" />
                 Questions or Concerns
               </div>
-              <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl lg:text-3xl">
-                Need help with our Terms or Account rules?
+              <h2 className="mt-3 text-xl font-bold tracking-tight text-[#0f172a] dark:text-[#f8fafc] sm:text-2xl">
+                Need help with our terms or account rules?
               </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-300 sm:text-base">
-                If you have any questions regarding these Terms &amp;
-                Conditions, account responsibilities, AI usage limits, or
-                upcoming billing and credit policies, please reach out to our
-                support team.
-              </p>
-              <p className="mt-2 text-sm leading-7 text-slate-300 sm:text-base">
-                Email: nextnews.co.in@gmail.com
+              <p className="mt-1.5 text-sm text-[#475569] dark:text-[#cbd5e1] leading-relaxed">
+                For questions regarding account access, AI usage credits, subscription rules, or privacy rights, get in touch with our team.
               </p>
             </div>
 
-            <div className="flex w-full shrink-0 flex-col gap-3 border-t border-white/10 pt-5 lg:w-auto lg:max-w-xs lg:border-t-0 lg:pt-0">
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <a
+                href="mailto:nextnews.co.in@gmail.com"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#0f172a] shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/60 dark:text-[#f8fafc] dark:hover:bg-slate-800/80 transition-all duration-200"
+              >
+                <Mail className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+                Email Support
+              </a>
               <Link
                 href="/support"
-                className="group flex items-center gap-3 rounded-[20px] border border-white/15 bg-white/10 px-5 py-4 backdrop-blur transition-all duration-200 hover:border-sky-400/40 hover:bg-white/15"
+                className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 dark:bg-sky-500 dark:hover:bg-sky-400 transition-all duration-200"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-500/20 text-sky-300 transition-colors duration-200 group-hover:bg-sky-500/30">
-                  <HeadphonesIcon className="h-5 w-5" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-white">
-                    Visit Support
-                  </p>
-                  <p className="mt-0.5 text-xs leading-5 text-slate-300">
-                    Get help with terms, usage, or billing queries
-                  </p>
-                </div>
-                <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-sky-300" />
+                <HeadphonesIcon className="h-4 w-4" />
+                Visit Support Center
               </Link>
-              <p className="px-1 text-xs leading-5 text-slate-400">
-                Our support team is available to clarify rules, investigate
-                account concerns, and assist with service-related inquiries.
-              </p>
             </div>
           </div>
         </section>
