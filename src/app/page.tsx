@@ -1,6 +1,7 @@
 import RegisterReminder from "./components/registerReminder";
 import WeeklyRoundup from "./components/weeklyRoundup/WeeklyRoundup";
 import TopHeadlinesContent from "./components/topHeadlinesContent";
+import NewsStatsTicker from "./components/newsStatsTicker";
 
 // 1. Define types matching your API response
 interface Article {
@@ -129,14 +130,14 @@ export default async function Home() {
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 bg-clip-text text-transparent dark:from-white dark:via-indigo-100 dark:to-violet-200">
             Top Headlines
           </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-400">
-            Stay updated with the latest stories from around the world.
-          </p>
+          <NewsStatsTicker initialArticlesCount={articles.length} />
         </header>
 
         <WeeklyRoundup excludeArticles={articles} />
 
-        <TopHeadlinesContent initialArticles={articles} pageSize={20} />
+        <div id="articles-section" className="scroll-mt-12">
+          <TopHeadlinesContent initialArticles={articles} pageSize={20} />
+        </div>
       </div>
     </main>
   );

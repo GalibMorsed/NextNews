@@ -73,6 +73,15 @@
   }
 }
 
+@keyframes breaking-news-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 #auth-boot-loader {
   align-items: center;
   background: rgba(15, 23, 42, 0.72);
@@ -214,6 +223,15 @@
 .animate-float-soft-delayed {
   animation: float-soft 7.4s ease-in-out infinite;
   animation-delay: 0.7s;
+}
+
+.breaking-news-marquee {
+  animation: breaking-news-marquee 36s linear infinite;
+}
+
+.breaking-news-marquee-shell:hover .breaking-news-marquee,
+.breaking-news-marquee-shell:focus-within .breaking-news-marquee {
+  animation-play-state: paused;
 }
 
 .dark {

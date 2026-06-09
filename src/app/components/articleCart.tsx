@@ -3,11 +3,12 @@
 import { ArrowUpRight } from "lucide-react";
 import AddNoteButton from "./addNoteButton";
 import AISummaryButton from "./aiSummaryButton";
-import { getNewsImageSrc } from "@/lib/newsImage";
+import { getNewsImageSrc, getSourceLogoSrc } from "@/lib/newsImage";
 import { trackActivityEvent } from "@/lib/activityAnalytics";
 import Link from "next/link";
 import { encodeArticleId } from "@/lib/articleUtils";
 import ArticleViewsCounter from "./articleViewsCounter";
+import SourceLogo from "./sourceLogo";
 
 interface Article {
   source: { id: string | null; name: string };
@@ -160,14 +161,20 @@ export default function ArticleCard({
             publishedAt={article.publishedAt}
             title={article.title}
           />
-          <div className="absolute top-3 left-3">
-            <span className="inline-block bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide">
-              {article.source?.name || "Unknown Source"}
-            </span>
+          <div className="absolute top-3 left-3 z-10">
+            <div className="inline-flex items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold pl-1 pr-2.5 py-1 rounded-full uppercase tracking-wide border border-white/10 shadow-sm">
+              <SourceLogo
+                src={getSourceLogoSrc(article.url)}
+                alt={`${article.source?.name || "Source"} logo`}
+                fallbackLabel={article.source?.name || "Unknown"}
+                sizeClassName="h-4 w-4"
+              />
+              <span className="truncate max-w-[120px]">{article.source?.name || "Unknown Source"}</span>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col p-5">
+        <div className="flex flex-1 flex-col p-5 pb-3">
           <div
             suppressHydrationWarning
             className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 font-medium uppercase tracking-wider"
@@ -188,14 +195,14 @@ export default function ArticleCard({
           <h2 className="mb-3 text-lg font-bold text-gray-900 leading-snug line-clamp-3 group-hover:text-blue-600 transition-colors">
             {article.title || "No Title Available"}
           </h2>
-          <p className="mb-4 text-sm text-gray-600 line-clamp-3 flex-1">
+          <p className="mb-2 text-sm text-gray-600 line-clamp-3">
             {article.description || "Click to read the full story."}
           </p>
         </div>
       </Link>
 
       <div className="p-5 pt-0 mt-auto">
-        <div className="pt-4 border-t border-gray-50">
+        <div className="pt-3 border-t border-gray-200">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Link
               href={`/article/${encodeArticleId(article.url)}`}
@@ -205,7 +212,7 @@ export default function ArticleCard({
                   : "text-gray-400 cursor-not-allowed"
               }`}
             >
-              Read Full Story
+              Continue Reading
               <ArrowUpRight className="w-4 h-4 ml-1" />
             </Link>
 

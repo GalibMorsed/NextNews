@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown, CreditCard, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ArticleCard from "./articleCart";
+import BreakingNewsTicker from "./breakingNewsTicker";
 import { useUserPlan } from "@/app/plans/payments/useUserPlan";
 
 interface Article {
@@ -29,6 +30,8 @@ interface NewsFeedWithLoadMoreProps {
   pageSize?: number;
   emptyMessage?: string;
   apiUrl?: string;
+  breakingTickerLabel?: string;
+  breakingTickerSubLabel?: string;
 }
 
 function formatPublishedDate(date?: string) {
@@ -55,6 +58,19 @@ function hasLocalAuth() {
   return Boolean(authToken || authEmail);
 }
 
+function buildArticleRenderKey(article: Article) {
+  return (
+    [
+      article.url?.trim(),
+      article.title?.trim(),
+      article.publishedAt?.trim(),
+      article.source?.name?.trim(),
+    ]
+      .filter(Boolean)
+      .join("|") || "untitled-article"
+  );
+}
+
 export default function NewsFeedWithLoadMore({
   initialArticles,
   category,
@@ -65,6 +81,8 @@ export default function NewsFeedWithLoadMore({
   pageSize = 80,
   emptyMessage = "No news available right now.",
   apiUrl = "/api/news",
+  breakingTickerLabel,
+  breakingTickerSubLabel,
 }: NewsFeedWithLoadMoreProps) {
   const [articles, setArticles] = useState<Article[]>(initialArticles ?? []);
   const [page, setPage] = useState(1);
@@ -87,11 +105,20 @@ export default function NewsFeedWithLoadMore({
   const { isProPlus, loading: isPlanLoading, hasCachedPlan } = useUserPlan();
 
   useEffect(() => {
-    setArticles(initialArticles ?? []);
-    setPage(1);
-    setHasMore((initialArticles?.length ?? 0) >= pageSize);
-    setIsLoadingMore(false);
-    setLoadError(null);
+    let isMounted = true;
+
+    queueMicrotask(() => {
+      if (!isMounted) return;
+      setArticles(initialArticles ?? []);
+      setPage(1);
+      setHasMore((initialArticles?.length ?? 0) >= pageSize);
+      setIsLoadingMore(false);
+      setLoadError(null);
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, [initialArticles, category, country, region, query, date, pageSize]);
 
   useEffect(() => {
@@ -266,25 +293,37 @@ export default function NewsFeedWithLoadMore({
     <section>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {articles.map((article, index) => (
-          <ArticleCard
-            key={`${article.url ?? "article"}-${index}`}
-            article={{
-              source: {
-                id: article.source?.id ?? null,
-                name: article.source?.name ?? "Unknown Source",
-              },
-              author: article.author ?? null,
-              title: article.title ?? "Untitled article",
-              description: article.description ?? "No description available.",
-              url: article.url ?? "",
-              urlToImage: article.urlToImage ?? null,
-              publishedAt: article.publishedAt ?? "",
-              content: article.content ?? null,
-            }}
-            formattedDate={formatPublishedDate(article.publishedAt)}
-            category={category}
-            showAiSummaryPromo={index === 0}
-          />
+          <div key={buildArticleRenderKey(article)} className="contents">
+            <ArticleCard
+              article={{
+                source: {
+                  id: article.source?.id ?? null,
+                  name: article.source?.name ?? "Unknown Source",
+                },
+                author: article.author ?? null,
+                title: article.title ?? "Untitled article",
+                description:
+                  article.description ?? "No description available.",
+                url: article.url ?? "",
+                urlToImage: article.urlToImage ?? null,
+                publishedAt: article.publishedAt ?? "",
+                content: article.content ?? null,
+              }}
+              formattedDate={formatPublishedDate(article.publishedAt)}
+              category={category}
+              showAiSummaryPromo={index === 0}
+            />
+            {index === 1 && (
+              <BreakingNewsTicker
+                category={category}
+                country="in"
+                region={region}
+                label={breakingTickerLabel}
+                subLabel={breakingTickerSubLabel}
+                className="lg:col-span-2"
+              />
+            )}
+          </div>
         ))}
       </div>
 

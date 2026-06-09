@@ -102,7 +102,7 @@ export default function WeeklyRoundup({
   const pathname = usePathname();
   const [articles, setArticles] = useState<Article[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Custom Slider & Animation States
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -238,7 +238,7 @@ export default function WeeklyRoundup({
       {
         root: container,
         threshold: 0.1, // Trigger when 10% of the card is visible inside container viewport
-      }
+      },
     );
 
     const cards = container.querySelectorAll(".roundup-card");
@@ -312,7 +312,7 @@ export default function WeeklyRoundup({
   }
 
   return (
-    <section className="mb-8">
+    <section className="mb-8" id="weekly-roundup">
       {/* Header section with modern badge and app theme match */}
       <div className="mb-4 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -421,11 +421,14 @@ export default function WeeklyRoundup({
                       <div className="mt-2 flex min-w-0 items-center justify-between gap-2">
                         <div className="truncate text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">
                           {a.publishedAt
-                            ? new Date(a.publishedAt).toLocaleDateString(undefined, {
-                                day: '2-digit',
-                                month: 'short',
-                                year: 'numeric'
-                              })
+                            ? new Date(a.publishedAt).toLocaleDateString(
+                                undefined,
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                },
+                              )
                             : ""}
                         </div>
                         <div className="flex-shrink-0">
