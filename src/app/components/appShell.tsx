@@ -8,6 +8,7 @@ import MobileCategoryRow from "./mobileCategoryRow";
 import Template from "../template";
 import GoalCompletionBanner from "./GoalCompletionBanner";
 import AuthSessionSync from "../auth/register/components/authSessionSync";
+import DownloadNowPopup from "./DownloadNowPopup";
 import { syncGoalTrackerProgress } from "@/lib/activityAnalytics";
 import {
   APPEARANCE_EVENT,
@@ -106,6 +107,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <MotionConfig reducedMotion={appearance.reducedMotion ? "always" : "never"}>
       <AuthSessionSync />
       <GoalCompletionBanner />
+      <DownloadNowPopup />
       <Navbar
         onMenuToggle={() => setIsSidebarOpen((prev) => !prev)}
         isMobileOpen={isSidebarOpen}

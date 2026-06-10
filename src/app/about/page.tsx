@@ -688,28 +688,28 @@ export default function AboutPage() {
                     ],
                   },
                   {
-                    name: "Jitesh Roy",
-                    role: "DevOps Engineer, Co-Founder",
-                    img: "/about/jitesh.jpg",
+                    name: "",
+                    role: "",
+                    img: "/about/developer.jpg",
                     socials: [
                       {
                         label: "GitHub",
-                        href: "https://github.com/Jitesh2207",
+                        href: "/",
                         icon: Github,
                       },
                       {
                         label: "LinkedIn",
-                        href: "https://www.linkedin.com/in/jitesh-roy-026327375",
+                        href: "/",
                         icon: Linkedin,
                       },
                       {
                         label: "Instagram",
-                        href: "https://www.instagram.com/jiteshhhh__roy/",
+                        href: "/",
                         icon: Instagram,
                       },
                       {
                         label: "Email",
-                        href: "mailto:jitesh.roy@nextnews.co.in",
+                        href: "/",
                         icon: Mail,
                       },
                     ],
@@ -1233,7 +1233,7 @@ export default function AboutPage() {
 
                 <div className="mt-5 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-cyan-50 p-4 text-center sm:text-left dark:border-blue-500/10 dark:from-blue-500/10 dark:via-slate-900 dark:to-cyan-500/10">
                   <p className="text-sm font-medium leading-6 text-slate-700 dark:text-slate-200">
-                    Reach out to one of us with your proposal or work and we
+                    Reach out to us with your proposal or work and we
                     will get back to you soon.
                   </p>
                 </div>
@@ -1249,11 +1249,11 @@ export default function AboutPage() {
                     <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors dark:text-slate-500 dark:group-hover:text-blue-400" />
                   </a>
                   <a
-                    href="mailto:jitesh.roy@nextnews.co.in"
+                    href="mailto:nextnews.co.in@gmail.com"
                     className="group relative flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 transition hover:border-blue-500/40 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-500/40"
                   >
                     <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-700 dark:text-slate-200 dark:group-hover:text-blue-400 transition-colors">
-                      jitesh.roy@nextnews.co.in
+                      nextnews.co.in@gmail.com
                     </span>
                     <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors dark:text-slate-500 dark:group-hover:text-blue-400" />
                   </a>
