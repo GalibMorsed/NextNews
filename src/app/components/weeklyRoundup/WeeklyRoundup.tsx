@@ -107,6 +107,7 @@ export default function WeeklyRoundup({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [visibleIndices, setVisibleIndices] = useState<Set<number>>(new Set());
+  const [isHovered, setIsHovered] = useState(false);
 
   const cacheKey = useMemo(
     () =>
@@ -304,6 +305,27 @@ export default function WeeklyRoundup({
     });
   };
 
+  useEffect(() => {
+    if (isHovered || !articles || articles.length === 0) return;
+
+    const interval = setInterval(() => {
+      setActiveIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % articles.length;
+        const container = scrollRef.current;
+        if (container) {
+          const cardWidth = container.scrollWidth / articles.length;
+          container.scrollTo({
+            left: nextIndex * cardWidth,
+            behavior: "smooth",
+          });
+        }
+        return nextIndex;
+      });
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isHovered, articles]);
+
   const roundupCountLabel = `${MIN_ROUNDUP_ARTICLES}-${MAX_ROUNDUP_ARTICLES} biggest stories this week`;
   const isLoading = articles === null;
 
@@ -357,7 +379,11 @@ export default function WeeklyRoundup({
           No featured weekly stories right now.
         </div>
       ) : (
-        <div className="relative group/carousel">
+        <div 
+          className="relative group/carousel"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           {/* Scroll Container with scroll-snap and hidden scrollbars */}
           <div
             ref={scrollRef}

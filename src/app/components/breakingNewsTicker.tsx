@@ -126,6 +126,7 @@ export default function BreakingNewsTicker({
   const desktopScrollRef = useRef<HTMLDivElement>(null);
   const [activeDesktopIndex, setActiveDesktopIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [visibleIndices, setVisibleIndices] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (isHovered || !articles || articles.length === 0) return;
@@ -245,6 +246,42 @@ export default function BreakingNewsTicker({
     };
   }, [cacheKey, category, country, region]);
 
+  useEffect(() => {
+    const container = desktopScrollRef.current;
+    if (!container || !articles || articles.length === 0) return;
+
+    setVisibleIndices(new Set());
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const indexAttr = entry.target.getAttribute("data-index");
+          if (indexAttr === null) return;
+          const index = parseInt(indexAttr, 10);
+
+          if (entry.isIntersecting) {
+            setVisibleIndices((prev) => {
+              const next = new Set(prev);
+              next.add(index);
+              return next;
+            });
+          }
+        });
+      },
+      {
+        root: container,
+        threshold: 0.1,
+      },
+    );
+
+    const cards = container.querySelectorAll(".ticker-card");
+    cards.forEach((card) => observer.observe(card));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [articles]);
+
   if (!articles || articles.length === 0) return null;
 
   return (
@@ -255,7 +292,7 @@ export default function BreakingNewsTicker({
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Tab Header */}
-        <div className="inline-flex items-center gap-3 px-4 py-2.5 border border-red-100 dark:border-red-950/50 bg-red-50/50 dark:bg-red-950/30 text-red-700 dark:text-red-200 rounded-t-xl border-b-0 translate-y-[1px] relative z-10">
+        <div className="inline-flex items-center gap-3 px-1 py-2 text-red-700 dark:text-red-200 relative z-10">
           <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white shadow-sm">
             <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-red-200/80" />
             <Radio className="relative h-3.5 w-3.5" />
@@ -277,54 +314,65 @@ export default function BreakingNewsTicker({
           <div 
             ref={desktopScrollRef}
             onScroll={handleDesktopScroll}
-            className="border border-red-100 dark:border-red-950/50 bg-white dark:bg-slate-950 rounded-b-xl rounded-tr-xl p-4 sm:p-5 flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-pl-4 sm:scroll-pl-5 shadow-[0_18px_42px_-34px_rgba(185,28,28,0.7)]"
+            className="py-4 sm:py-5 flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-pl-4 sm:scroll-pl-5"
           >
-            {articles.map((article) => (
-              <Link
-                key={`${buildBreakingArticleKey(article)}-desktop`}
-                href={article.url || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/item flex items-stretch gap-4 p-3 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 hover:bg-red-50/40 dark:hover:bg-red-950/10 hover:border-red-200 dark:hover:border-red-900/40 transition-all duration-300 w-[290px] sm:w-[380px] shrink-0 text-left snap-start animate-fade-in"
-              >
-                <span className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-white dark:border-slate-800 shadow-sm bg-white dark:bg-slate-950">
-                  {article.urlToImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={article.urlToImage}
-                      alt=""
-                      className="h-full w-full object-cover transition duration-300 group-hover/item:scale-105"
-                      onError={(event) => {
-                        event.currentTarget.src = "/news1.jpg";
-                      }}
-                    />
-                  ) : (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src="/news1.jpg"
-                      alt=""
-                      className="h-full w-full object-cover transition duration-300 group-hover/item:scale-105"
-                    />
-                  )}
-                </span>
-                <span className="flex flex-col justify-between flex-1 min-w-0">
-                  <span className="min-w-0">
-                    <span className="block truncate text-[10px] font-black uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
-                      {formatSource(article)}
+            {articles.map((article, idx) => {
+              const isVisible = visibleIndices.has(idx);
+              return (
+                <Link
+                  key={`${buildBreakingArticleKey(article)}-desktop`}
+                  href={article.url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-index={idx}
+                  style={{
+                    transitionDelay: isVisible ? `${(idx % 4) * 80}ms` : "0ms",
+                  }}
+                  className={`ticker-card group/item flex items-stretch gap-4 p-3 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 hover:bg-red-50/40 dark:hover:bg-red-950/10 hover:border-red-200 dark:hover:border-red-900/40 transition-all duration-700 ease-out hover:-translate-y-1 w-[290px] sm:w-[380px] shrink-0 text-left snap-start ${
+                    isVisible
+                      ? "opacity-100 translate-y-0 scale-100"
+                      : "opacity-0 translate-y-8 scale-95"
+                  }`}
+                >
+                  <span className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-white dark:border-slate-800 shadow-sm bg-white dark:bg-slate-950">
+                    {article.urlToImage ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={article.urlToImage}
+                        alt=""
+                        className="h-full w-full object-cover transition duration-300 group-hover/item:scale-105"
+                        onError={(event) => {
+                          event.currentTarget.src = "/news1.jpg";
+                        }}
+                      />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src="/news1.jpg"
+                        alt=""
+                        className="h-full w-full object-cover transition duration-300 group-hover/item:scale-105"
+                      />
+                    )}
+                  </span>
+                  <span className="flex flex-col justify-between flex-1 min-w-0">
+                    <span className="min-w-0">
+                      <span className="block truncate text-[10px] font-black uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
+                        {formatSource(article)}
+                      </span>
+                      <span className="mt-1 line-clamp-2 text-sm font-bold leading-snug text-slate-900 dark:text-slate-100 group-hover/item:text-red-700 dark:group-hover/item:text-red-200 transition-colors">
+                        {article.title}
+                      </span>
                     </span>
-                    <span className="mt-1 line-clamp-2 text-sm font-bold leading-snug text-slate-900 dark:text-slate-100 group-hover/item:text-red-700 dark:group-hover/item:text-red-200 transition-colors">
-                      {article.title}
+                    <span className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 dark:border-slate-800/60">
+                      <span className="text-[11px] font-semibold text-red-600/80 dark:text-red-300/80">
+                        {formatPublishedTime(article.publishedAt)}
+                      </span>
+                      <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-400 group-hover/item:text-red-600 dark:group-hover/item:text-red-400 group-hover/item:-translate-y-0.5 group-hover/item:translate-x-0.5 transition-all" />
                     </span>
                   </span>
-                  <span className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 dark:border-slate-800/60">
-                    <span className="text-[11px] font-semibold text-red-600/80 dark:text-red-300/80">
-                      {formatPublishedTime(article.publishedAt)}
-                    </span>
-                    <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-400 group-hover/item:text-red-600 dark:group-hover/item:text-red-400 group-hover/item:-translate-y-0.5 group-hover/item:translate-x-0.5 transition-all" />
-                  </span>
-                </span>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Left Hover Navigation Arrow (fully transparent glassmorphic style) */}

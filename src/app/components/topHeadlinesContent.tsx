@@ -325,7 +325,6 @@ export default function TopHeadlinesContent({
           country="us"
           pageSize={pageSize}
           breakingTickerLabel="Breaking Trending"
-          breakingTickerSubLabel="Top Headlines Live"
           emptyMessage="No news available at the moment. Please check back later."
         />
       )}

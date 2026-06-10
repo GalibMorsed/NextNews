@@ -98,7 +98,7 @@ function addSource(
 }
 
 async function fetchNewsApiOrgSources() {
-  const apiKey = process.env.NEWS_API_KEY2 || process.env.NEWS_API_KEY4;
+  const apiKey = process.env.NEWS_API_KEY || process.env.NEWS_API_KEY4;
   if (!apiKey) return [] as PersonalizationSource[];
 
   const params = new URLSearchParams({
