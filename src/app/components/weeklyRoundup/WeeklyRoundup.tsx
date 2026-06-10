@@ -333,6 +333,10 @@ export default function WeeklyRoundup({
     return null;
   }
 
+  if (articles !== null && articles.length === 0) {
+    return null;
+  }
+
   return (
     <section className="mb-8" id="weekly-roundup">
       {/* Header section with modern badge and app theme match */}
