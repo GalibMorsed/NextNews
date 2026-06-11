@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import NewsFeedWithLoadMore from "@/app/components/newsFeedWithLoadMore";
+import FifaSection from "@/app/components/FifaSection";
 import { getCategoryDisplayName } from "@/lib/newsCategories";
 import { trackCategoryVisit } from "@/lib/activityAnalytics";
 import { supabase } from "../../../../lib/superbaseClient";
@@ -187,6 +188,7 @@ export default function CategoryContent({
 
   return (
     <section className="relative">
+      <FifaSection />
       {/* Header - button stays on the same line even on mobile */}
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4 sm:gap-6">
         <h1 className="text-3xl font-bold capitalize tracking-tighter text-slate-900 dark:text-slate-100 sm:text-4xl">

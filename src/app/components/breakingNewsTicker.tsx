@@ -282,7 +282,9 @@ export default function BreakingNewsTicker({
     };
   }, [articles]);
 
-  if (!articles || articles.length === 0) return null;
+  const isLoading = articles === null;
+
+  if (articles !== null && articles.length === 0) return null;
 
   return (
     <section className={className} aria-label="Breaking news ticker">
@@ -310,107 +312,131 @@ export default function BreakingNewsTicker({
 
         {/* Carousel Wrapper */}
         <div className="relative group/carousel">
-          {/* Articles Container Box */}
-          <div 
-            ref={desktopScrollRef}
-            onScroll={handleDesktopScroll}
-            className="py-4 sm:py-5 flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-pl-4 sm:scroll-pl-5"
-          >
-            {articles.map((article, idx) => {
-              const isVisible = visibleIndices.has(idx);
-              return (
-                <Link
-                  key={`${buildBreakingArticleKey(article)}-desktop`}
-                  href={article.url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-index={idx}
-                  style={{
-                    transitionDelay: isVisible ? `${(idx % 4) * 80}ms` : "0ms",
-                  }}
-                  className={`ticker-card group/item flex items-stretch gap-4 p-3 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 hover:bg-red-50/40 dark:hover:bg-red-950/10 hover:border-red-200 dark:hover:border-red-900/40 transition-all duration-700 ease-out hover:-translate-y-1 w-[290px] sm:w-[380px] shrink-0 text-left snap-start ${
-                    isVisible
-                      ? "opacity-100 translate-y-0 scale-100"
-                      : "opacity-0 translate-y-8 scale-95"
-                  }`}
+          {isLoading ? (
+            <div className="py-4 sm:py-5 flex gap-4 overflow-x-auto scrollbar-hide">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-stretch gap-4 p-3 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 w-[290px] sm:w-[380px] shrink-0"
                 >
-                  <span className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-white dark:border-slate-800 shadow-sm bg-white dark:bg-slate-950">
-                    {article.urlToImage ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={article.urlToImage}
-                        alt=""
-                        className="h-full w-full object-cover transition duration-300 group-hover/item:scale-105"
-                        onError={(event) => {
-                          event.currentTarget.src = "/news1.jpg";
-                        }}
-                      />
-                    ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src="/news1.jpg"
-                        alt=""
-                        className="h-full w-full object-cover transition duration-300 group-hover/item:scale-105"
-                      />
-                    )}
-                  </span>
-                  <span className="flex flex-col justify-between flex-1 min-w-0">
-                    <span className="min-w-0">
-                      <span className="block truncate text-[10px] font-black uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
-                        {formatSource(article)}
+                  <div className="h-16 w-16 shrink-0 rounded-lg bg-slate-200 dark:bg-slate-800 animate-pulse" />
+                  <div className="flex flex-col justify-between flex-1 min-w-0">
+                    <div className="space-y-2">
+                      <div className="h-3 w-1/4 rounded bg-slate-200 dark:bg-slate-800 animate-pulse" />
+                      <div className="h-4 w-5/6 rounded bg-slate-200 dark:bg-slate-800 animate-pulse" />
+                    </div>
+                    <div className="h-3 w-1/3 rounded bg-slate-200 dark:bg-slate-800 animate-pulse mt-2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Articles Container Box */}
+              <div 
+                ref={desktopScrollRef}
+                onScroll={handleDesktopScroll}
+                className="py-4 sm:py-5 flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-pl-4 sm:scroll-pl-5"
+              >
+                {articles.map((article, idx) => {
+                  const isVisible = visibleIndices.has(idx);
+                  return (
+                    <Link
+                      key={`${buildBreakingArticleKey(article)}-desktop`}
+                      href={article.url || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-index={idx}
+                      style={{
+                        transitionDelay: isVisible ? `${(idx % 4) * 80}ms` : "0ms",
+                      }}
+                      className={`ticker-card group/item flex items-stretch gap-4 p-3 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 hover:bg-red-50/40 dark:hover:bg-red-950/10 hover:border-red-200 dark:hover:border-red-900/40 transition-all duration-700 ease-out hover:-translate-y-1 w-[290px] sm:w-[380px] shrink-0 text-left snap-start ${
+                        isVisible
+                          ? "opacity-100 translate-y-0 scale-100"
+                          : "opacity-0 translate-y-8 scale-95"
+                      }`}
+                    >
+                      <span className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-white dark:border-slate-800 shadow-sm bg-white dark:bg-slate-950">
+                        {article.urlToImage ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={article.urlToImage}
+                            alt=""
+                            className="h-full w-full object-cover transition duration-300 group-hover/item:scale-105"
+                            onError={(event) => {
+                              event.currentTarget.src = "/news1.jpg";
+                            }}
+                          />
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src="/news1.jpg"
+                            alt=""
+                            className="h-full w-full object-cover transition duration-300 group-hover/item:scale-105"
+                          />
+                        )}
                       </span>
-                      <span className="mt-1 line-clamp-2 text-sm font-bold leading-snug text-slate-900 dark:text-slate-100 group-hover/item:text-red-700 dark:group-hover/item:text-red-200 transition-colors">
-                        {article.title}
+                      <span className="flex flex-col justify-between flex-1 min-w-0">
+                        <span className="min-w-0">
+                          <span className="block truncate text-[10px] font-black uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
+                            {formatSource(article)}
+                          </span>
+                          <span className="mt-1 line-clamp-2 text-sm font-bold leading-snug text-slate-900 dark:text-slate-100 group-hover/item:text-red-700 dark:group-hover/item:text-red-200 transition-colors">
+                            {article.title}
+                          </span>
+                        </span>
+                        <span className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 dark:border-slate-800/60">
+                          <span className="text-[11px] font-semibold text-red-600/80 dark:text-red-300/80">
+                            {formatPublishedTime(article.publishedAt)}
+                          </span>
+                          <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-400 group-hover/item:text-red-600 dark:group-hover/item:text-red-400 group-hover/item:-translate-y-0.5 group-hover/item:translate-x-0.5 transition-all" />
+                        </span>
                       </span>
-                    </span>
-                    <span className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 dark:border-slate-800/60">
-                      <span className="text-[11px] font-semibold text-red-600/80 dark:text-red-300/80">
-                        {formatPublishedTime(article.publishedAt)}
-                      </span>
-                      <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-400 group-hover/item:text-red-600 dark:group-hover/item:text-red-400 group-hover/item:-translate-y-0.5 group-hover/item:translate-x-0.5 transition-all" />
-                    </span>
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+                    </Link>
+                  );
+                })}
+              </div>
 
-          {/* Left Hover Navigation Arrow (fully transparent glassmorphic style) */}
-          <button
-            onClick={scrollPrev}
-            disabled={activeDesktopIndex === 0}
-            className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 shadow-md backdrop-blur-md transition-all duration-300 hover:bg-red-50 dark:hover:bg-red-950/20 hover:border-red-200 dark:hover:border-red-900/30 hover:text-red-600 dark:hover:text-red-400 hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-0 lg:flex hidden z-10 cursor-pointer opacity-0 group-hover/carousel:opacity-100"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
+              {/* Left Hover Navigation Arrow (fully transparent glassmorphic style) */}
+              <button
+                onClick={scrollPrev}
+                disabled={activeDesktopIndex === 0}
+                className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 shadow-md backdrop-blur-md transition-all duration-300 hover:bg-red-50 dark:hover:bg-red-950/20 hover:border-red-200 dark:hover:border-red-900/30 hover:text-red-600 dark:hover:text-red-400 hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-0 lg:flex hidden z-10 cursor-pointer opacity-0 group-hover/carousel:opacity-100"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
 
-          {/* Right Hover Navigation Arrow (fully transparent glassmorphic style) */}
-          <button
-            onClick={scrollNext}
-            disabled={activeDesktopIndex === articles.length - 1}
-            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 shadow-md backdrop-blur-md transition-all duration-300 hover:bg-red-50 dark:hover:bg-red-950/20 hover:border-red-200 dark:hover:border-red-900/30 hover:text-red-600 dark:hover:text-red-400 hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-0 lg:flex hidden z-10 cursor-pointer opacity-0 group-hover/carousel:opacity-100"
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
+              {/* Right Hover Navigation Arrow (fully transparent glassmorphic style) */}
+              <button
+                onClick={scrollNext}
+                disabled={activeDesktopIndex === articles.length - 1}
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 shadow-md backdrop-blur-md transition-all duration-300 hover:bg-red-50 dark:hover:bg-red-950/20 hover:border-red-200 dark:hover:border-red-900/30 hover:text-red-600 dark:hover:text-red-400 hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-0 lg:flex hidden z-10 cursor-pointer opacity-0 group-hover/carousel:opacity-100"
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </>
+          )}
         </div>
 
         {/* Custom Pill Indicators */}
-        <div className="mt-4 flex items-center justify-center gap-1.5">
-          {articles.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => scrollToDesktopCard(idx)}
-              className={`h-1.5 rounded-full transition-all duration-300 ease-out cursor-pointer ${
-                activeDesktopIndex === idx
-                  ? "w-6 bg-red-600 dark:bg-red-400"
-                  : "w-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
-        </div>
+        {!isLoading && (
+          <div className="mt-4 flex items-center justify-center gap-1.5">
+            {articles.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => scrollToDesktopCard(idx)}
+                className={`h-1.5 rounded-full transition-all duration-300 ease-out cursor-pointer ${
+                  activeDesktopIndex === idx
+                    ? "w-6 bg-red-600 dark:bg-red-400"
+                    : "w-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700"
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

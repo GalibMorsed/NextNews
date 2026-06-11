@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import NewsFeedWithLoadMore from "@/app/components/newsFeedWithLoadMore";
 import WeeklyRoundup from "@/app/components/weeklyRoundup/WeeklyRoundup";
+import FifaSection from "@/app/components/FifaSection";
 import { supabase } from "../../../../../lib/superbaseClient";
 
 interface Article {
@@ -134,6 +135,7 @@ export default function IndianTadkaContent({
 
   return (
     <section className="relative">
+      <FifaSection />
       <div className="mb-6">
         <h1 className="text-3xl font-bold capitalize tracking-tighter text-slate-900 dark:text-slate-100 sm:text-4xl">
           {sourceName}
