@@ -338,7 +338,7 @@ async function suggestCategoriesWithOpenRouter(
 ): Promise<TrendingCategory[] | null> {
     const apiKey = Deno.env.get("OPENROUTER_API_KEY")?.trim();
     if (!apiKey) return null;
-    const model = Deno.env.get("OPENROUTER_MODEL")?.trim() || "nvidia/nemotron-3-nano-30b-a3b:free";
+    const model = Deno.env.get("OPENROUTER_MODEL")?.trim() || "anthropic/claude-opus-5.5";
 
     try {
         const prompt = [
