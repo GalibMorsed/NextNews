@@ -458,25 +458,27 @@ export default function PersonalizationPage() {
         />
       </div>
 
-      <div className="relative mx-auto max-w-6xl space-y-9">
+      <div className="relative mx-auto max-w-6xl space-y-6 sm:space-y-8">
         <motion.section
           initial="hidden"
           animate="visible"
           variants={sectionVariants}
           custom={0}
-          className="rounded-[20px] border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/80 p-6 shadow-sm backdrop-blur sm:p-8"
+          className="relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white/80 px-4 py-3.5 sm:px-6 sm:py-4 shadow-xs backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80"
         >
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-4">
             <div className="min-w-0 flex-1">
-              <span className="mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                Tailor Your Experience
-              </span>
-              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 bg-clip-text text-transparent dark:from-white dark:via-indigo-200 dark:to-violet-200">
-                Personalization
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300 sm:text-base">
-                Choose trusted sources and focused topics. Your preferences sync
-                across the app for a cleaner, more relevant feed.💪🏼
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+                  Personalization
+                </h1>
+                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200/80 bg-indigo-50/80 px-2 py-0.5 text-[10px] font-bold text-indigo-700 uppercase tracking-wider dark:border-indigo-900/60 dark:bg-indigo-950/50 dark:text-indigo-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                  Feed Setup
+                </span>
+              </div>
+              <p className="mt-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400">
+                Your sources & Your topics, synced across the app. 💪🏼
               </p>
             </div>
           </div>
