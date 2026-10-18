@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   ArrowUpRight,
+  ChevronDown,
   Compass,
   Globe2,
   Loader2,
@@ -39,6 +40,7 @@ import RegionSelector, {
 } from "./components/RegionSelector";
 import ExploreLiveStoriesAndVoices from "./components/ExploreLiveStoriesAndVoices";
 import StoryPromoPopup from "./components/StoryPromoPopup";
+import CategoryCardStack from "./components/CategoryCardStack";
 
 type ExploreState = {
   data: ExploreResponse | null;
@@ -112,11 +114,13 @@ function SectionHeading({
   title,
   description,
   icon: Icon,
+  iconBesideEyebrow = false,
 }: {
   eyebrow?: string;
   title: string;
   description: string;
   icon?: LucideIcon;
+  iconBesideEyebrow?: boolean;
 }) {
   return (
     <motion.div
@@ -126,13 +130,26 @@ function SectionHeading({
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/50 p-5 shadow-sm transition-transform duration-300 sm:p-6 dark:border-slate-700 dark:from-slate-900 dark:via-indigo-950/20 dark:to-violet-950/20"
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          {eyebrow && (
+      <div className={iconBesideEyebrow ? "" : "flex items-start justify-between gap-4"}>
+        <div className={iconBesideEyebrow ? "" : "flex-1"}>
+          {iconBesideEyebrow ? (
+            <div className="mb-3 flex items-center justify-between gap-3">
+              {eyebrow && (
+                <span className="inline-flex whitespace-nowrap rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+                  {eyebrow}
+                </span>
+              )}
+              {Icon ? (
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/80 text-[var(--primary)] shadow-sm ring-1 ring-slate-200/80 backdrop-blur-sm dark:bg-slate-800/80 dark:text-white dark:ring-slate-700/80">
+                  <Icon className="h-5 w-5" />
+                </div>
+              ) : null}
+            </div>
+          ) : eyebrow ? (
             <span className="mb-3 inline-flex rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
               {eyebrow}
             </span>
-          )}
+          ) : null}
           <h2 className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 sm:text-3xl dark:from-emerald-50 dark:via-indigo-100 dark:to-violet-200">
             {title}
           </h2>
@@ -140,7 +157,7 @@ function SectionHeading({
             {description}
           </p>
         </div>
-        {Icon ? (
+        {!iconBesideEyebrow && Icon ? (
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/80 text-[var(--primary)] shadow-sm ring-1 ring-slate-200/80 backdrop-blur-sm dark:bg-slate-800/80 dark:text-white dark:ring-slate-700/80">
             <Icon className="h-5 w-5" />
           </div>
@@ -157,6 +174,7 @@ export default function ExplorePage() {
     useState<ExploreRegionId>("world");
   const [searchInput, setSearchInput] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
+  const [showAllDesktopCategories, setShowAllDesktopCategories] = useState(false);
   const [exploreState, setExploreState] = useState<ExploreState>(EMPTY_STATE);
   const [followedSources, setFollowedSources] = useState<string[]>([]);
   const [favoriteTopics, setFavoriteTopics] = useState<string[]>([]);
@@ -492,28 +510,27 @@ export default function ExplorePage() {
           </PageSurface>
         ) : (
           <>
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div className="relative">
-                <div className="pointer-events-none absolute left-8 top-0 -z-10 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-indigo-500/20 to-violet-500/20 blur-[80px] filter dark:from-indigo-500/10 dark:to-violet-500/10" />
-                <PageSurface className="relative overflow-hidden bg-white/60 backdrop-blur-xl dark:bg-slate-900/60">
-                  <div className="px-6 py-8 sm:px-8">
-                    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                      <div className="max-w-3xl flex-1">
-                        <span className="mb-3 inline-flex rounded-full bg-indigo-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-                          World is Your's
-                        </span>
-                        <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 sm:text-5xl dark:from-white dark:via-indigo-100 dark:to-violet-200">
+                <div className="pointer-events-none absolute left-8 top-0 -z-10 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-indigo-500/15 to-violet-500/15 blur-[60px] filter dark:from-indigo-500/10 dark:to-violet-500/10" />
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white/80 px-4 py-3.5 sm:px-6 sm:py-4 shadow-xs backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
                           Explore
                         </h1>
-                        <p className="mt-2 max-w-2xl text-sm font-medium text-slate-600 dark:text-slate-400 sm:text-base">
-                          Switch regions or search a live topic. Stories,
-                          category paths, trends, and suggested sources all
-                          update around what is happening now. 🧭🗺️
-                        </p>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200/80 bg-indigo-50/80 px-2 py-0.5 text-[10px] font-bold text-indigo-700 uppercase tracking-wider dark:border-indigo-900/60 dark:bg-indigo-950/50 dark:text-indigo-300">
+                          <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                          Live
+                        </span>
                       </div>
+                      <p className="mt-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400">
+                        Switch regions or search a topic. Everything updates live. 🧭 🗺️
+                      </p>
                     </div>
                   </div>
-                </PageSurface>
+                </div>
               </div>
 
               <motion.div
@@ -589,8 +606,9 @@ export default function ExplorePage() {
                     icon={Globe2}
                     description={
                       data?.regionBrief ||
-                      "Explore the latest developments and breaking stories from this region, curated by our AI based on your preferences."
+                      "Latest stories from this region, AI-curated for you."
                     }
+                    iconBesideEyebrow
                   />
 
                   <div className="flex flex-col gap-6">
@@ -629,31 +647,31 @@ export default function ExplorePage() {
                                 "A significant regional development requiring your attention. Read the full analysis or explore deeper search angles below."}
                             </p>
 
-                            <div className="flex flex-wrap gap-4">
+                            <div className="flex flex-nowrap gap-2 sm:gap-4">
                               <a
                                 href={heroArticle.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-6 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(79,70,229,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] active:translate-y-0"
+                                className="inline-flex h-10 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-3 text-xs font-bold text-white shadow-[0_4px_14px_0_rgba(79,70,229,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] active:translate-y-0 sm:h-12 sm:flex-none sm:gap-2 sm:px-6 sm:text-sm"
                               >
                                 Open full story
-                                <ArrowUpRight className="h-4 w-4" />
+                                <ArrowUpRight className="h-4 w-4 shrink-0" />
                               </a>
                               <a
                                 href="#explore-categories"
-                                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                                className="inline-flex h-10 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:h-12 sm:flex-none sm:gap-2 sm:px-6 sm:text-sm"
                               >
                                 Browse topics
-                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" />
                               </a>
                             </div>
                           </div>
 
                           <div className="group perspective-[2000px]">
-                            <div className="flex h-full flex-col rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-50/50 to-violet-50/50 p-6 transition-transform duration-500 hover:rotate-x-[2deg] hover:rotate-y-[-5deg] dark:from-indigo-950/20 dark:to-violet-950/20">
-                              <div className="flex items-center gap-2">
-                                <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">
+                            <div className="flex h-full flex-col rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-50/50 to-violet-50/50 p-4 transition-transform duration-500 hover:rotate-x-[2deg] hover:rotate-y-[-5deg] sm:p-6 dark:from-indigo-950/20 dark:to-violet-950/20">
+                              <div className="flex flex-nowrap items-center gap-2">
+                                <Sparkles className="h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                                <p className="whitespace-nowrap text-[9px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:text-indigo-400 sm:text-[11px] sm:tracking-[0.2em]">
                                   AI Suggested Search Direction
                                 </p>
                               </div>
@@ -663,10 +681,17 @@ export default function ExplorePage() {
                               </p>
                               <div className="mt-auto flex flex-col gap-6 pt-6 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex -space-x-2">
-                                  {[1, 2, 3].map((i) => (
-                                    <div
+                                  {[
+                                    { src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=96&h=96&fit=crop&crop=faces", alt: "Perspective contributor" },
+                                    { src: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&h=96&fit=crop&crop=faces", alt: "Perspective contributor" },
+                                    { src: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=96&h=96&fit=crop&crop=faces", alt: "Perspective contributor" },
+                                  ].map((avatar, i) => (
+                                    <img
                                       key={i}
-                                      className="h-8 w-8 rounded-full border-2 border-white/50 bg-slate-200 dark:border-slate-800/50 dark:bg-slate-700"
+                                      src={avatar.src}
+                                      alt={avatar.alt}
+                                      loading="lazy"
+                                      className="h-8 w-8 rounded-full border-2 border-white/70 object-cover shadow-sm dark:border-slate-800"
                                     />
                                   ))}
                                   <div className="flex h-8 items-center pl-4 text-xs font-bold text-[var(--muted)]">
@@ -688,15 +713,21 @@ export default function ExplorePage() {
                       </PageSurface>
                     ) : null}
 
-                    <div className="grid gap-6 grid-cols-1 xl:grid-cols-3">
+                    <div className="flex items-center justify-between px-1 text-xs font-semibold text-[var(--muted)] md:hidden">
+                      <span>Top stories</span>
+                      <span className="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-300">
+                        Swipe for more <ArrowRight className="h-3.5 w-3.5" />
+                      </span>
+                    </div>
+                    <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 xl:grid-cols-3">
                       {sideArticles.map((article, index) => (
                         <PageSurface
                           key={article.url}
                           index={index + 1}
-                          className="group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                          className="group w-[86%] shrink-0 snap-center overflow-hidden rounded-3xl border-slate-200/80 bg-white shadow-[0_10px_30px_-18px_rgba(49,46,129,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md sm:w-[70%] md:w-auto md:shrink md:snap-none dark:border-slate-700/80 dark:bg-slate-900"
                         >
                           <div className="flex flex-col h-full bg-[var(--card)]">
-                            <div className="relative h-52 w-full overflow-hidden">
+                            <div className="relative h-44 w-full overflow-hidden sm:h-52">
                               <StoryImage
                                 article={article}
                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -740,11 +771,23 @@ export default function ExplorePage() {
                     eyebrow="Category Highlights"
                     title={`More stories from ${data?.regionLabel}`}
                     icon={Compass}
-                    description="Explore more stories organized into categories, curated by our AI to help you dive deeper into the topics that matter most in this region right now."
+                    description="AI-curated stories by category, tailored to this region right now. "
+                    iconBesideEyebrow
                   />
 
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {visibleCategories.map((category, index) => {
+                  {/* Mobile screen view: modern swipeable card stack */}
+                  <div className="block md:hidden">
+                    <CategoryCardStack
+                      categories={visibleCategories}
+                      selectedRegion={selectedRegion}
+                    />
+                  </div>
+
+                  {/* Desktop screen view: clean responsive grid */}
+                  <div className="hidden md:grid md:grid-cols-2 md:gap-4 xl:grid-cols-3">
+                    {visibleCategories
+                      .slice(0, showAllDesktopCategories ? visibleCategories.length : 3)
+                      .map((category, index) => {
                       const categoryStyle =
                         CATEGORY_ICON_STYLES[
                           index % CATEGORY_ICON_STYLES.length
@@ -759,7 +802,7 @@ export default function ExplorePage() {
                         >
                           <PageSurface
                             index={index}
-                            className="h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md dark:hover:border-slate-600"
+                            className="h-full overflow-hidden border-slate-200/80 shadow-[0_10px_30px_-18px_rgba(49,46,129,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md dark:border-slate-700/80 dark:hover:border-slate-600"
                           >
                             <div
                               className={`flex h-28 items-center justify-center border-b border-white/60 transition-transform duration-300 group-hover:scale-[1.02] dark:border-slate-800/80 ${categoryStyle.panelClassName}`}
@@ -792,8 +835,21 @@ export default function ExplorePage() {
                           </PageSurface>
                         </Link>
                       );
-                    })}
+                      })}
                   </div>
+                  {visibleCategories.length > 3 ? (
+                    <div className="hidden justify-center pt-2 md:flex">
+                      <button
+                        type="button"
+                        onClick={() => setShowAllDesktopCategories((showAll) => !showAll)}
+                        aria-expanded={showAllDesktopCategories}
+                        className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 hover:shadow-md dark:border-indigo-900/70 dark:bg-slate-900 dark:text-indigo-300 dark:hover:bg-indigo-950/40"
+                      >
+                        {showAllDesktopCategories ? "Show fewer categories" : "Show all categories"}
+                        <ChevronDown className={`h-4 w-4 transition-transform ${showAllDesktopCategories ? "rotate-180" : ""}`} />
+                      </button>
+                    </div>
+                  ) : null}
                 </section>
 
                 <ExploreLiveStoriesAndVoices
