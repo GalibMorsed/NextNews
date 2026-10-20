@@ -273,7 +273,7 @@ export default function RegionSelector({
               Trending Regions
             </h4>
             <p className="text-sm text-[var(--muted)]">
-              Switch regions to see localized analysis.
+              Change region, change the analysis.
             </p>
           </div>
 

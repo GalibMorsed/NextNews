@@ -78,21 +78,22 @@ export default function ExploreLiveStoriesAndVoices({
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 onClick={() => onTopicClick(topic.tag)}
-                className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-rose-50/60 px-4 py-4 text-left transition-all hover:border-[var(--primary)]/30 hover:bg-white hover:shadow-md dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 dark:hover:bg-slate-800"
+                className="group w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-rose-50/60 p-4 text-left transition-all hover:border-[var(--primary)]/30 hover:bg-white hover:shadow-md dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 dark:hover:bg-slate-800"
               >
-                <div className="flex min-w-0 items-start justify-between gap-3 sm:gap-4">
-                  <div className="min-w-0 flex-1">
-                    <p className="break-words text-lg font-semibold text-[var(--foreground)] transition-colors">
-                      {topic.tag}
-                    </p>
-                    <p className="mt-2 break-words text-sm leading-6 text-[var(--muted)]">
-                      {topic.reason}
-                    </p>
-                  </div>
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 transition-transform dark:bg-emerald-950/50 dark:text-emerald-200">
+                {/* Row 1: # Tag text and arrow icon together in one row */}
+                <div className="flex items-center justify-between gap-3">
+                  <p className="break-words text-lg font-bold tracking-tight text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
+                    {topic.tag}
+                  </p>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 transition-transform group-hover:scale-105 group-hover:rotate-12 dark:bg-emerald-950/60 dark:text-emerald-300">
                     <ArrowUpRight className="h-4 w-4" />
                   </div>
                 </div>
+
+                {/* Row 2: Underneath that row, the normal text shows full width */}
+                <p className="mt-2 break-words text-sm leading-relaxed text-[var(--muted)]">
+                  {topic.reason}
+                </p>
               </motion.button>
             </div>
           ))}
@@ -124,53 +125,60 @@ export default function ExploreLiveStoriesAndVoices({
               SOURCE_ACCENT_STYLES[index % SOURCE_ACCENT_STYLES.length];
             const logoSrc = getSourceLogoSrc(source.url);
 
+            const rawUrl = source.url?.trim();
+            const channelUrl = rawUrl
+              ? rawUrl.startsWith("http://") || rawUrl.startsWith("https://")
+                ? rawUrl
+                : `https://${rawUrl}`
+              : source.name.includes(".")
+              ? `https://${source.name.trim()}`
+              : `https://www.google.com/search?q=${encodeURIComponent(source.name + " official website")}`;
+
             return (
-              <motion.div
+              <motion.a
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 key={`${source.name}-${source.regionHint}-${index}`}
-                className={`group flex flex-col gap-4 rounded-2xl border border-slate-200 bg-gradient-to-r p-4 shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md sm:flex-row sm:items-center sm:justify-between dark:border-slate-700 dark:hover:border-slate-600 ${accentStyle.panel}`}
+                href={channelUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-gradient-to-r p-3.5 sm:p-4 shadow-xs transition-all duration-300 hover:border-slate-300 hover:bg-white hover:shadow-md active:scale-[0.99] dark:border-slate-700 dark:hover:border-slate-600 dark:hover:bg-slate-800 ${accentStyle.panel}`}
               >
-                <div className="flex min-w-0 flex-1 items-start gap-4">
+                {/* Channel Info: Logo + Channel Name & Verified Badge */}
+                <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-3.5">
                   <SourceLogo
                     src={logoSrc}
                     alt={source.name}
                     fallbackLabel={source.name}
-                    sizeClassName="h-12 w-12"
+                    sizeClassName="h-11 w-11 sm:h-12 sm:w-12 shrink-0 rounded-xl shadow-xs"
                   />
 
-                  <div className="flex min-w-0 flex-1 flex-col gap-1.5 xl:flex-row xl:items-center xl:gap-5">
-                    <div className="min-w-0 xl:min-w-[140px]">
-                      <div className="flex items-center gap-1.5">
-                        <p className="truncate text-base font-bold text-[var(--foreground)]">
-                          {source.name}
-                        </p>
-                        <BadgeCheck size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
-                      </div>
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted)]">
-                        {source.regionHint}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate text-base font-bold text-[var(--foreground)] group-hover:text-indigo-600 transition-colors dark:group-hover:text-indigo-400">
+                        {source.name}
                       </p>
+                      <BadgeCheck size={16} className="text-blue-500 fill-blue-500/10 shrink-0" />
                     </div>
-
-                    <div className="hidden h-8 w-px bg-slate-200 dark:bg-slate-800 xl:block" />
-
-                    <p className="min-w-0 flex-1 break-words text-sm leading-relaxed text-[var(--muted)] line-clamp-2 xl:line-clamp-1">
-                      {source.reason}
-                    </p>
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-1 sm:justify-end sm:pt-0">
+                {/* Follow Button */}
+                <div className="shrink-0">
                   <button
                     type="button"
-                    onClick={() => onToggleSource(source.name)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onToggleSource(source.name);
+                    }}
                     disabled={isSaving}
-                    className={`inline-flex min-w-[120px] shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-5 py-2.5 text-sm font-bold transition-all active:scale-95 ${
+                    className={`inline-flex min-w-[96px] sm:min-w-[108px] shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-4 py-2 text-xs sm:text-sm font-bold transition-all active:scale-95 ${
                       isFollowing
                         ? "border-indigo-500/30 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20"
-                        : "border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700"
+                        : "border-slate-200 bg-white text-slate-700 shadow-xs hover:border-slate-300 hover:bg-slate-50 hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700"
                     }`}
                   >
                     {isSaving ? (
@@ -182,7 +190,7 @@ export default function ExploreLiveStoriesAndVoices({
                     )}
                   </button>
                 </div>
-              </motion.div>
+              </motion.a>
             );
           })}
         </div>

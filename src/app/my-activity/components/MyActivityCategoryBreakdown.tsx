@@ -19,7 +19,7 @@ export default function MyActivityCategoryBreakdown({
   return (
     <Panel
       title="Category breakdown"
-      description="Categories are ranked by how often you used them during a selected period."
+      description="Categories ranked by your usage this period."
     >
       {categoryBreakdown.length > 0 ? (
         <div className="grid gap-x-10 gap-y-6 sm:grid-cols-2">

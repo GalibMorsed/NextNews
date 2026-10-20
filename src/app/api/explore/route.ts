@@ -199,7 +199,28 @@ function normalizeCategories(raw: unknown): ExploreCategorySuggestion[] {
       };
     })
     .filter((item): item is ExploreCategorySuggestion => Boolean(item))
-    .slice(0, 3);
+    .slice(0, 6);
+}
+
+function fillCategorySuggestions(
+  suggestions: ExploreCategorySuggestion[],
+  fallback: ExploreCategorySuggestion[],
+): ExploreCategorySuggestion[] {
+  const seen = new Set<string>();
+  const filled = suggestions.filter((category) => {
+    if (seen.has(category.slug)) return false;
+    seen.add(category.slug);
+    return true;
+  }).slice(0, 6);
+
+  for (const category of fallback) {
+    if (filled.length >= 6) break;
+    if (seen.has(category.slug)) continue;
+    filled.push(category);
+    seen.add(category.slug);
+  }
+
+  return filled;
 }
 
 function normalizeSources(raw: unknown): ExploreSourceSuggestion[] {
@@ -286,7 +307,7 @@ function fallbackInsights(
       };
     });
 
-  const fallbackCategories = EXPLORE_CATEGORY_OPTIONS.slice(0, 3).map((item) => ({
+  const fallbackCategories = EXPLORE_CATEGORY_OPTIONS.slice(0, 8).map((item) => ({
     slug: item.slug,
     title: item.title,
     description: item.description,
@@ -356,7 +377,7 @@ async function fetchAiInsights(
     "}",
     "Rules:",
     "- 5 trending topics.",
-    "- exactly 3 category suggestions.",
+    "- exactly 8 distinct category suggestions.",
     "- up to 6 source suggestions.",
     "- Use only category slugs from the allowed list.",
     "- Keep all text concise and product-ready.",
@@ -456,10 +477,10 @@ export async function GET(request: Request) {
         query,
         heroArticle,
         sideArticles,
-        moreStoryCategories:
-          aiInsights?.moreStoryCategories.length
-            ? aiInsights.moreStoryCategories
-            : fallback.moreStoryCategories,
+        moreStoryCategories: fillCategorySuggestions(
+          aiInsights?.moreStoryCategories ?? [],
+          fallback.moreStoryCategories,
+        ),
         trendingTopics:
           aiInsights?.trendingTopics.length
             ? aiInsights.trendingTopics

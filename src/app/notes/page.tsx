@@ -11,6 +11,7 @@ interface Note {
   article_date?: string;
   source_name?: string;
   content: string;
+  is_pinned?: boolean;
 }
 
 export default function NotesPage() {
@@ -54,6 +55,8 @@ export default function NotesPage() {
   const sortedNotes = useMemo(
     () =>
       [...notes].sort((a, b) => {
+        const pinOrder = Number(Boolean(b.is_pinned)) - Number(Boolean(a.is_pinned));
+        if (pinOrder !== 0) return pinOrder;
         const dateA = a.article_date ? new Date(a.article_date).getTime() : 0;
         const dateB = b.article_date ? new Date(b.article_date).getTime() : 0;
         return dateB - dateA;
@@ -63,50 +66,50 @@ export default function NotesPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-10 dark:bg-slate-900 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl animate-pulse space-y-5">
+      <main className="min-h-screen bg-slate-50 px-2 py-8 sm:px-4 sm:py-10 dark:bg-slate-900">
+        <div className="mx-auto w-full max-w-[90%] animate-pulse space-y-5">
           <div className="h-28 rounded-3xl bg-white dark:bg-slate-800" />
-          <div className="h-40 rounded-2xl bg-white dark:bg-slate-800" />
-          <div className="h-40 rounded-2xl bg-white dark:bg-slate-800" />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
+            <div className="h-44 rounded-2xl bg-white dark:bg-slate-800" />
+            <div className="h-44 rounded-2xl bg-white dark:bg-slate-800" />
+            <div className="h-44 rounded-2xl bg-white dark:bg-slate-800" />
+            <div className="h-44 rounded-2xl bg-white dark:bg-slate-800" />
+          </div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="relative min-h-screen bg-slate-50 px-4 py-10 dark:bg-slate-950 sm:px-6 lg:px-8">
+    <main className="relative min-h-screen bg-slate-50 px-2 py-8 sm:px-4 sm:py-10 dark:bg-slate-950">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_#e2e8f0,_#f8fafc_55%,_#ffffff)] dark:hidden" />
-      <div className="relative mx-auto max-w-5xl space-y-6">
-        <section className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm backdrop-blur transition hover:shadow-md dark:border-slate-700 dark:bg-slate-800/90 sm:p-8">
-          {/* subtle animated background */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-blue-50/0 via-blue-50/40 to-purple-50/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:via-slate-700/40" />
-
-          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative mx-auto w-full max-w-[90%] space-y-4 sm:space-y-6">
+        <section className="relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white/80 px-4 py-3.5 sm:px-6 sm:py-4 shadow-xs backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div>
-              <span className="mb-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                Saved Notes
-              </span>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+                  Your Notes
+                </h1>
+                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200/80 bg-indigo-50/80 px-2 py-0.5 text-[10px] font-bold text-indigo-700 uppercase tracking-wider dark:border-indigo-900/60 dark:bg-indigo-950/50 dark:text-indigo-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                  Archive
+                </span>
+              </div>
 
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
-                Your Notes
-              </h1>
-
-              <p className="mt-2 max-w-xl text-sm text-slate-600 dark:text-slate-300 sm:text-base">
-                All your article highlights, summaries, and thoughts — neatly
-                organized and always accessible.
+              <p className="mt-1 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400">
+                Your highlights, summaries, and notes, organized in one place.
               </p>
             </div>
 
-            {/* count card */}
-            <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-6 py-4 text-center transition hover:scale-[1.03] dark:border-slate-700 dark:bg-slate-700/60">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
-                  Total Notes
-                </p>
-                <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">
-                  {notes.length}
-                </p>
-              </div>
+            {/* Compact count badge */}
+            <div className="flex items-center self-start sm:self-auto gap-2.5 rounded-xl border border-slate-200/90 bg-slate-50/90 px-3.5 py-1.5 dark:border-slate-800 dark:bg-slate-800/70">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Total Notes:
+              </span>
+              <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100 tabular-nums">
+                {notes.length}
+              </span>
             </div>
           </div>
         </section>
@@ -137,7 +140,7 @@ export default function NotesPage() {
         ) : null}
 
         {sortedNotes.length > 0 ? (
-          <section className="grid gap-4">
+          <section className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 md:gap-5 lg:gap-6 items-stretch">
             {sortedNotes.map((note) => (
               <NoteCard
                 key={note.id}
@@ -149,6 +152,13 @@ export default function NotesPage() {
                   setNotes((prev) =>
                     prev.map((item) =>
                       item.id === id ? { ...item, content } : item,
+                    ),
+                  )
+                }
+                onPinned={(id, isPinned) =>
+                  setNotes((prev) =>
+                    prev.map((item) =>
+                      item.id === id ? { ...item, is_pinned: isPinned } : item,
                     ),
                   )
                 }
