@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { MotionConfig, motion } from "framer-motion";
 import {
   Activity,
   Bot,
   BrainCircuit,
-  FileText,
+  BookOpenCheck,
   Flame,
   Loader2,
   Lock,
+  NotebookPen,
   Sparkles,
 } from "lucide-react";
 import { getVerifiedAuthUser } from "@/lib/clientAuth";
@@ -376,6 +377,25 @@ export default function MyActivityPage() {
     return { current, best };
   }, [engagementDays]);
 
+  const streakDelta = useMemo(() => {
+    const days = Array.from(previousEngagementDays.keys()).sort();
+    let prevStreak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 0; i < days.length; i += 1) {
+      const idx = days.length - 1 - i;
+      const expected = today.getTime() - i * 86400000;
+      if (new Date(`${days[idx]}T00:00:00`).getTime() === expected)
+        prevStreak += 1;
+      else break;
+    }
+    return prevStreak > 0
+      ? Math.round(((streak.current - prevStreak) / prevStreak) * 100)
+      : streak.current > 0
+        ? 100
+        : 0;
+  }, [previousEngagementDays, streak.current]);
+
   // Goal Tracker Persistence & Logic
   const [weeklyGoal, setWeeklyGoal] = useState<number>(
     DEFAULT_GOAL_TRACKER_STATE.weeklyGoal,
@@ -672,6 +692,7 @@ export default function MyActivityPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_28%),linear-gradient(to_bottom,_#fafaf9,_#ffffff_28%)] px-4 py-6 sm:px-6 lg:px-8 dark:bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.12),_transparent_24%),linear-gradient(to_bottom,_#020617,_#0f172a_38%,_#020617)]">
+      <MotionConfig reducedMotion="user">
       {!isAuthResolved ? (
         <div className="mx-auto w-full max-w-3xl">
           <div className="rounded-3xl border border-slate-200/80 bg-white/92 p-8 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/88">
@@ -731,30 +752,31 @@ export default function MyActivityPage() {
             pageError={pageError}
           />
 
-          <section className="grid min-w-0 grid-cols-2 gap-4 xl:grid-cols-4">
+          <section className="grid min-w-0 grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
             <MetricCard
               title="Articles read"
               value={articleCount}
               delta={articleDelta}
-              subtitle="How many opened articles with in this range."
-              icon={<FileText className="h-5 w-5" />}
+              subtitle="Articles opened in this range."
+              icon={<BookOpenCheck className="h-5 w-5" />}
             />
             <MetricCard
               title="Notes added"
               value={noteCount}
               delta={noteDelta}
-              subtitle="Saved notes and highlights from your account."
-              icon={<FileText className="h-5 w-5" />}
+              subtitle="Your saved notes and highlights."
+              icon={<NotebookPen className="h-5 w-5" />}
             />
             <MetricCard
               title="Reading streak"
               value={streak.current}
               suffix={streak.current === 1 ? "day" : "days"}
+              delta={streakDelta}
               subtitle={`Personal best: ${streak.best} day${streak.best === 1 ? "" : "s"} in a row.`}
               icon={<Flame className="h-5 w-5" />}
             />
             <MetricCard
-              title="Total engagement"
+              title="Engagement"
               value={totalEngagement}
               suffix="%"
               delta={totalEngagementDelta}
@@ -795,6 +817,7 @@ export default function MyActivityPage() {
           </section>
         </motion.div>
       )}
+      </MotionConfig>
     </main>
   );
 }

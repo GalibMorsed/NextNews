@@ -77,15 +77,15 @@ export default function MyActivityGoalTracker({
   return (
     <Panel
       title="Goal tracker"
-      description="Weekly reading goal — resets every Monday"
+      description="Weekly reading goal."
       icon={<Target className="h-5 w-5" />}
     >
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-        <div className="flex items-baseline gap-2">
-          <span className="text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+      <div className="mb-4 flex flex-nowrap items-center justify-between gap-2">
+        <div className="flex min-w-0 items-baseline gap-1.5 sm:gap-2">
+          <span className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-5xl">
             {currentWeekProgress}
           </span>
-          <span className="text-lg font-medium text-slate-400 dark:text-slate-500">
+          <span className="whitespace-nowrap text-sm font-medium text-slate-400 dark:text-slate-500 sm:text-lg">
             / {weeklyGoal} activities
           </span>
         </div>
@@ -93,9 +93,9 @@ export default function MyActivityGoalTracker({
         <motion.div
           whileHover={{ scale: 1.04 }}
           transition={softSpring}
-          className="flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-300"
+          className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-300 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
         >
-          <Flame className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          <Flame className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 sm:h-4 sm:w-4" />
           {weeklyStreak}-week streak
         </motion.div>
       </div>

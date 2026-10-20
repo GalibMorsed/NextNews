@@ -39,6 +39,7 @@ export default function MyActivityDailyActivity({
               </div>
               <div className="flex h-[180px] w-full items-end">
                 <motion.div
+                  key={`${item.label}-${item.count}`}
                   initial={{ height: 0, opacity: 0.7 }}
                   animate={{ height: `${height}px`, opacity: 1 }}
                   transition={{
@@ -52,43 +53,13 @@ export default function MyActivityDailyActivity({
                 >
                   <motion.span
                     aria-hidden
-                    className="absolute inset-x-[12%] top-2 h-5 rounded-full bg-white/20 blur-sm"
-                    animate={{
-                      x: ["-6%", "7%", "-4%"],
-                      y: [0, 3, 0],
-                      scaleX: [1, 1.12, 0.96],
-                    }}
+                    className="absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    initial={{ x: "-100%", opacity: 0 }}
+                    animate={{ x: "300%", opacity: [0, 1, 0] }}
                     transition={{
-                      duration: 3.6,
-                      repeat: Infinity,
+                      duration: 0.8,
                       ease: "easeInOut",
-                      delay: index * 0.15,
-                    }}
-                  />
-                  <motion.span
-                    aria-hidden
-                    className="absolute -bottom-2 left-[18%] h-10 w-[68%] rounded-full bg-emerald-300/30 blur-md dark:bg-emerald-200/20"
-                    animate={{
-                      x: ["-10%", "8%", "-6%"],
-                      scaleX: [0.94, 1.06, 0.98],
-                      scaleY: [1, 0.92, 1],
-                    }}
-                    transition={{
-                      duration: 4.4,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 0.2 + index * 0.12,
-                    }}
-                  />
-                  <motion.span
-                    aria-hidden
-                    className="absolute inset-x-0 top-0 h-[1px] bg-white/50"
-                    animate={{ opacity: [0.35, 0.7, 0.35] }}
-                    transition={{
-                      duration: 2.6,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: index * 0.1,
+                      delay: 0.25 + index * 0.06,
                     }}
                   />
                 </motion.div>

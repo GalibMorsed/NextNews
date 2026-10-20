@@ -44,28 +44,38 @@ export default function MyActivityAiAnalysts({
   return (
     <Panel
       title="AI analysts"
-      description="Your AI usage activity across summaries and personalized suggestions."
+      description="AI usage: summaries and suggestions."
       icon={<Bot className="h-5 w-5" />}
     >
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
-        {analystCards.map(({ title, description, icon: Icon, delta }) => (
+        {analystCards.map(({ title, description, icon: Icon, delta }, index) => (
           <motion.article
             key={title}
-            whileHover={{ y: -4, transition: softSpring }}
-            className="rounded-[24px] border border-slate-200/80 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(240,253,250,0.85))] p-5 shadow-sm dark:border-slate-700/80 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,0.96),_rgba(10,18,34,0.92))] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_10px_30px_-15px_rgba(16,185,129,0.1)]"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...softSpring, delay: index * 0.05 }}
+            whileHover={{ y: -2, transition: softSpring }}
+            className="rounded-2xl sm:rounded-[24px] border border-slate-200/90 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95),_rgba(240,253,250,0.85))] p-4 sm:p-5 shadow-xs sm:shadow-sm dark:border-slate-800 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,0.96),_rgba(10,18,34,0.92))] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_10px_30px_-15px_rgba(16,185,129,0.1)]"
           >
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 dark:ring-1 dark:ring-emerald-700/30">
-              <Icon className="h-5 w-5" />
-            </span>
-            <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
-              {title}
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300/90">
+            {/* 1st row on mobile: Icon and Title inline together */}
+            <div className="flex items-center gap-3 sm:block">
+              <span className="inline-flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 dark:ring-1 dark:ring-emerald-700/30">
+                <Icon className="h-5 w-5" />
+              </span>
+              <h3 className="text-base sm:text-lg font-bold sm:font-semibold text-slate-900 dark:text-slate-100 sm:mt-4">
+                {title}
+              </h3>
+            </div>
+
+            {/* 2nd row on mobile: Normal text */}
+            <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-300/90 sm:mt-2 sm:leading-6">
               {description}
             </p>
+
+            {/* 3rd row on mobile: Period delta text badge */}
             {typeof delta === "number" ? (
               <div
-                className={`mt-4 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
+                className={`mt-3 sm:mt-4 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
                   delta >= 0
                     ? "border-emerald-200/60 bg-emerald-50 text-emerald-700 dark:border-emerald-700/40 dark:bg-emerald-950/40 dark:text-emerald-300"
                     : "border-rose-200/60 bg-rose-50 text-rose-700 dark:border-rose-700/40 dark:bg-rose-950/40 dark:text-rose-300"
