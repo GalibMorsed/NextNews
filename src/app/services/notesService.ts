@@ -19,6 +19,7 @@ export interface UserNote {
   article_date: string;
   source_name: string;
   content: string;
+  is_pinned?: boolean;
   created_at: string;
 }
 
@@ -136,6 +137,31 @@ export async function updateNote(id: string, content: string) {
   const notes = Array.isArray(data?.notes) ? (data.notes as UserNote[]) : [];
   const updatedNotes = notes.map((note) =>
     note.id === id ? { ...note, content } : note,
+  );
+
+  return supabase
+    .from("user_notes")
+    .update({
+      notes: updatedNotes,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", user.id);
+}
+
+export async function setNotePinned(id: string, isPinned: boolean) {
+  const user = await getAuthenticatedUser();
+
+  const { data, error } = await supabase
+    .from("user_notes")
+    .select("notes")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) return { data: null, error };
+
+  const notes = Array.isArray(data?.notes) ? (data.notes as UserNote[]) : [];
+  const updatedNotes = notes.map((note) =>
+    note.id === id ? { ...note, is_pinned: isPinned } : note,
   );
 
   return supabase
