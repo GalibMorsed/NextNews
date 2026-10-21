@@ -75,7 +75,6 @@ type BillingSettingsCardProps = {
 };
 
 type SettingsHeaderSectionProps = {
-  badge: string;
   title: string;
   subtitle: string;
 };
@@ -407,24 +406,20 @@ export function SettingsCard({
 }
 
 export function SettingsHeaderSection({
-  badge,
   title,
   subtitle,
 }: SettingsHeaderSectionProps) {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-800/60 p-5 shadow-sm backdrop-blur-xl sm:p-6"
+      className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200/80 bg-white/90 p-4 sm:px-5 sm:py-3.5 shadow-2xs backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/85"
     >
-      <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[var(--primary)]/5 blur-3xl dark:bg-[var(--primary)]/10" />
-      <span className="relative mb-3 inline-flex rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-        {badge}
-      </span>
-      <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 bg-clip-text text-transparent dark:from-white dark:via-indigo-200 dark:to-violet-200">
+      <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-indigo-500/5 blur-2xl dark:bg-indigo-500/10" />
+      <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
         {title}
       </h1>
-      <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 sm:text-base">
+      <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
         {subtitle}
       </p>
     </motion.section>
