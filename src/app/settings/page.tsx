@@ -443,9 +443,8 @@ export default function AccountSettingsPage() {
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 px-4 py-8 sm:px-6 md:py-10 lg:px-8 transition-colors duration-500">
       <div className="mx-auto w-full max-w-5xl space-y-6">
         <SettingsHeaderSection
-          badge="User Profile"
           title="Account Settings"
-          subtitle="Manage profile, security, preferences, and communication settings.🧠"
+          subtitle="Manage your profile, security, and preferences. 🧠"
         />
 
         <PlanSettingsCard />
