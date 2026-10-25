@@ -66,8 +66,8 @@ export default function NotesPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-slate-50 px-2 py-8 sm:px-4 sm:py-10 dark:bg-slate-900">
-        <div className="mx-auto w-full max-w-[90%] animate-pulse space-y-5">
+      <main className="min-h-screen bg-slate-50 py-8 sm:py-10 dark:bg-slate-900">
+        <div className="mx-auto w-[90%] animate-pulse space-y-5">
           <div className="h-28 rounded-3xl bg-white dark:bg-slate-800" />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
             <div className="h-44 rounded-2xl bg-white dark:bg-slate-800" />
@@ -81,9 +81,9 @@ export default function NotesPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-slate-50 px-2 py-8 sm:px-4 sm:py-10 dark:bg-slate-950">
+    <main className="relative min-h-screen bg-slate-50 py-8 sm:py-10 dark:bg-slate-950">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_#e2e8f0,_#f8fafc_55%,_#ffffff)] dark:hidden" />
-      <div className="relative mx-auto w-full max-w-[90%] space-y-4 sm:space-y-6">
+      <div className="relative mx-auto w-[90%] space-y-4 sm:space-y-6">
         <section className="relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white/80 px-4 py-3.5 sm:px-6 sm:py-4 shadow-xs backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div>
