@@ -8,7 +8,14 @@ export const metadata = {
 };
 
 export default async function FifaPage() {
-  const { articles } = await fetchFifaNews(1, 20);
+  let articles = [];
+
+  try {
+    const data = await fetchFifaNews(1, 20);
+    articles = data.articles;
+  } catch (error) {
+    console.error("Failed to load FIFA news during prerender:", error);
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-slate-50 px-0 py-6 md:px-8 md:py-8 lg:px-12 lg:py-12 dark:bg-[#0B0F19]">
