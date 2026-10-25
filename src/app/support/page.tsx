@@ -99,28 +99,28 @@ export default function SupportPage() {
       title: "FAQ",
       desc: "Browse common questions and quick solutions.",
       icon: (
-        <FaQuestionCircle className="text-[22px] text-black drop-shadow-sm transition-colors duration-300 dark:text-white" />
+        <FaQuestionCircle className="text-[17px] sm:text-[22px] text-black drop-shadow-sm transition-colors duration-300 dark:text-white" />
       ),
     },
     {
       title: "Live Chat",
       desc: "Chat with our support team in real time.",
       icon: (
-        <FaComments className="text-[22px] text-black drop-shadow-sm transition-colors duration-300 dark:text-white" />
+        <FaComments className="text-[17px] sm:text-[22px] text-black drop-shadow-sm transition-colors duration-300 dark:text-white" />
       ),
     },
     {
       title: "Phone Support",
       desc: "Call us during business hours.",
       icon: (
-        <FaPhoneAlt className="text-[22px] text-black drop-shadow-sm transition-colors duration-300 dark:text-white" />
+        <FaPhoneAlt className="text-[15px] sm:text-[22px] text-black drop-shadow-sm transition-colors duration-300 dark:text-white" />
       ),
     },
     {
       title: "Email Support",
       desc: "Write us about any Assistance or Feedback.",
       icon: (
-        <FaEnvelope className="text-[22px] text-black drop-shadow-sm transition-colors duration-300 dark:text-white" />
+        <FaEnvelope className="text-[17px] sm:text-[22px] text-black drop-shadow-sm transition-colors duration-300 dark:text-white" />
       ),
     },
   ];
@@ -331,34 +331,40 @@ export default function SupportPage() {
                   </motion.span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-5">
                   {supportOptions.map((item, index) => (
                     <motion.div
                       key={item.title}
-                      className="group flex cursor-pointer items-start gap-5 overflow-hidden rounded-2xl border border-slate-200/60 bg-white/60 p-5 shadow-sm shadow-teal-100/10 backdrop-blur-md transition-all duration-300 hover:border-teal-300/80 hover:bg-gradient-to-br hover:from-white hover:to-teal-50/50 hover:shadow-lg hover:shadow-teal-200/30 dark:border-slate-700/60 dark:bg-slate-800/60 dark:hover:border-teal-700/60 dark:hover:from-slate-800 dark:hover:to-teal-950/40 dark:hover:shadow-teal-900/30"
-                      initial={{ opacity: 0, y: 20 }}
+                      className="group flex flex-col sm:flex-row cursor-pointer sm:items-start sm:gap-4 overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200/70 bg-white/70 p-3 sm:p-5 shadow-xs backdrop-blur-md transition-all duration-300 hover:border-teal-300/80 hover:bg-gradient-to-br hover:from-white hover:to-teal-50/50 hover:shadow-md dark:border-slate-700/60 dark:bg-slate-800/60 dark:hover:border-teal-700/60 dark:hover:from-slate-800 dark:hover:to-teal-950/40"
+                      initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
-                        duration: 0.4,
-                        delay: 0.2 + 0.1 * index,
+                        duration: 0.35,
+                        delay: 0.15 + 0.08 * index,
                         ease: "easeOut",
                       }}
-                      whileHover={{ y: -4, scale: 1.02 }}
+                      whileHover={{ y: -3, scale: 1.01 }}
                       onClick={() => handleOptionClick(item.title)}
                     >
-                      <motion.div
-                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-50 to-cyan-50 shadow-inner ring-1 ring-teal-100/80 transition-all duration-300 group-hover:from-teal-100 group-hover:to-cyan-100 dark:from-teal-950/40 dark:to-cyan-950/20 dark:ring-teal-900/50 dark:group-hover:from-teal-900/60 dark:group-hover:to-cyan-900/40"
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        {item.icon}
-                      </motion.div>
+                      <div className="flex items-center gap-2 sm:block sm:shrink-0">
+                        <motion.div
+                          className="flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-br from-teal-50 to-cyan-50 shadow-inner ring-1 ring-teal-100/80 transition-all duration-300 group-hover:from-teal-100 group-hover:to-cyan-100 dark:from-teal-950/40 dark:to-cyan-950/20 dark:ring-teal-900/50 dark:group-hover:from-teal-900/60 dark:group-hover:to-cyan-900/40"
+                          whileHover={{ scale: 1.08, rotate: 4 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {item.icon}
+                        </motion.div>
 
-                      <div className="min-w-0 flex-1 pt-1">
-                        <h3 className="truncate font-semibold text-slate-900 transition-colors duration-300 group-hover:text-teal-600 dark:text-slate-100 dark:group-hover:text-teal-400">
+                        <h3 className="sm:hidden truncate text-xs font-bold text-slate-900 transition-colors duration-300 group-hover:text-teal-600 dark:text-slate-100 dark:group-hover:text-teal-400">
                           {item.title}
                         </h3>
-                        <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      </div>
+
+                      <div className="min-w-0 flex-1 sm:pt-0.5">
+                        <h3 className="hidden sm:block truncate text-base font-semibold text-slate-900 transition-colors duration-300 group-hover:text-teal-600 dark:text-slate-100 dark:group-hover:text-teal-400">
+                          {item.title}
+                        </h3>
+                        <p className="mt-1.5 sm:mt-1 line-clamp-2 text-[11px] sm:text-sm leading-snug sm:leading-relaxed text-slate-600 dark:text-slate-400">
                           {item.desc}
                         </p>
                       </div>

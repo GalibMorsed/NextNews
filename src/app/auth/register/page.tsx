@@ -494,7 +494,7 @@ export default function RegisterPage() {
             </div>
 
             <h1 className="text-2xl font-bold leading-tight text-slate-900 sm:text-3xl dark:text-slate-100">
-              Create your account and personalize your news flow.
+              Create your account and personalize your flow.
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base dark:text-slate-400">
               Get curated categories, saved preferences, and faster access
