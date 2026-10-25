@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function FifaPage() {
-  let articles = [];
+  let articles: Awaited<ReturnType<typeof fetchFifaNews>>["articles"] = [];
 
   try {
     const data = await fetchFifaNews(1, 20);
